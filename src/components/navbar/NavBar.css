@@ -1,0 +1,31 @@
+nav {
+    background-color: #656565; /* Sfondo scuro per la navbar */
+    color: white; /* Testo bianco */
+    padding: 10px 0; /* Aggiunge un po' di spazio interno */
+    position: sticky; /* Rende la navbar fissa in cima alla pagina */
+    top: 0; /* Posiziona la navbar in cima */
+    z-index: 1000; /* Assicura che la navbar sia sopra altri elementi */
+}
+
+nav ul {
+    list-style: none; /* Rimuove i pallini dalle liste */
+    display: flex; /* Dispone gli elementi in orizzontale */
+    margin: 0;
+    padding: 0;
+    justify-content: center; /* Centra gli elementi orizzontalmente */
+}
+
+nav li {
+    margin: 0 25px; /* Aggiunge spazio tra gli elementi */
+}
+
+nav a {
+    color: #e1e1e1; /* Testo bianco per i link */
+    text-decoration: none; /* Rimuove la sottolineatura dai link */
+    font-size: 20px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+nav a:hover {
+    text-decoration: underline; /* Sottolinea i link al passaggio del mouse */
+}
