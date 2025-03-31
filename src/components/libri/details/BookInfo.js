@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import '../Books.css';
 import {useParams} from "react-router-dom";
+import Cookies from "js-cookie";
 
 const BookInfo = () => {
 
@@ -14,6 +15,9 @@ const BookInfo = () => {
         const [book, setBook] = useState({});
         const [previousBook, setPreviousBook] = useState({});
         const [nextBook, setNextBook] = useState({});
+
+        const [images, setImages] = useState([]);
+        const [file, setFile] = useState(null);
 
         const [recensioni, setRecensioni] = useState([]);
 
@@ -35,6 +39,23 @@ const BookInfo = () => {
                     const nextBookResponse = await axios.get(`/api/libri/exists/${nextId}`);
                     setNextBook(nextBookResponse.data);
 
+                    console.log("imagesResponse 1");
+                    const imagesResponse = await axios.get(`/api/images/${id}`, {
+                        responseType: 'arraybuffer',
+                    }).then(response => {
+                        const base64 = btoa(
+                            new Uint8Array(imagesResponse.data).reduce(
+                                (data, byte) => data + String.fromCharCode(byte),
+                                ''
+                            )
+                        );
+                        setImages(`data:${imagesResponse.headers['content-type']};base64,${base64}`);
+                    })
+                        .catch(() => {
+                            console.warn("No image found for this book");
+                            setLoading(false);
+                        });
+
                     const recensioniResponse = await axios.get(`/api/recensioni/all/${id}`);
                     const recensioni = recensioniResponse.data;
                     const userRequests = recensioni.map(recensione =>
@@ -47,6 +68,7 @@ const BookInfo = () => {
 
                     const recensioniWithUsername = await Promise.all(userRequests);
                     setRecensioni(recensioniWithUsername);
+
                     setLoading(false);
                 } catch (error) {
                     setError(error);
@@ -69,6 +91,25 @@ const BookInfo = () => {
             }
         }
 
+        const handleUpload = () => {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            axios.post(`/api/images/${id}`, formData, {
+                headers: {
+                    "Authorization": `Bearer ${ Cookies.get('XSRF-TOKEN')}`,
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true
+            })
+                .then(response => {
+                    console.log('File uploaded successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error uploading file:', error);
+                });
+        }
+
         console.log(loading + " " + error + " " + book);
         if (loading) {
             return <div className={"centered"}>Caricamento...</div>;
@@ -84,33 +125,35 @@ const BookInfo = () => {
 
         return [
             <div className={"book-page"}>
-                <h1>Book Details</h1>
-                <h2>{book.titolo}</h2>
-                <p><strong>Autore:</strong> {book.autore}</p>
-                <p><strong>Genere:</strong> {book.genere}</p>
-
-                <div className={"section"}>
-                    <h3>Acquisto</h3>
-
-                    <p style={{fontSize: 18}}>Prezzo: {rifornimento.prezzo} €</p>
-
-                    <p><b style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
 
 
-                    <button className={"button"}>Aggiungi al carrello</button>
-                    <button className={"button"}>Acquista</button>
+                <div className={"side"}>
+                    <div className={"left"}>
+                        <h2>{book.titolo}</h2>
+                        <p><strong>Autore:</strong> {book.autore}</p>
+                        <p><strong>Genere:</strong> {book.genere}</p>
+
+                        {images && images.length > 0 && (
+                            <img src={images} alt="Book Cover" className={"book-cover"}/>
+                        )}
+
+                    </div>
+
+                    <div className={"section"}>
+                        <h3>Acquisto</h3>
+
+                        <p style={{fontSize: 18}}>Prezzo: {rifornimento.prezzo} €</p>
+
+                        <p><b style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
+
+
+                        <button className={"button"}>Aggiungi al carrello</button>
+                        <button className={"button"}>Acquista</button>
+                    </div>
                 </div>
 
-                <div className={"section"}>
-                    <h3>Amministrazione</h3>
-                    <p>Comandi utili per la gestione del libro</p>
 
-                    <button className="button">Modifica</button>
-
-                    <button className="button">Elimina</button>
-                </div>
-
-                <div className={"section"}>
+                <div className={"large-section"}>
                     <h3>Recensioni</h3>
                     <p>Le recensioni degli utenti</p>
 
@@ -121,6 +164,7 @@ const BookInfo = () => {
                             return (
                                 <div className={"recensione"} key={recensione.id}>
                                     <p>{recensione.utente}</p>
+
 
                                     <a>{'⭐'.repeat(recensione.stelle)} <b>{recensione.titolo}</b></a> <br/>
                                     <a className={"publish"}>Pubblicato
@@ -142,6 +186,20 @@ const BookInfo = () => {
                         }
                     )}
                 </div>
+
+
+                <div className={"section"}>
+                    <h3>Amministrazione</h3>
+                    <p>Comandi utili per la gestione del libro</p>
+
+                    <button className="button">Modifica</button>
+
+                    <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])}/>
+                    <button className="button" onClick={handleUpload}>Carica foto</button>
+
+                    <button className="button">Elimina</button>
+                </div>
+
             </div>
             ,
 
