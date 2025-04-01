@@ -98,7 +98,8 @@ const BookInfo = () => {
             axios.post(`/api/images/${id}`, formData, {
                 headers: {
                     "Authorization": `Bearer ${ Cookies.get('XSRF-TOKEN')}`,
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
                 },
                 withCredentials: true
             })
