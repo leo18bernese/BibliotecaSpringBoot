@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.image;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,17 +15,26 @@ public class ImageController {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/images";
 
-    @PostMapping("/{productId} ")
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+    @PostMapping("/{productId}")
     public ResponseEntity<String> uploadImage(@PathVariable Long productId,
                                               @RequestParam("file") MultipartFile file) {
+        System.out.println("ImageController: uploadImage called " + productId + " " + file.getOriginalFilename());
+
         try {
             String finalPath = UPLOAD_DIR + "/" + productId;
+
+            Path dirPath = Paths.get(finalPath);
+            if (!Files.exists(dirPath)) {
+                Files.createDirectories(dirPath);
+            }
 
             Path path = Paths.get(finalPath, file.getOriginalFilename());
             Files.write(path, file.getBytes());
 
             return ResponseEntity.ok("Image uploaded successfully");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Cannot upload image");
         }
     }
@@ -38,7 +48,11 @@ public class ImageController {
             byte[] image = Files.readAllBytes(path);
 
             return ResponseEntity.ok(image);
-        } catch (Exception e) {
+        }  catch (java.nio.file.AccessDeniedException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.noContent().build();
         }
     }

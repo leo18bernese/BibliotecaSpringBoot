@@ -4,6 +4,7 @@ import me.leoo.springboot.libri.recensioni.Recensione;
 import me.leoo.springboot.libri.recensioni.RecensioneRepository;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
+import me.leoo.springboot.libri.utente.UtenteService;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -24,6 +25,9 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private RecensioneRepository recensioneRepository;
 
+    @Autowired
+    private UtenteService utenteService;
+
     @Override
     public void run(String... args) throws Exception {
         libroRepository.save(new Libro("Moby Dick", "Herman Melville", "Avventura", 1851, 624, 3, 15.00));
@@ -41,7 +45,7 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("Libri caricati nel database: " + libri.size());
 
         Utente u = new Utente("Daniel18", "ciao1234", "Daniel", "Bello", "daniel@gmail.com");
-        Utente uu = utenteRepository.save(u);
+        Utente uu = utenteService.register(u);
 
 
         for (Libro libro : libri) {
