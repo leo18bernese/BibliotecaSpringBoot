@@ -1,95 +1,51 @@
 // src/App.js
-import React, {useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import './App.css';
 import NavBar from "./components/navbar/NavBar";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import SearchBooks from "./components/libri/search/SearchBooks";
 import BookInfo from "./components/libri/details/BookInfo";
-import Cookies from 'js-cookie';
-import axios from "axios";
-
-
-async function getCsrfToken() {
-    try {
-        const response = await axios.get("http://localhost:8080/csrf-token");
-
-        const token = response.data;
-        Cookies.set("csrftoken", token.token);
-        console.log("Token salvato:", token);
-    } catch (error) {
-        console.error("Errore di login:", error.response?.data || error.message);
-    }
-
-    return Cookies.get('csrftoken');
-}
+import {UserContext, UserProvider} from './components/user/UserContext';
+import Carrello from "./components/carrello/Carrello";
+import {CartProvider} from "./components/carrello/CartContext";
 
 function App() {
-    const [user, setUser] = useState(null);
+    return (
+        <UserProvider>
+            <CartProvider>
+                <Router>
+                    <NavBar/>
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/search" element={<SearchBooks/>}/>
+                        <Route path="/libri/:id" element={<BookInfo/>}/>
+                        <Route path="/account" element={<div>Account</div>}/>
+                        <Route path="/cart" element={<Carrello/>}/>
+                    </Routes>
+                </Router>
+            </CartProvider>
+        </UserProvider>
+    );
+}
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            const csrfToken = await getCsrfToken();
-            if (csrfToken) {
-                axios.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken;
-            } else {
-                console.error('CSRF token not found');
-            }
-
-            try {
-                const response = await axios.post("/api/auth/login", {
-                    username: "Daniel18",
-                    password: "ciao1234"
-                }, {
-                    headers: {
-                        'X-XSRF-TOKEN': csrfToken
-                    }
-                });
-
-                console.log("Login response:", response.data);
-
-                if (response.data) {
-                    setUser(response.data);
-                    Cookies.set('XSRF-TOKEN', response.data.token);
-                }
-            } catch (error) {
-                console.error("Login error:", error.response?.data || error.message);
-            }
-        };
-
-        fetchUser();
-    }, []);
+function Home() {
+    const {user} = useContext(UserContext);
 
     return (
-        <Router>
-            <NavBar/>
-            <Routes>
-                <Route path="/" element={
-                    <div className="App">
-                        <header className="App-header">
-                            <h1>Libri List</h1>
-
-                            {!user && (
-                                <div className={"user-info"}>
-                                    <h3>Login to see your information</h3>
-                                </div>
-                            )}
-
-                            {user && (
-                                <div className={"user-info"}>
-                                    <h3>Welcome, {user.username}!</h3>
-                                </div>
-                            )}
-                        </header>
-
-
+        <div className="App">
+            <header className="App-header">
+                <h1>Libri List</h1>
+                {!user ? (
+                    <div className="user-info">
+                        <h3>Login to see your information</h3>
                     </div>
-                }/>
-                <Route path="/search" element={<SearchBooks/>}/>
-                <Route path="/libri/:id" element={<BookInfo/>}/>
-            </Routes>
-
-
-        </Router>
+                ) : (
+                    <div className="user-info">
+                        <h3>Welcome, {user.username}!</h3>
+                    </div>
+                )}
+            </header>
+        </div>
     );
 }
 
