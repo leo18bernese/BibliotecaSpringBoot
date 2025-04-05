@@ -1,5 +1,7 @@
 package me.leoo.springboot.libri.libri;
 
+import me.leoo.springboot.libri.carrello.Carrello;
+import me.leoo.springboot.libri.carrello.CarrelloRepository;
 import me.leoo.springboot.libri.recensioni.Recensione;
 import me.leoo.springboot.libri.recensioni.RecensioneRepository;
 import me.leoo.springboot.libri.utente.Utente;
@@ -21,6 +23,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private UtenteRepository utenteRepository;
+
+    @Autowired
+    private CarrelloRepository carrelloRepository;
 
     @Autowired
     private RecensioneRepository recensioneRepository;
@@ -46,6 +51,9 @@ public class DataLoader implements CommandLineRunner {
 
         Utente u = new Utente("Daniel18", "ciao1234", "Daniel", "Bello", "daniel@gmail.com");
         Utente uu = utenteService.register(u);
+
+        Carrello carrello = new Carrello(uu);
+        carrelloRepository.save(carrello);
 
 
         for (Libro libro : libri) {

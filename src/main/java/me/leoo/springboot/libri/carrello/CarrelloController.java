@@ -25,8 +25,11 @@ public class CarrelloController {
     @GetMapping("/{id}")
     public ResponseEntity<Carrello> getCarrello(@PathVariable Long id) {
         try {
+
+            System.out.println(utenteRepository.findById(id));
             Utente utente = utenteRepository.findById(id).orElseThrow();
 
+            System.out.println(carrelloRepository.findByUtente(utente));
             Carrello carrello = carrelloRepository.findByUtente(utente).orElseThrow();
             return ResponseEntity.ok(carrello);
         } catch (Exception e) {
@@ -35,7 +38,8 @@ public class CarrelloController {
     }
 
     @PutMapping("/{id}/add/{libroId}")
-    public ResponseEntity<Carrello> addLibro(@PathVariable Long id, @PathVariable Long libroId, @RequestParam int quantita) {
+    public ResponseEntity<Carrello> addLibro(@PathVariable Long id, @PathVariable Long libroId,
+                                             @RequestParam("quantity") int quantita) {
         try {
             Utente utente = utenteRepository.findById(id).orElseThrow();
             Libro libro = libroRepository.findById(libroId).orElseThrow();
