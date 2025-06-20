@@ -9,11 +9,19 @@ import {UserContext, UserProvider} from './components/user/UserContext';
 import Carrello from "./components/carrello/Carrello";
 import {CartProvider} from "./components/carrello/CartContext";
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import ScrollToTop from "./components/utils/ScrollToTop";
+
+const queryClient = new QueryClient();
+
 function App() {
     return (
+        <QueryClientProvider client={queryClient}>
         <UserProvider>
             <CartProvider>
                 <Router>
+                    <ScrollToTop />
+
                     <NavBar/>
                     <Routes>
                         <Route path="/" element={<Home/>}/>
@@ -25,6 +33,7 @@ function App() {
                 </Router>
             </CartProvider>
         </UserProvider>
+        </QueryClientProvider>
     );
 }
 

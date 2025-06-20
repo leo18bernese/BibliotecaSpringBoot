@@ -15,15 +15,13 @@ export const CartProvider = ({children}) => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("quantity", quantity);
+        const requestBody = {
+            libroId: itemId,
+            quantita: quantity
+        };
 
-        const response = await axios.put(`api/carrello/${user.id}/add/${itemId}`,
-            formData, {
-                headers: {
-                    "Authorization": `Bearer ${Cookies.get('XSRF-TOKEN')}`
-                }
-            });
+        const response = await axios.post(`api/carrello/items`,
+            requestBody);
 
         if (response.status === 200) {
             console.log("Item added to cart:", response.data);

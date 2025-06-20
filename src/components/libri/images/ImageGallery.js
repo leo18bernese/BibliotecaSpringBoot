@@ -22,25 +22,25 @@ const ImageGallery = ({id, images, API_URL}) => {
                         src={`${API_URL}/${id}/name/${selectedImage}`}
                         alt={selectedImage}
                         className="max-w-full h-auto rounded-md mx-auto cursor-pointer"
-                        style={{maxHeight: '300px', objectFit: 'contain'}}
+                        style={{maxHeight: '500px', objectFit: 'contain'}}
                         onClick={handleImageClick}
                     />
                 )}
                 <div className="mt-4 w-full text-center text-gray-500 text-sm italic">
-                    Clicca sull'immagine per ingrandirla
+                    {selectedImage ? 'Clicca sull\'immagine per ingrandirla' : 'Nessuna immagine disponibile'}
                 </div>
             </div>
 
             {/* Thumbnail navigation (if you have multiple images) */}
             {images.length > 1 && (
-                <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                <div className="mt-4 flex flex-wrap justify-center">
                     {images.map((image, index) => (
                         <img
                             key={index}
                             src={`${API_URL}/${id}/name/${image}`}
                             alt={`Thumbnail ${index}`}
                             className={`w-16 h-16 object-cover rounded cursor-pointer border-2 ${
-                                selectedImage === image ? 'border-blue-500' : 'border-gray-200'
+                                selectedImage === image ? 'border-red-600' : 'border-gray-200'
                             }`}
                             onClick={() => {
                                 setSelectedImage(image);
