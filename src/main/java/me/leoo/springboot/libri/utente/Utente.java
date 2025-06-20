@@ -7,15 +7,19 @@ import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.carrello.CarrelloRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Utente {
+public class Utente implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,4 +55,11 @@ public class Utente {
     public void removeRuolo(String ruolo) {
         ruoli.remove(ruolo);
     }
+
+    // Authorization
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
 }

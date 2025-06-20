@@ -20,16 +20,8 @@ public class UtenteService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Utente utente = utenteRepository.findByUsername(username)
+        return utenteRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + username));
-
-        return User
-                .withUsername(username)
-                .password(utente.getPassword())
-                .authorities(utente.getRuoli()
-                        .stream().map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList()))
-                .build();
     }
 
     public Utente register(Utente utente) throws IllegalArgumentException {

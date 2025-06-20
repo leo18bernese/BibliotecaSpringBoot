@@ -2,6 +2,7 @@ package me.leoo.springboot.libri.carrello;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Builder
 @Data
 @Entity
 @AllArgsConstructor
@@ -22,10 +24,13 @@ public class Carrello {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "utente_id", unique = true, nullable = false)
     private Utente utente;
 
-    @OneToMany
+    @OneToMany(mappedBy = "carrello", cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKeyJoinColumn(name = "libro_id")
+    @Builder.Default
     private Map<Long, CarrelloItem> items = new HashMap<>();
 
     @Temporal(TemporalType.TIMESTAMP)

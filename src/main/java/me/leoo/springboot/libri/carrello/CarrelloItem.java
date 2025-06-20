@@ -16,10 +16,12 @@ public class CarrelloItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "carrello_id", nullable = false)
     private Carrello carrello;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "libro_id", nullable = false)
     private Libro libro;
 
     private int quantita;

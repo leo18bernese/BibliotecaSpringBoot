@@ -26,8 +26,6 @@ public class CarrelloController {
     @Autowired
     private CarrelloService carrelloService;
 
-    private static final Logger log = LoggerFactory.getLogger(CarrelloController.class);
-
     // Carrello
     @GetMapping
     public ResponseEntity<Carrello> getCarrello(@AuthenticationPrincipal Utente utente) {
@@ -42,7 +40,9 @@ public class CarrelloController {
     @PostMapping("/items")
     public ResponseEntity<?> addLibro(@AuthenticationPrincipal Utente utente,
                                       @RequestBody ItemRequest request) {
-        System.out.println("CarrelloController: addLibro called " + request.libroId() + " " + request.quantita());
+        if(utente == null) {
+            return ResponseEntity.status(401).body("Utente non autenticato");
+        }
 
         try {
             Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.quantita());
