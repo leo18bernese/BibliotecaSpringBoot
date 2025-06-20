@@ -20,7 +20,7 @@ export const CartProvider = ({children}) => {
             quantita: quantity
         };
 
-        const response = await axios.post(`api/carrello/items`,
+        const response = await axios.post(`/api/carrello/items`,
             requestBody);
 
         if (response.status === 200) {

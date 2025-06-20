@@ -10,7 +10,24 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
 
+        const authenticateUser = async () => {
+            const loginResponse = await axios.post("/api/auth/login", {
+                username: "Daniel18",
+                password: "ciao1234"
+            });
+
+            if (loginResponse.status !== 200) {
+                console.error("Errore durante il login:", loginResponse.statusText);
+                setIsLoading(false);
+                return;
+            }
+
+            Cookies.set('jwt-token', loginResponse.data.token, { expires: 7 }); // 7 days expiration
+        }
+
         const validateTokenAndFetchUser = async () => {
+            authenticateUser();
+
             console.log("Controllo il token JWT...");
 
             const jwtToken = Cookies.get('jwt-token');
