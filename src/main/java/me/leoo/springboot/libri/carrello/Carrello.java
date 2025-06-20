@@ -40,7 +40,7 @@ public class Carrello {
         this.ultimaModifica = new Date();
     }
 
-    public void addItem(Libro libro, int quantita) throws Exception {
+    public void addItem(Libro libro, int quantita) {
         Rifornimento rifornimento = libro.getRifornimento();
 
         if (!rifornimento.isDisponibile(quantita)) {
@@ -58,7 +58,7 @@ public class Carrello {
         ultimaModifica = new Date();
     }
 
-    public void removeItem(Libro libro, int quantita) throws Exception {
+    public void removeItem(Libro libro, int quantita) {
         Rifornimento rifornimento = libro.getRifornimento();
 
         if (!items.containsKey(libro.getId())) {
@@ -81,7 +81,7 @@ public class Carrello {
         ultimaModifica = new Date();
     }
 
-    public CarrelloItem getItem(Libro libro) throws Exception {
+    public CarrelloItem getItem(Libro libro){
         if (!items.containsKey(libro.getId())) {
             throw new IllegalArgumentException("Libro non presente nel carrello");
         }
@@ -90,7 +90,7 @@ public class Carrello {
     }
 
 
-    public double getPrezzo(Libro libro) throws Exception {
+    public double getPrezzo(Libro libro){
         if (!items.containsKey(libro.getId())) {
             throw new IllegalArgumentException("Libro non presente nel carrello");
         }
@@ -110,7 +110,7 @@ public class Carrello {
         return totale;
     }
 
-    public String getDisponibilita(Libro libro) throws Exception {
+    public String getDisponibilita(Libro libro){
         if (!items.containsKey(libro.getId())) {
             throw new IllegalArgumentException("Libro non presente nel carrello");
         }
@@ -120,7 +120,7 @@ public class Carrello {
         return item.getLibro().getRifornimento().getStatus();
     }
 
-    public double getSconto(Libro libro) throws Exception {
+    public double getSconto(Libro libro) {
         if (!items.containsKey(libro.getId())) {
             throw new IllegalArgumentException("Libro non presente nel carrello");
         }

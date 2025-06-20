@@ -28,12 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("JwtAuthenticationFilter: doFilterInternal called");
-
         final String authHeader = request.getHeader("Authorization");
-
-        log.info("Headers: {}", Collections.list(request.getHeaderNames()));
-        log.info("AuthHeader: {}", authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -67,8 +62,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    System.out.println("authenticated user: " + username);
                 }
             }
+
         } catch (MalformedJwtException e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
         } catch (Exception e) {

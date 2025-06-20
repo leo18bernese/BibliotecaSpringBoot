@@ -8,19 +8,16 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -30,21 +27,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                /*.csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))*/
-                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable) // Disabilita CSRF
+                .cors(Customizer.withDefaults()) // Abilita e usa il bean CorsConfigurationSource
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/libri").permitAll()
-                        .requestMatchers("/api/libri/**").permitAll()
-                        .requestMatchers("/api/utenti/**").permitAll()
-                        .requestMatchers("/api/rifornimento/**").permitAll()
-                        .requestMatchers("/api/carrello/**").permitAll()
-                        .requestMatchers("/api/recensioni/**").permitAll()
-                        .requestMatchers("/api/images/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/csrf-token").permitAll()
+                        // Endpoints pubblici
+                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/h2-console/**").permitAll()
+                        // Endpoints che richiedono autenticazione
+                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/recensioni/**").authenticated()
+                        // Proteggi tutti gli altri endpoint per default
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -76,5 +66,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

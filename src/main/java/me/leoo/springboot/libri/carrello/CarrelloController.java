@@ -1,11 +1,13 @@
 package me.leoo.springboot.libri.carrello;
 
-import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,70 +23,55 @@ public class CarrelloController {
     @Autowired
     private CarrelloRepository carrelloRepository;
 
+    @Autowired
+    private CarrelloService carrelloService;
+
+    private static final Logger log = LoggerFactory.getLogger(CarrelloController.class);
+
     // Carrello
-    @GetMapping("/{id}")
-    public ResponseEntity<Carrello> getCarrello(@PathVariable Long id) {
+    @GetMapping
+    public ResponseEntity<Carrello> getCarrello(@AuthenticationPrincipal Utente utente) {
         try {
-
-            System.out.println(utenteRepository.findById(id));
-            Utente utente = utenteRepository.findById(id).orElseThrow();
-
-            System.out.println(carrelloRepository.findByUtente(utente));
-            Carrello carrello = carrelloRepository.findByUtente(utente).orElseThrow();
+            Carrello carrello = carrelloService.getCarrelloByUtente(utente);
             return ResponseEntity.ok(carrello);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/{id}/add/{libroId}")
-    public ResponseEntity<Carrello> addLibro(@PathVariable Long id, @PathVariable Long libroId,
-                                             @RequestParam("quantity") int quantita) {
+    @PostMapping("/items")
+    public ResponseEntity<?> addLibro(@AuthenticationPrincipal Utente utente,
+                                      @RequestBody ItemRequest request) {
+        System.out.println("CarrelloController: addLibro called " + request.libroId() + " " + request.quantita());
+
         try {
-            Utente utente = utenteRepository.findById(id).orElseThrow();
-            Libro libro = libroRepository.findById(libroId).orElseThrow();
+            Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.quantita());
+            return ResponseEntity.ok(carrello);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore nell'aggiunta del libro al carrello: " + e.getMessage());
+        }
+    }
 
-            Carrello carrello = carrelloRepository.findByUtente(utente).orElseThrow();
-            carrello.addItem(libro, quantita);
-
-            carrelloRepository.save(carrello);
-
+    @DeleteMapping("/items")
+    public ResponseEntity<Carrello> removeLibro(@AuthenticationPrincipal Utente utente, @RequestBody ItemRequest request) {
+        try {
+            Carrello carrello = carrelloService.removeItemFromCarrello(utente, request.libroId(), request.quantita());
             return ResponseEntity.ok(carrello);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/{id}/remove/{libroId}")
-    public ResponseEntity<Carrello> removeLibro(@PathVariable Long id, @PathVariable Long libroId, @RequestParam int quantita) {
+    @GetMapping("/items/{libroId}")
+    public ResponseEntity<CarrelloItem> getLibro(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
         try {
-            Utente utente = utenteRepository.findById(id).orElseThrow();
-            Libro libro = libroRepository.findById(libroId).orElseThrow();
-
-            Carrello carrello = carrelloRepository.findByUtente(utente).orElseThrow();
-            carrello.removeItem(libro, quantita);
-
-            carrelloRepository.save(carrello);
-
-            return ResponseEntity.ok(carrello);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/{id}/{libroId}")
-    public ResponseEntity<CarrelloItem> removeLibro(@PathVariable Long id, @PathVariable Long libroId) {
-        try {
-            Utente utente = utenteRepository.findById(id).orElseThrow();
-            Libro libro = libroRepository.findById(libroId).orElseThrow();
-
-            Carrello carrello = carrelloRepository.findByUtente(utente).orElseThrow();
-            CarrelloItem item = carrello.getItem(libro);
-
-
+            CarrelloItem item = carrelloService.getCarrelloItem(utente, libroId);
             return ResponseEntity.ok(item);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    public record ItemRequest(Long libroId, int quantita) {
     }
 }
