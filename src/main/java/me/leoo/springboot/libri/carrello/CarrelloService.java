@@ -25,6 +25,7 @@ public class CarrelloService {
     @Transactional
     public Carrello addItemToCarrello(Utente utente, Long libroId, int quantita) {
         Carrello carrello = getCarrelloByUtente(utente);
+
         Libro libro = libroRepository.findById(libroId)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
 

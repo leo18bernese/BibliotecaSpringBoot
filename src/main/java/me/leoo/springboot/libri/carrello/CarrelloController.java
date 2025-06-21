@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/carrello")
 public class CarrelloController {
@@ -37,6 +40,41 @@ public class CarrelloController {
         }
     }
 
+    public record CarrelloItemResponse(Long libroId, String titolo, int quantita, double prezzo) {}
+
+    @GetMapping("/items")
+    public ResponseEntity<?> getCarrelloItems(@AuthenticationPrincipal Utente utente) {
+        if (utente == null) {
+            return ResponseEntity.status(401).body("Utente non autenticato");
+        }
+        try {
+            Carrello carrello = carrelloService.getCarrelloByUtente(utente);
+            Set<CarrelloItemResponse> responseItems = carrello.getItems().stream()
+                    .map(item -> new CarrelloItemResponse(
+                            item.getLibro().getId(),
+                            item.getLibro().getTitolo(),
+                            item.getQuantita(),
+                            item.getLibro().getRifornimento().getPrezzoTotale()
+                    ))
+                    .collect(Collectors.toSet());
+            return ResponseEntity.ok(responseItems);
+        } catch (Exception e) {
+            // Se si verifica una LazyInitializationException, questa logica di mappatura
+            // dovrebbe essere spostata in un metodo transazionale nel CarrelloService.
+            return ResponseEntity.badRequest().body("Errore nel recupero degli item del carrello: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getCarrelloAmount(@AuthenticationPrincipal Utente utente) {
+        try {
+            Carrello carrello = carrelloService.getCarrelloByUtente(utente);
+            return ResponseEntity.ok(carrello.getItems().size());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/items")
     public ResponseEntity<?> addLibro(@AuthenticationPrincipal Utente utente,
                                       @RequestBody ItemRequest request) {
@@ -45,9 +83,12 @@ public class CarrelloController {
         }
 
         try {
+            System.out.println("facendo addLibro per utente: " + utente.getUsername() + " con libroId: " + request.libroId() + " e quantita: " + request.quantita());
             Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.quantita());
+
             return ResponseEntity.ok(carrello);
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseEntity.badRequest().body("Errore nell'aggiunta del libro al carrello: " + e.getMessage());
         }
     }

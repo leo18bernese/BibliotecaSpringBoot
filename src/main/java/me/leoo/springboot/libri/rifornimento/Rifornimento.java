@@ -102,7 +102,9 @@ public class Rifornimento {
     // Status
     @Transient
     public String getStatus() {
-        if (quantita == 0) {
+        int disponibili = getDisponibili();
+
+        if (disponibili == 0) {
             if (prossimoRifornimento == null || prossimoRifornimento.getTime() < new Date().getTime()) {
                 return "Non disponibile";
             }
@@ -112,8 +114,8 @@ public class Rifornimento {
             return "In arrivo tra " + data + " giorni";
         }
 
-        if (quantita < 10) {
-            return "In esaurimento. Disponibili solo " + quantita + " pezzi";
+        if (disponibili < 10) {
+            return "In esaurimento. Disponibili solo " + disponibili + " pezzi";
         }
 
         return "Disponibile. Consegna in " + giorniConsegna + " giorni";
@@ -121,7 +123,9 @@ public class Rifornimento {
 
     @Transient
     public String getColor() {
-        if (quantita == 0) {
+        int disponibili = getDisponibili();
+
+        if (disponibili == 0) {
             if (prossimoRifornimento == null || prossimoRifornimento.getTime() < new Date().getTime()) {
                 return LibriUtils.DANGER; // danger (red)
             }
@@ -129,7 +133,7 @@ public class Rifornimento {
             return LibriUtils.WARNING;
         }
 
-        if (quantita < 10) {
+        if (disponibili < 10) {
             return LibriUtils.WARNING;
         }
 

@@ -1,23 +1,21 @@
 package me.leoo.springboot.libri.carrello;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utente.Utente;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 @Builder
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class Carrello {
 
     @Id
@@ -29,9 +27,7 @@ public class Carrello {
     private Utente utente;
 
     @OneToMany(mappedBy = "carrello", cascade = CascadeType.ALL, orphanRemoval = true)
-    @MapKeyJoinColumn(name = "libro_id")
-    @Builder.Default
-    private Map<Long, CarrelloItem> items = new HashMap<>();
+    private Set<CarrelloItem> items = new HashSet<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCreazione;
@@ -46,91 +42,96 @@ public class Carrello {
     }
 
     public void addItem(Libro libro, int quantita) {
+
         Rifornimento rifornimento = libro.getRifornimento();
 
         if (!rifornimento.isDisponibile(quantita)) {
             throw new IllegalArgumentException("Quantita insuficiente");
         }
 
-        if (items.containsKey(libro.getId())) {
-            CarrelloItem item = items.get(libro.getId());
-            item.setQuantita(item.getQuantita() + quantita);
+        CarrelloItem item = getItem(libro);
+        if (item == null) {
+            System.out.println("item is null, creating new item");
+            items.add(new CarrelloItem(this, libro, quantita));
         } else {
-            items.put(libro.getId(), new CarrelloItem(this, libro, quantita));
+            System.out.println("item is not null, updating existing item");
+            item.setQuantita(item.getQuantita() + quantita);
         }
 
+        System.out.println("Adding " + quantita + " of " + libro.getTitolo() + " to the cart");
+
         rifornimento.addPrenotati(quantita);
+        System.out.println(libro + "    " + item + "    " + rifornimento + "    " + rifornimento.getPrenotati());
+
+        System.out.println("Updated rifornimento: " + rifornimento.getPrenotati() + " prenotati");
         ultimaModifica = new Date();
+
     }
 
     public void removeItem(Libro libro, int quantita) {
         Rifornimento rifornimento = libro.getRifornimento();
 
-        if (!items.containsKey(libro.getId())) {
-            throw new IllegalArgumentException("Libro non presente nel carrello");
+        CarrelloItem item = getItem(libro);
+        if (item == null) {
+            throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
 
-        CarrelloItem item = items.get(libro.getId());
-
         if (item.getQuantita() <= quantita) {
-            items.remove(libro.getId());
+            items.remove(item);
 
             rifornimento.removePrenotati(item.getQuantita());
         } else {
             item.setQuantita(item.getQuantita() - quantita);
 
             rifornimento.removePrenotati(quantita);
-
         }
 
         ultimaModifica = new Date();
     }
 
-    public CarrelloItem getItem(Libro libro){
-        if (!items.containsKey(libro.getId())) {
-            throw new IllegalArgumentException("Libro non presente nel carrello");
-        }
+    public CarrelloItem getItem(Libro libro) throws IllegalArgumentException {
+        return items.stream()
+                .filter(c -> c.getLibro().getId().equals(libro.getId()))
+                .findFirst()
+                .orElse(null);
+    }
 
-        return items.get(libro.getId());
+    public boolean containsKey(Libro libro) {
+        return items.stream().anyMatch(c -> c.getLibro().getId().equals(libro.getId()));
     }
 
 
-    public double getPrezzo(Libro libro){
-        if (!items.containsKey(libro.getId())) {
-            throw new IllegalArgumentException("Libro non presente nel carrello");
-        }
+    public double getPrezzo(Libro libro) {
+        CarrelloItem item = getItem(libro);
 
-        CarrelloItem item = items.get(libro.getId());
+        if (item == null) {
+            throw new IllegalArgumentException("Libro non trovato nel carrello");
+        }
 
         return item.getQuantita() * libro.getRifornimento().getPrezzoTotale();
     }
 
     public double getTotale() {
-        double totale = 0;
+        return items.stream()
+                .map(i -> i.getQuantita() * i.getLibro().getRifornimento().getPrezzoTotale())
+                .reduce(0.0, Double::sum);
 
-        for (CarrelloItem item : items.values()) {
-            totale += item.getQuantita() * item.getLibro().getRifornimento().getPrezzoTotale();
-        }
-
-        return totale;
     }
 
-    public String getDisponibilita(Libro libro){
-        if (!items.containsKey(libro.getId())) {
-            throw new IllegalArgumentException("Libro non presente nel carrello");
+    public String getDisponibilita(Libro libro) {
+        CarrelloItem item = getItem(libro);
+        if (item == null) {
+            throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
-
-        CarrelloItem item = items.get(libro.getId());
 
         return item.getLibro().getRifornimento().getStatus();
     }
 
     public double getSconto(Libro libro) {
-        if (!items.containsKey(libro.getId())) {
-            throw new IllegalArgumentException("Libro non presente nel carrello");
+        CarrelloItem item = getItem(libro);
+        if (item == null) {
+            throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
-
-        CarrelloItem item = items.get(libro.getId());
 
         return item.getLibro().getRifornimento().getSconto();
     }
