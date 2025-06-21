@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import ImageGallery from "../images/ImageGallery";
 import {CartContext} from "../../carrello/CartContext";
 import {useQuery} from "@tanstack/react-query";
+import {Toaster} from "react-hot-toast";
 
 const API_URL = 'http://localhost:8080/api/images';
 
@@ -91,8 +92,6 @@ const BookInfo = () => {
     }
 
 
-
-
     const handleUpload = () => {
         const formData = new FormData();
         formData.append('file', file);
@@ -127,6 +126,7 @@ const BookInfo = () => {
     }
 
     const rifornimento = book.rifornimento;
+    const isDisponibile = rifornimento.disponibili > 0;
 
     return (
         <>
@@ -137,27 +137,36 @@ const BookInfo = () => {
                     </div>
 
                     <div className="md:w-1/2">
-                        <div className="mb-8">
+                        <div className="mb-8 ">
                             <h1 className="text-2xl font-bold mb-4">{book.titolo}</h1>
                             <p className="mb-2"><strong>Autore:</strong> {book.autore}</p>
-                            <p className="mb-4"><strong>Genere:</strong> {book.genere}</p>
+                            <p className="mb-2"><strong>Genere:</strong> {book.genere}</p>
+                            <p className="mb-4"><strong>Anno di pubblicazione:</strong> {book.annoPubblicazione}</p>
                         </div>
+
 
                         <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-8 border-2 border-gray-300">
                             <h3 className="text-xl font-semibold mb-4">Acquisto</h3>
+
                             <p className="text-lg mb-2">Prezzo: {rifornimento.prezzo} €</p>
                             <p className="mb-4"><b className="font-bold"
                                                    style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
+
                             <div className="flex flex-wrap gap-2">
+                                <Toaster/>
                                 <button
-                                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition"
-                                    onClick={() => addItem(book.id, 1)}>
+                                    className={` ${!isDisponibile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 px-4 rounded transition`}
+                                    onClick={() => addItem(book.id, 1)}
+                                    disabled={!isDisponibile}>
                                     Aggiungi al carrello
                                 </button>
-                                <button
-                                    className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition">
-                                    Acquista
-                                </button>
+
+                                {isDisponibile &&
+                                    <button
+                                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition">
+                                        Acquista
+                                    </button> }
+
                             </div>
                         </div>
                     </div>

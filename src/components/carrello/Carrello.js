@@ -1,36 +1,60 @@
-// src/components/SearchBooks.js
-import React, {useContext, useEffect, useState} from 'react';
+// src/components/Carrello.js (Nota: il nome del file era SearchBooks.js nell'esempio precedente, ma il contenuto era per Carrello)
+import React, { useContext } from 'react';
 import axios from 'axios';
-import Cookies from "js-cookie";
-import {UserContext} from "../user/UserContext";
+import { UserContext } from "../user/UserContext";
+import { useQuery } from "@tanstack/react-query"; // Importa useQuery
 
-const API_URL = 'http://localhost:8080/api/images';
+const fetchCarrelloByUserId = async (userId) => {
+    // Aggiungi un controllo per userId per evitare richieste non necessarie
+    if (!userId) {
+        return []; // Restituisce un array vuoto se l'utente non è loggato
+    }
+    const { data } = await axios.get(`http://localhost:8080/api/carrello/items`);
+    console.log(data);
+    return data;
+};
 
 const Carrello = () => {
+    const { user } = useContext(UserContext);
 
-    const {user} = useContext(UserContext);
-    console.log(user);
-    const [carrello, setCarrello] = useState([]);
+    // Usa useQuery per gestire il fetching del carrello
+    const {
+        data: carrello = [],
+        isLoading,
+        error,
+        isError,
+        isSuccess
+    } = useQuery({
+        queryKey: ['carrello', user?.id],
+        queryFn: () => fetchCarrelloByUserId(user?.id),
+        enabled: !!user?.id,
+        staleTime: 5 * 60 * 1000,
+    });
 
-    useEffect(() => {
-        if (user) {
-            const fetchCarrello = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:8080/api/carrello/${user.id}`, {
-                        headers: {
-                            Authorization: `Bearer ${Cookies.get('token')}`
-                        }
-                    });
-                    setCarrello(response.data);
-                } catch (error) {
-                    console.error('Error fetching carrello:', error);
-                }
-            };
+    if (isLoading) {
+        return (
+            <div className="container mx-auto p-4 flex justify-center items-center h-48">
+                Caricamento carrello...
+            </div>
+        );
+    }
 
-            fetchCarrello();
-        }
+    if (isError) {
+        return (
+            <div className="container mx-auto p-4 text-red-600">
+                Errore durante il caricamento del carrello: {error.message}
+            </div>
+        );
+    }
 
-    }, [user]);
+    if (!user) {
+        return (
+            <div className="container mx-auto p-4">
+                <h1 className="text-2xl font-bold mb-4">Carrello</h1>
+                <p>Effettua il login per visualizzare il tuo carrello.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto p-4">
