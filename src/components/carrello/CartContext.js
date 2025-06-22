@@ -28,6 +28,7 @@ export const CartProvider = ({children}) => {
                 toast.success("Elemento aggiunto al carrello con successo!");
                 await queryClient.invalidateQueries(['book', itemId]);
             }
+
             return response;
         } catch (error) {
             console.error("Error adding item to cart:", error);
