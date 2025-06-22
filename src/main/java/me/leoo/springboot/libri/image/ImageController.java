@@ -73,6 +73,35 @@ public class ImageController {
         }
     }
 
+    @GetMapping("/{productId}/first")
+    public ResponseEntity<byte[]> getFirstImage(@PathVariable Long productId) {
+        try {
+            String finalPath = UPLOAD_DIR + "/" + productId;
+            Path dirPath = Paths.get(finalPath);
+
+            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            List<File> files = Files.list(dirPath)
+                    .filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .toList();
+
+            if (files.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            File firstFile = files.get(0);
+            byte[] image = Files.readAllBytes(firstFile.toPath());
+
+            return getImageResponse(image, firstFile.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/{productId}/name/{fileName}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long productId, @PathVariable String fileName) {
         try {
