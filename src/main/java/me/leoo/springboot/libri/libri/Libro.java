@@ -40,7 +40,6 @@ public class Libro {
         this.numeroPagine = numeroPagine;
 
         this.rifornimento = new Rifornimento(quantita, prezzo);
-
     }
 
 

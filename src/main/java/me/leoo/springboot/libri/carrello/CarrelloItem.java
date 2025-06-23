@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 
+import java.util.Date;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -26,9 +28,17 @@ public class CarrelloItem {
 
     private int quantita;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date aggiunta;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ultimaModifica;
+
     public CarrelloItem(Carrello carrello, Libro libro, int quantita) {
         this.carrello = carrello;
         this.libro = libro;
         this.quantita = quantita;
+        this.aggiunta = new Date();
+        this.ultimaModifica = new Date();
     }
 }

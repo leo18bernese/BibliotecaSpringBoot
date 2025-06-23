@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
+import me.leoo.springboot.libri.rifornimento.Sconto;
 import me.leoo.springboot.libri.utente.Utente;
 
 import java.util.Date;
@@ -46,7 +47,7 @@ public class Carrello {
         Rifornimento rifornimento = libro.getRifornimento();
 
         if (!rifornimento.isDisponibile(quantita)) {
-            throw new IllegalArgumentException("Quantita insuficiente");
+            throw new IllegalArgumentException("Quantità richiesta non disponibile");
         }
 
         CarrelloItem item = getItem(libro);
@@ -56,6 +57,7 @@ public class Carrello {
         } else {
             System.out.println("item is not null, updating existing item");
             item.setQuantita(item.getQuantita() + quantita);
+            item.setUltimaModifica(new Date());
         }
 
         System.out.println("Adding " + quantita + " of " + libro.getTitolo() + " to the cart");
@@ -82,6 +84,7 @@ public class Carrello {
             rifornimento.removePrenotati(item.getQuantita());
         } else {
             item.setQuantita(item.getQuantita() - quantita);
+            item.setUltimaModifica(new Date());
 
             rifornimento.removePrenotati(quantita);
         }
@@ -127,7 +130,7 @@ public class Carrello {
         return item.getLibro().getRifornimento().getStatus();
     }
 
-    public double getSconto(Libro libro) {
+    public Sconto getSconto(Libro libro) {
         CarrelloItem item = getItem(libro);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");

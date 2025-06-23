@@ -27,7 +27,9 @@ public class Rifornimento {
     private int prenotati;
 
     private double prezzo;
-    public double sconto;
+
+    @Nullable
+    public Sconto sconto;
 
     private int giorniConsegna;
 
@@ -36,16 +38,16 @@ public class Rifornimento {
     private Date prossimoRifornimento;
 
     public Rifornimento(int quantita, double prezzo) {
-        this(quantita, 0, prezzo, 0, 3, TimeUtil.fromNow(3, Calendar.DAY_OF_MONTH).getTime());
+        this(quantita, 0, prezzo, Sconto.from(prezzo, 15), 3, TimeUtil.fromNow(3, Calendar.DAY_OF_MONTH).getTime());
     }
 
-    public Rifornimento(int quantita, int prenotati, double prezzo, double sconto, int giorniConsegna, @Nullable Date prossimoRifornimento) {
+    public Rifornimento(int quantita, int prenotati, double prezzo, Sconto sconto, int giorniConsegna, @Nullable Date prossimoRifornimento) {
         this.quantita = quantita;
         this.prenotati = prenotati;
         this.prezzo = prezzo;
         this.sconto = sconto;
         this.giorniConsegna = giorniConsegna;
-        this.prossimoRifornimento = RandomUtil.randomInt(0, 1) == 1 ? prossimoRifornimento : null;
+        this.prossimoRifornimento = RandomUtil.randomInt(0, 2) == 1 ? prossimoRifornimento : null;
     }
 
     // Storage
@@ -94,9 +96,18 @@ public class Rifornimento {
     // Price
     @Transient
     public double getPrezzoTotale() {
-        if (sconto == 0) return prezzo;
+        if (sconto == null) {
+            return prezzo;
+        }
 
-        return prezzo - ((prezzo / 100) * sconto);
+        double scontoSoldi = sconto.getValore();
+
+        if (scontoSoldi == 0) return prezzo;
+
+        System.out.println("Prezzo: " + prezzo + ", Sconto: " + scontoSoldi);
+        System.out.println("Prezzo totale: " + String.format("%.2f", prezzo - scontoSoldi));
+
+        return LibriUtils.round(prezzo - scontoSoldi);
     }
 
     // Status
@@ -111,11 +122,11 @@ public class Rifornimento {
 
             String data = ChronoUnit.DAYS.between(new Date().toInstant(), prossimoRifornimento.toInstant()) + "";
 
-            return "In arrivo tra " + data + " giorni";
+            return "⧗ In arrivo tra " + data + " giorni";
         }
 
         if (disponibili < 10) {
-            return "In esaurimento. Disponibili solo " + disponibili + " pezzi";
+            return "⚠ In esaurimento. Disponibili solo " + disponibili + " pezzi";
         }
 
         return "Disponibile. Consegna in " + giorniConsegna + " giorni";

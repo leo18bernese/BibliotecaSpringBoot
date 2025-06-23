@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class CarrelloController {
 
     // DTO per le risposte
     public record CarrelloItemResponse(Long libroId, String titolo, String autore, int annoPubblicazione, int quantita,
-                                       double prezzo, Rifornimento rifornimento) {
+                                       Date dataAggiunta, double prezzo, Rifornimento rifornimento) {
     }
 
     public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, int numeroItems) {
@@ -50,8 +51,9 @@ public class CarrelloController {
                             libro.getId(),
                             libro.getTitolo(),
                             libro.getAutore(),
-                            item.getQuantita(),
                             libro.getAnnoPubblicazione(),
+                            item.getQuantita(),
+                            item.getAggiunta(),
                             libro.getRifornimento().getPrezzoTotale(),
                             libro.getRifornimento()
                     );
@@ -108,7 +110,8 @@ public class CarrelloController {
     }
 
     @DeleteMapping("/items")
-    public ResponseEntity<?> removeLibro(@AuthenticationPrincipal Utente utente, @RequestBody ItemRequest request) {
+    public ResponseEntity<?> removeLibro(@AuthenticationPrincipal Utente utente,
+                                         @RequestBody ItemRequest request) {
         try {
             Carrello carrello = carrelloService.removeItemFromCarrello(utente, request.libroId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
@@ -127,8 +130,9 @@ public class CarrelloController {
                     libro.getId(),
                     libro.getTitolo(),
                     libro.getAutore(),
-                    item.getQuantita(),
                     libro.getAnnoPubblicazione(),
+                    item.getQuantita(),
+                    item.getUltimaModifica(),
                     libro.getRifornimento().getPrezzoTotale(),
                     libro.getRifornimento());
 

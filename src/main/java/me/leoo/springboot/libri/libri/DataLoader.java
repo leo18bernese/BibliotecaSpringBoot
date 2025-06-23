@@ -35,6 +35,11 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if(libroRepository.existsById(1L)) {
+            System.out.println("Libri già caricati nel database, salto il caricamento");
+            return;
+        }
+
         libroRepository.save(new Libro("Moby Dick", "Herman Melville", "Avventura", 1851, 624, 3, 15.00));
         libroRepository.save(new Libro("1984", "George Orwell", "Distopia", 1949, 328, 5, 12.50));
         libroRepository.save(new Libro("Il Codice da Vinci", "Dan Brown", "Thriller", 2003, 656, 20, 18.00));
@@ -55,7 +60,6 @@ public class DataLoader implements CommandLineRunner {
         Carrello carrello = new Carrello(uu);
         carrelloRepository.save(carrello);
 
-
         for (Libro libro : libri) {
             for (int i = 0; i < 3; i++) {
                 Recensione recensione = new Recensione(libro.getId(), uu.getId(), "Molto bello", "Ottimo libro, lo consiglio", 4, true, true, new Date(), new Date());
@@ -66,7 +70,6 @@ public class DataLoader implements CommandLineRunner {
 
             libroRepository.save(libro);
         }
-
 
         System.out.println("Libri caricati nel database");
     }

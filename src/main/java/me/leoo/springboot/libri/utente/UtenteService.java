@@ -24,6 +24,10 @@ public class UtenteService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + username));
     }
 
+    public boolean isRegistered(String username) {
+        return utenteRepository.existsByUsername(username);
+    }
+
     public Utente register(Utente utente) throws IllegalArgumentException {
         if (utenteRepository.existsByUsername(utente.getUsername())) {
             throw new IllegalArgumentException("Username già in uso: " + utente.getUsername());
