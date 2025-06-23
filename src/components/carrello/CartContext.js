@@ -31,8 +31,35 @@ export const CartProvider = ({children}) => {
 
             return response;
         } catch (error) {
-            console.error("Error adding item to cart:", error);
             toast.error(error.response.data || "Errore durante l'aggiunta dell'elemento al carrello");
+            console.log(error.response.data || "Errore durante l'aggiunta dell'elemento al carrello"); // You can keep this for debugging if needed
+        }
+
+    };
+
+    const removeItem = async (itemId, quantity) => {
+        if (!user) {
+            console.error("User not logged in");
+            return;
+        }
+
+        const requestBody = {
+            libroId: itemId,
+            quantita: quantity
+        };
+
+        try {
+            const response = await axios.delete(`/api/carrello/items`, { data: requestBody });
+
+            if (response.status === 200) {
+                toast.success("Elemento rimosso dal carrello con successo!");
+                await queryClient.invalidateQueries(['book', itemId]);
+            }
+
+            return response;
+        } catch (error) {
+            console.error("Error removing item to cart:", error);
+            toast.error(error.response.data || "Errore durante la rimozione dell'elemento dal carrello");
             throw error;
         }
 
@@ -40,7 +67,7 @@ export const CartProvider = ({children}) => {
 
     return (
 
-        <CartContext.Provider value={{addItem}}>
+        <CartContext.Provider value={{addItem, removeItem}}>
             {children}
 
         </CartContext.Provider>

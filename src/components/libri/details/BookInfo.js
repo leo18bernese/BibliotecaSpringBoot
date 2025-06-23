@@ -40,6 +40,11 @@ const fetchReviews = async (id) => {
     return data;
 };
 
+const fetchCartItem = async (bookId) => {
+    const {data} = await axios.get(`/api/carrello/items/${bookId}`);
+    return data;
+}
+
 const BookInfo = () => {
     const {id} = useParams();
     const navigate = useNavigate();
@@ -76,6 +81,11 @@ const BookInfo = () => {
     const {data: reviews = [], isLoading: areReviewsLoading} = useQuery({
         queryKey: ['reviews', bookId],
         queryFn: () => fetchReviews(bookId),
+    });
+
+    const {data: cartItem} = useQuery({
+        queryKey: ['cartItem', bookId],
+        queryFn: () => fetchCartItem(bookId),
     });
 
 
@@ -124,20 +134,21 @@ const BookInfo = () => {
     if (!book) {
         return <div className="flex justify-center items-center min-h-screen">Libro non trovato</div>;
     }
-
+console.log(book);
+    console.log(cartItem);
     const rifornimento = book.rifornimento;
     const isDisponibile = rifornimento.disponibili > 0;
 
     return (
         <>
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8" style={{ backgroundColor: '#f8fafc' }}>
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="md:w-1/2">
                         <ImageGallery id={id} images={images} API_URL={API_URL}/>
                     </div>
 
-                    <div className="md:w-1/2">
-                        <div className="mb-8 ">
+                    <div className="md:w-1/2 grid grid-cols-2 gap-8" style={{ alignItems: 'start' }}>
+                        <div className="p-4 bg-white shadow-md rounded-lg">
                             <h1 className="text-2xl font-bold mb-4">{book.titolo}</h1>
                             <p className="mb-2"><strong>Autore:</strong> {book.autore}</p>
                             <p className="mb-2"><strong>Genere:</strong> {book.genere}</p>
@@ -145,12 +156,27 @@ const BookInfo = () => {
                         </div>
 
 
-                        <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-8 border-2 border-gray-300">
+                        <div className="bg-white shadow-md rounded-lg p-4 ">
                             <h3 className="text-xl font-semibold mb-4">Acquisto</h3>
 
-                            <p className="text-lg mb-2">Prezzo: {rifornimento.prezzo} €</p>
-                            <p className="mb-4"><b className="font-bold"
+                            <div className="flex items-center space-x-3">
+                                {rifornimento.prezzoTotale < rifornimento.prezzo &&
+                                    <p className="text-red-600 text-2xl line-through font-bold mb-2" style={{textDecorationThickness: '3px'}}> {rifornimento.prezzo.toFixed(2)} €</p>
+                                }
+                                <p className="text-2xl font-semibold mb-2"> {rifornimento.prezzoTotale.toFixed(2)} €</p>
+                            </div>
+
+                            <span className="p-2 rounded-2xl font-semibold uppercase text-sm mb" style={{ backgroundColor: '#d1fae5', color: '#065f46' }}>
+                                <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
+                            </span>
+
+
+                            <p className="mt-6"><b className="font-bold"
                                                    style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
+
+                            {cartItem.quantita > 0 &&
+                            <p className="mt-1  mb-4"><b className="text-blue-500 font-bold">Hai già {cartItem.quantita} unità nel carrello</b></p>
+                            }
 
                             <div className="flex flex-wrap gap-2">
                                 <Toaster/>
@@ -166,6 +192,8 @@ const BookInfo = () => {
                                         className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition">
                                         Acquista
                                     </button> }
+
+                                {}
 
                             </div>
                         </div>

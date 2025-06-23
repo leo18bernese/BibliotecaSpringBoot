@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import {Link} from "react-router-dom";
+import {CartContext} from "./CartContext";
 
 const API_URL = 'http://localhost:8080/api/images';
 
@@ -23,6 +24,9 @@ const fetchImageByBookId = async (bookId) => {
 };
 
 const CarrelloItem = ({item}) => {
+
+    const {addItem, removeItem} = useContext(CartContext);
+
     const {
         data: imageUrl,
         isLoading: areImageLoading,
@@ -67,7 +71,16 @@ const CarrelloItem = ({item}) => {
                         {item.titolo}
                     </Link>
 
-                    <p className="text-gray-700">{item.autore}</p>
+                    <p className="text-gray-700">di {item.autore}</p>
+                    <p className="text-gray-700 mb-4">Scritto nel: {item.annoPubblicazione}</p>
+
+                    <div className="border-2 border-gray-600 rounded-md inline-flex p-1 space-x-2">
+                        <button className="text-gray-600" onClick={() => removeItem(item.libroId, 1)}>-</button>
+
+                        <p className="text-gray-600">{item.quantita}</p>
+
+                        <button className="text-gray-600" onClick={() => addItem(item.libroId, 1)}>+</button>
+                    </div>
                 </div>
 
                 <div className="text-right font-semibold text-lg ml-4">
