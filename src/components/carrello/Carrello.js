@@ -3,7 +3,8 @@ import axios from 'axios';
 import {UserContext} from "../user/UserContext";
 import {useQuery} from "@tanstack/react-query";
 import CarrelloItem from "./CarrelloItem";
-import {Toaster} from "react-hot-toast"; // Import the new component
+import {Toaster} from "react-hot-toast";
+import {useNavigate} from "react-router-dom"; // Import the new component
 
 const fetchCarrelloByUserId = async (userId) => {
     if (!userId) {
@@ -16,6 +17,7 @@ const fetchCarrelloByUserId = async (userId) => {
 
 const Carrello = () => {
     const {user} = useContext(UserContext);
+    const navigate = useNavigate();
 
     const {
         data: carrello = [],
@@ -96,7 +98,7 @@ const Carrello = () => {
                             <div className="mt-4 border-t pt-4">
                                 <button
                                     className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-                                    onClick={() => alert('Checkout non implementato!')}>
+                                    onClick={() => navigate('/checkout', { state: { cart: carrello } })}>
                                     Procedi al Checkout
                                 </button>
                             </div>

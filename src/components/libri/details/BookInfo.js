@@ -137,11 +137,13 @@ const BookInfo = () => {
 console.log(book);
     console.log(cartItem);
     const rifornimento = book.rifornimento;
-    const isDisponibile = rifornimento.disponibili > 0;
+    const isDisponibile = rifornimento.quantita > 0;
 
     return (
         <>
             <div className="container mx-auto px-4 py-8" style={{ backgroundColor: '#f8fafc' }}>
+                <Toaster/>
+
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="md:w-1/2">
                         <ImageGallery id={id} images={images} API_URL={API_URL}/>
@@ -174,14 +176,13 @@ console.log(book);
                             <p className="mt-6"><b className="font-bold"
                                                    style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
 
-                            {cartItem.quantita > 0 &&
+                            {cartItem && cartItem.quantita > 0 &&
                             <p className="mt-1  mb-4"><b className="text-blue-500 font-bold">Hai già {cartItem.quantita} unità nel carrello</b></p>
                             }
 
                             <div className="flex flex-wrap gap-2">
-                                <Toaster/>
                                 <button
-                                    className={` ${!isDisponibile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 px-4 rounded transition`}
+                                    className={` ${!isDisponibile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded transition`}
                                     onClick={() => addItem(book.id, 1)}
                                     disabled={!isDisponibile}>
                                     Aggiungi al carrello
@@ -189,8 +190,8 @@ console.log(book);
 
                                 {isDisponibile &&
                                     <button
-                                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition">
-                                        Acquista
+                                        className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition">
+                                        Acquista Ora
                                     </button> }
 
                                 {}

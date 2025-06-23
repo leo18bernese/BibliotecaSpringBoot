@@ -11,6 +11,7 @@ import {CartProvider} from "./components/carrello/CartContext";
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ScrollToTop from "./components/utils/ScrollToTop";
+import CheckOut from "./components/checkout/CheckOut";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ function App() {
                         <Route path="/libri/:id" element={<BookInfo/>}/>
                         <Route path="/account" element={<div>Account</div>}/>
                         <Route path="/cart" element={<Carrello/>}/>
+                        <Route path="/checkout" element={<CheckOut/>}/>
                     </Routes>
                 </Router>
             </CartProvider>
