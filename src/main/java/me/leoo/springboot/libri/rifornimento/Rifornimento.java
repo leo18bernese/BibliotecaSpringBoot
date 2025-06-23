@@ -113,7 +113,8 @@ public class Rifornimento {
     // Status
     @Transient
     public String getStatus() {
-        int disponibili = getDisponibili();
+        //int disponibili = getDisponibili();
+        int disponibili = quantita;
 
         if (disponibili == 0) {
             if (prossimoRifornimento == null || prossimoRifornimento.getTime() < new Date().getTime()) {
@@ -134,7 +135,8 @@ public class Rifornimento {
 
     @Transient
     public String getColor() {
-        int disponibili = getDisponibili();
+        //int disponibili = getDisponibili();
+        int disponibili = quantita;
 
         if (disponibili == 0) {
             if (prossimoRifornimento == null || prossimoRifornimento.getTime() < new Date().getTime()) {
