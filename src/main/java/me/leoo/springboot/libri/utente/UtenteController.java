@@ -1,15 +1,14 @@
 package me.leoo.springboot.libri.utente;
 
-import me.leoo.springboot.libri.security.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/utenti")
@@ -25,7 +24,7 @@ public class UtenteController {
         try {
             Utente utente = utenteRepository.findById(id).orElseThrow();
 
-            if(!checkUtenteAccess(utente)) {
+            if (!checkUtenteAccess(utente)) {
                 return ResponseEntity.status(403).build();
             }
 
@@ -46,6 +45,7 @@ public class UtenteController {
         }
 
     }
+
     @GetMapping("current")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getCurrentUtente() {

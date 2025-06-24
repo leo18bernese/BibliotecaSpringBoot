@@ -166,7 +166,7 @@ public class ImageController {
     }
 
     private ResponseEntity<byte[]> getImageResponse(byte[] image, String fileName) {
-       String contentType = determineContentType(fileName);
+        String contentType = determineContentType(fileName);
 
         return ResponseEntity.ok()
                 .header("Content-Type", contentType)

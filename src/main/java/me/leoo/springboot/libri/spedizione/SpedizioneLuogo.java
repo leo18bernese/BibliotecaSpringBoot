@@ -3,8 +3,6 @@ package me.leoo.springboot.libri.spedizione;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-
 @RequiredArgsConstructor
 @Getter
 public enum SpedizioneLuogo {

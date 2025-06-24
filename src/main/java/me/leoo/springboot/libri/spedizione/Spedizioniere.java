@@ -1,8 +1,5 @@
 package me.leoo.springboot.libri.spedizione;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
 public record Spedizioniere(String id, String displayName, String logoPath,

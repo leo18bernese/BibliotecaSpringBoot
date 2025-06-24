@@ -1,6 +1,5 @@
 package me.leoo.springboot.libri.spedizione;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -1,8 +1,10 @@
 package me.leoo.springboot.libri.carrello;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.rifornimento.Sconto;
