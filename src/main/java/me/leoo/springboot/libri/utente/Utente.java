@@ -1,9 +1,11 @@
 package me.leoo.springboot.libri.utente;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.leoo.springboot.libri.carrello.Carrello;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -33,6 +35,10 @@ public class Utente implements UserDetails {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> ruoli = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Carrello carrello;
 
     public Utente(String username, String password, String nome, String cognome, String email) {
         this.username = username;

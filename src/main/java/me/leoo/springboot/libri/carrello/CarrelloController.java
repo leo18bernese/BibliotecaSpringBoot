@@ -95,6 +95,16 @@ public class CarrelloController {
         }
     }
 
+    @GetMapping("/total")
+    public ResponseEntity<Double> getCarrelloTotal(@AuthenticationPrincipal Utente utente) {
+        try {
+            Carrello carrello = carrelloService.getCarrelloByUtente(utente);
+            return ResponseEntity.ok(carrello.getTotale());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/items")
     public ResponseEntity<?> addLibro(@AuthenticationPrincipal Utente utente,
                                       @RequestBody ItemRequest request) {

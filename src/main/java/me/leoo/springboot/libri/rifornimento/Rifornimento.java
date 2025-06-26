@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.utils.LibriUtils;
+import me.leoo.springboot.libri.utils.Sconto;
 import me.leoo.utils.common.random.RandomUtil;
 import me.leoo.utils.common.time.TimeUtil;
 
@@ -94,13 +95,17 @@ public class Rifornimento {
     }
 
     // Price
+
+    /**
+     * @return discounted price if present
+     */
     @Transient
     public double getPrezzoTotale() {
         if (sconto == null) {
             return prezzo;
         }
 
-        double scontoSoldi = sconto.getValore();
+        double scontoSoldi = sconto.getSconto(prezzo);
 
         if (scontoSoldi == 0) return prezzo;
 

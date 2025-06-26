@@ -7,8 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
-import me.leoo.springboot.libri.rifornimento.Sconto;
 import me.leoo.springboot.libri.utente.Utente;
+import me.leoo.springboot.libri.utils.LibriUtils;
+import me.leoo.springboot.libri.utils.Sconto;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -117,9 +118,11 @@ public class Carrello {
     }
 
     public double getTotale() {
-        return items.stream()
+        double value = items.stream()
                 .map(i -> i.getQuantita() * i.getLibro().getRifornimento().getPrezzoTotale())
                 .reduce(0.0, Double::sum);
+
+        return LibriUtils.round(value);
 
     }
 

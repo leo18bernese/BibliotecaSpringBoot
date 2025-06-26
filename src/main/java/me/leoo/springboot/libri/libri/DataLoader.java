@@ -1,5 +1,8 @@
 package me.leoo.springboot.libri.libri;
 
+import me.leoo.springboot.libri.buono.Buono;
+import me.leoo.springboot.libri.buono.BuonoRepository;
+import me.leoo.springboot.libri.buono.StatoBuono;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.carrello.CarrelloRepository;
 import me.leoo.springboot.libri.recensioni.Recensione;
@@ -7,10 +10,12 @@ import me.leoo.springboot.libri.recensioni.RecensioneRepository;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import me.leoo.springboot.libri.utente.UtenteService;
+import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +36,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private UtenteService utenteService;
+
+    @Autowired
+    private BuonoRepository buonoRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -70,6 +78,91 @@ public class DataLoader implements CommandLineRunner {
             libroRepository.save(libro);
         }
 
+
+        // Buono sconto del 20% senza data di scadenza
+        Buono buono1 = new Buono(
+                "SCONTO20",
+                new Sconto(20, 0),
+                new Date(),
+                null,
+                0,
+                5,
+                50,
+                false,
+                null,
+                StatoBuono.ATTIVO
+        );
+        buonoRepository.save(buono1);
+
+// Buono sconto fisso di 15€ con scadenza tra 30 giorni
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 30);
+        Date scadenza = calendar.getTime();
+        Buono buono2 = new Buono(
+                "MENO15EURO",
+                new Sconto(0, 15),
+                new Date(),
+                scadenza,
+                0,
+                1,
+                100,
+                false,
+                uu,
+                StatoBuono.ATTIVO
+        );
+        buonoRepository.save(buono2);
+
+// Buono sconto del 50% per un utente specifico
+        Buono buono3 = new Buono(
+                "VIP50",
+                new Sconto(50, 0),
+                new Date(),
+                null,
+                0,
+                1,
+                0,
+                false,
+                uu,
+                StatoBuono.ATTIVO
+        );
+        buonoRepository.save(buono3);
+
+// Buono sconto di 5€ cumulabile con altri buoni
+        Buono buono4 = new Buono(
+                "EXTRA5",
+                new Sconto(0, 5),
+                new Date(),
+                null,
+                0,
+                10,
+                20,
+                true,
+                null,
+                StatoBuono.ATTIVO
+        );
+        buonoRepository.save(buono4);
+
+// Buono sconto 30% non ancora attivo (futuro)
+        Calendar futureStart = Calendar.getInstance();
+        futureStart.add(Calendar.MONTH, 1);
+        Calendar futureEnd = Calendar.getInstance();
+        futureEnd.add(Calendar.MONTH, 2);
+        Buono buono5 = new Buono(
+                "ESTATE30",
+                new Sconto(30, 0),
+                futureStart.getTime(),
+                futureEnd.getTime(),
+                0,
+                50,
+                0,
+                false,
+                null,
+                StatoBuono.ATTIVO
+        );
+        buonoRepository.save(buono5);
+
+
         System.out.println("Libri caricati nel database");
+
     }
 }
