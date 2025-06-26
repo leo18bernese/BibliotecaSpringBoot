@@ -5,6 +5,7 @@ import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
 import {useQuery} from "@tanstack/react-query";
 import PaymentTabs from "./PaymentTabs";
+import AdressForm from "./AdressForm";
 
 const fetchPlaces = async () => {
     const {data} = await axios.get(`/api/spedizione/places`);
@@ -36,6 +37,16 @@ const CheckOut = () => {
     const [courierType, setCourierType] = useState("");
     const [shippingService, setShippingService] = useState("");
 
+    const [shippingAddress, setShippingAddress] = useState({
+        name: '',
+        address: '',
+        city: '',
+        postalCode: '',
+        country: ''
+    });
+
+    const [couponCodes, setCouponCodes] = useState([]);
+
     const {data: places, isLoading: isLoadingPlaces} = useQuery({
         queryKey: ['shippingPlaces'],
         queryFn: fetchPlaces,
@@ -57,6 +68,7 @@ const CheckOut = () => {
     if (isLoading) return <div>Loading...</div>;
     if (errorCouriers) return <div>Error loading couriers: {errorCouriers.message}</div>;
 
+    console.log(places)
     console.log("selezionato", locationType);
     console.log("couriers", courierType);
 
@@ -100,10 +112,10 @@ const CheckOut = () => {
             <div>
                 <Toaster/>
 
-                <p>Welcome, {user.username}!</p>
-                <p>Proceed with your order.</p>
+                <p className="text-gray-700">Welcome, {user.username}!</p>
+                <p className="font-semibold text-gray-700 text-lg">Proceed with your order.</p>
 
-                <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-4 text-gray-700 "
+                <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-4 text-gray-700 mt-6"
                      style={{alignItems: 'start'}}>
                     <div>
                         <div id="spedizione" className="bg-white p-6 rounded-lg"
@@ -164,6 +176,32 @@ const CheckOut = () => {
                                     }
                                 </div>
                             )}
+                        </div>
+
+                        <div id="indirizzo" className="bg-white p-6 rounded-lg my-8 "
+                             style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
+                            <h2 className="text-lg font-semibold my-4">Indirizzo di Spedizione</h2>
+
+                            {locationType === "" && (
+                                <p className="text-sm text-gray-600 mb-4">Seleziona un luogo di spedizione per poter scegliere l'indirizzo di spedizione.</p>
+                            )}
+
+                            {locationType === "HOME" ? (
+                                <div>
+                                    <h3 className="text-md font-semibold mb-2">Indirizzo di casa</h3>
+
+                                    <p className="text-sm text-gray-600 mb-4">Inserisci il tuo indirizzo di casa:</p>
+
+                                    <AdressForm/>
+
+                                </div>
+                            ) : (
+                                <div>
+                                    <h3 className="text-md font-semibold mb-2">Seleziona un punto di ritiro</h3>
+                                </div>
+                            )}
+
+
                         </div>
 
                         <div id="pagamento" className="bg-white p-6 rounded-lg my-8 "

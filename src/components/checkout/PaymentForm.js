@@ -74,7 +74,7 @@ const PaymentForm = () => {
     };
 
     return (
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4 mt-3" onSubmit={handleSubmit}>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Numero Carta</label>
                 <input
