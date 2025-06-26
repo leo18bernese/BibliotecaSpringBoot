@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {UserContext} from "../user/UserContext";
 import {useLocation, useNavigate} from "react-router-dom";
-import toast from "react-hot-toast";
+import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
 import {useQuery} from "@tanstack/react-query";
 import PaymentTabs from "./PaymentTabs";
@@ -16,10 +16,17 @@ const fetchCouriers = async (type) => {
     return data;
 }
 
+const fetchTotal = async () => {
+    const {data} = await axios.get(`/api/carrello/total`);
+    return data;
+}
+
 
 const CheckOut = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
+
+    const [errors, setErrors] = useState({});
 
     const location = useLocation();
     const cart = location.state?.cart;
@@ -40,6 +47,11 @@ const CheckOut = () => {
         enabled: !!locationType, // Only fetch couriers if locationType is set
     });
 
+    const {data: total, isLoading: isLoadingTotal} = useQuery({
+        queryKey: ['cartTotal'],
+        queryFn: fetchTotal,
+    });
+
     const isLoading = isLoadingPlaces || isLoadingCouriers;
 
     if (isLoading) return <div>Loading...</div>;
@@ -48,136 +60,179 @@ const CheckOut = () => {
     console.log("selezionato", locationType);
     console.log("couriers", courierType);
 
-    const sommaProdotti = cart.reduce((total, item) => total + (item.prezzo * item.quantita), 0).toFixed(2)
+    const sommaProdotti = total;
     const spedizione = (courierType && shippingService) ? couriers.find(c => c.id === courierType)?.offerte.find(o => o.tipo === shippingService)?.costo : 0;
+
+    const disabled = !shippingService || !courierType || !locationType;
+
+    const validate = () => {
+        const newErrors = {};
+
+        if (!locationType || !courierType || !shippingService) {
+            newErrors.shipping = "Please select a shipping method, courier, and service.";
+        }
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
+    const validateDiscountCode = async (code) => {
+        const params = new URLSearchParams();
+        params.append('codice', code);
+
+        const {data} = axios.post(`/api/buono/validate`, params)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error("Error validating discount code:", error);
+                toast.error(error.response.data);
+            });
+
+
+    }
 
     return <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Check Out</h1>
 
         {user ? (
             <div>
+                <Toaster/>
+
                 <p>Welcome, {user.username}!</p>
                 <p>Proceed with your order.</p>
 
-                <div id="spedizione" className="bg-white p-6 rounded-lg"
-                     style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
+                <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-4 text-gray-700 "
+                     style={{alignItems: 'start'}}>
+                    <div>
+                        <div id="spedizione" className="bg-white p-6 rounded-lg"
+                             style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
 
-                    <h2 className="text-lg font-semibold my-4">Metodo di spedizione</h2>
+                            <h2 className="text-lg font-semibold my-4">Metodo di spedizione</h2>
 
-                    {places.map((place) => {
-                        return (
-                            <div key={place.id} className="flex items-center mb-4">
-                                <input
-                                    type="radio"
-                                    id={place.id}
-                                    name="shippingPlace"
-                                    value={place.id}
-                                    checked={locationType === place.id}
-                                    onChange={() => setLocationType(place.id)}
-                                    className="mr-2"
-                                />
-                                <label htmlFor={place.id} className="cursor-pointer">
-                                    {place.description}
-                                </label>
-                            </div>
-                        );
-                    })}
-
-                    {locationType && (
-                        <div className="border-t my-5">
-                            <h2 className="text-lg font-semibold my-4">Corriere</h2>
-
-                            {couriers.map((courier) => {
-                                console.log("courier", courier);
+                            {places.map((place) => {
                                 return (
-                                    <div key={courier.id} className="flex items-center mb-4">
-                                        <input
-                                            type="radio"
-                                            id={courier.id}
-                                            name="shippingCourier"
-                                            value={courier.id}
-                                            checked={courierType === courier.id}
-                                            onChange={() => setCourierType(courier.id)}
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor={courier.id} className="cursor-pointer">
-                                            {courier.displayName}
-                                        </label>
-                                    </div>
+                                    <button
+                                        key={place.id}
+                                        className={`flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full ${locationType === place.id ? 'bg-blue-100 border-blue-500' : 'bg-white'}`}
+                                        onClick={() => setLocationType(place.id)}
+                                    >
+                                        {place.description}
+                                    </button>
                                 );
                             })}
+
+                            {locationType && (
+                                <div className="border-t my-5">
+                                    <h2 className="text-lg font-semibold my-4">Corriere</h2>
+
+                                    {couriers.map((courier) => {
+                                        console.log("courier", courier);
+                                        return (
+                                            <button
+                                                key={courier.id}
+                                                className={`flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full ${courierType === courier.id ? 'bg-blue-100 border-blue-500' : 'bg-white'}`}
+                                                onClick={() => setCourierType(courier.id)}
+                                            >
+                                                {courier.displayName}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {courierType && (
+                                <div className="border-t my-5">
+                                    <h2 className="text-lg font-semibold my-4">Servizio di spedizione</h2>
+
+                                    {couriers.find(c => c.id === courierType)?.offerte.map((offerta) => {
+
+                                        console.log("offerta", offerta);
+
+                                        return (
+                                            <button
+                                                key={offerta.tipo}
+                                                className={`flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full ${shippingService === offerta.tipo ? 'bg-blue-100 border-blue-500' : 'bg-white'}`}
+                                                onClick={() => setShippingService(offerta.tipo)}
+                                            >
+                                                {offerta.nome} ({offerta.giorniMinimo}-{offerta.giorniMassimo} giorni)
+                                                - {offerta.costo}€
+                                            </button>
+                                        );
+                                    })
+                                    }
+                                </div>
+                            )}
                         </div>
-                    )}
 
-                    {courierType && (
-                        <div className="border-t my-5">
-                            <h2 className="text-lg font-semibold my-4">Servizio di spedizione</h2>
+                        <div id="pagamento" className="bg-white p-6 rounded-lg my-8 "
+                             style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
 
-                            {couriers.find(c => c.id === courierType)?.offerte.map((offerta) => {
+                            <h2 className="text-lg font-semibold my-4">Metodo di pagamento</h2>
 
-                                console.log("offerta", offerta);
-
-                                return (
-                                    <div key={offerta.tipo} className="flex items-center mb-4">
-                                        <input
-                                            type="radio"
-                                            id={offerta.tipo}
-                                            name="shippingService"
-                                            value={offerta.tipo}
-                                            checked={shippingService === offerta.tipo}
-                                            onChange={() => setShippingService(offerta.tipo)}
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor={offerta.tipo} className="cursor-pointer">
-                                            {offerta.nome} ({offerta.giorniMinimo}-{offerta.giorniMassimo} giorni)
-                                            - {offerta.costo}€
-                                        </label>
-                                    </div>
-                                );
-                            })
-                            }
+                            <PaymentTabs/>
                         </div>
-                    )}
-                </div>
 
-                <div id="pagamento"className="bg-white p-6 rounded-lg my-8 "
-                     style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
+                        <div id="pagamento" className="bg-white p-6 rounded-lg my-8 "
+                             style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
 
-                        <h2 className="text-lg font-semibold my-4">Metodo di pagamento</h2>
+                            <h2 className="text-lg font-semibold my-4">Buoni Sconto</h2>
+                            <p className="text-sm text-gray-600 mb-4">Se hai un buono sconto, inseriscilo qui:</p>
 
-                        <PaymentTabs />
-                </div>
+                            <div className="flex flex-grow ">
+                                <input
+                                    type="text"
+                                    id="discountCode"
+                                    placeholder="Inserisci codice sconto"
+                                    className="border border-gray-300 rounded-md w-5/6 mr-4 p-2"
+                                />
 
-                <div id="riepilogo">
-                    {shippingService && (
-                        <div className="border-t my-5">
-                            <h2 className="text-lg font-semibold my-4">Riepilogo Ordine</h2>
-
-                            <div className="flex justify-between">
-                                <h3 className="text-md font-semibold">Carrello:</h3>
-                                <h3 className="text-md font-semibold text-right">{sommaProdotti} €</h3>
-                            </div>
-                            <div className="flex justify-between">
-                                <h3 className="text-md font-semibold">Spesa di spedizione:</h3>
-                                <h3 className="text-md font-semibold text-right">+ {spedizione} €</h3>
-                            </div>
-                            <div className="flex justify-between">
-                                <h3 className="text-md font-semibold">Totale:</h3>
-                                <h3 className="text-md font-semibold text-right">{(parseFloat(sommaProdotti) + parseFloat(spedizione)).toFixed(2)} €</h3>
+                                <button
+                                    className="bg-blue-500 hover:bg-blue-600 text-white rounded p-1 w-1/6 font-semibold "
+                                    onClick={() => validateDiscountCode(document.getElementById("discountCode").value)}
+                                > Applica Buono Sconto
+                                </button>
                             </div>
 
-                            <button
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-4"
-                                onClick={() => {
+                        </div>
+
+                    </div>
+
+
+                    <div id="riepilogo" className=" bg-white p-6 rounded-lg"
+                         style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
+                        <h2 className="text-lg font-semibold my-4 text-gray-700">Riepilogo Ordine</h2>
+
+                        <div className="flex justify-between border-t pt-2 text-md ">
+                            <h3 className="font-semibold text-gray-500">Carrello:</h3>
+                            <h3 className="font-semibold text-right  text-gray-800">{sommaProdotti} €</h3>
+                        </div>
+
+                        <div className="flex justify-between border-b py-2 text-md ">
+                            <h3 className="font-semibold text-gray-500">Spesa di spedizione:</h3>
+                            <h3 className="font-semibold text-right text-gray-800">{shippingService ? `+ ${spedizione} €` : "Da calcolare ..."}</h3>
+                        </div>
+
+                        <div className="flex justify-between py-2 text-lg">
+                            <h3 className=" font-semibold">Totale:</h3>
+                            <h3 className=" font-semibold text-right text-blue-700">{(parseFloat(sommaProdotti) + parseFloat(spedizione)).toFixed(2)} €</h3>
+                        </div>
+
+                        <button
+                            className={`${disabled ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'} text-white px-4 py-2 rounded-xl mt-4 w-full`}
+                            onClick={() => {
+
+                                if (validate()) {
                                     toast.success("Order placed successfully!");
                                     navigate("/orders");
-                                }}
-                            >Conferma Ordine
-                            </button>
-                        </div>
-                    )}
+                                }
+                            }}
+                            disabled={!shippingService || !courierType || !locationType}
+                        >Conferma Ordine
+                        </button>
+                    </div>
                 </div>
-
             </div>
         ) : (
             toast.error("Please log in to proceed with checkout.") &&

@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
-import InputMask from 'react-input-mask';
+import React, { useState } from 'react';
+// Importa useIMask
+import {IMask, useIMask} from 'react-imask';
 
 const PaymentForm = () => {
     const [formData, setFormData] = useState({
@@ -9,12 +10,48 @@ const PaymentForm = () => {
     });
     const [errors, setErrors] = useState({});
 
-    const cardNumberRef = useRef(null);
-    const expiryRef = useRef(null);
+    // --- Per Numero Carta ---
+    const { ref: cardNumberRef, maskRef: cardNumberMaskRef } = useIMask({
+        mask: '0000 0000 0000 0000',
+        // Puoi aggiungere logic per il type di carta se vuoi
+    }, {
+        onAccept: (value) => setFormData(prev => ({ ...prev, cardNumber: value }))
+    });
+
+    // --- Per Scadenza ---
+    const { ref: expiryRef, maskRef: expiryMaskRef } = useIMask({
+        mask: 'MM/YY',
+        blocks: {
+            MM: {
+                mask: IMask.MaskedRange,
+                from: 1,
+                to: 12,
+                autofix: true,
+            },
+            YY: {
+                mask: IMask.MaskedRange,
+                from: new Date().getFullYear() % 100, // Partendo dall'anno corrente
+                to: (new Date().getFullYear() % 100) + 11, // Fino a 10 anni nel futuro
+                autofix: true,
+            },
+        },
+    }, {
+        onAccept: (value) => setFormData(prev => ({ ...prev, expiry: value }))
+    });
+
+    const { ref: cvvRef } = useIMask({
+        mask: '000', // CVV può essere 3 o 4 cifre, ma qui lo limitiamo a 4 per semplicità
+    }, {
+        onAccept: (value) => setFormData(prev => ({ ...prev, cvv: value }))
+    });
 
     const validate = () => {
         const newErrors = {};
-        if (!/^[0-9\s]{13,19}$/.test(formData.cardNumber)) {
+
+        // La validazione deve essere adattata per le stringhe pulite ottenute da IMask
+        // La regex per cardNumber potrebbe aver bisogno di essere più flessibile se IMask include spazi
+
+        if (!/^[0-9]{13,19}$/.test(formData.cardNumber.replace(/\s/g, ''))) { // Rimuovi spazi per validazione
             newErrors.cardNumber = 'Numero carta non valido.';
         }
         if (!/^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(formData.expiry)) {
@@ -23,7 +60,9 @@ const PaymentForm = () => {
         if (!/^[0-9]{3,4}$/.test(formData.cvv)) {
             newErrors.cvv = 'CVV non valido.';
         }
+
         setErrors(newErrors);
+
         return Object.keys(newErrors).length === 0;
     };
 
@@ -34,49 +73,38 @@ const PaymentForm = () => {
         }
     };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
     return (
         <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Numero Carta</label>
-                <InputMask
-                    mask="9999 9999 9999 9999"
-                    maskChar=""
+                <input
+                    ref={cardNumberRef} // Passa il ref qui
                     name="cardNumber"
-                    value={formData.cardNumber}
-                    onChange={handleChange}
-                    className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.cardNumber ? 'border-red-500' : ''}`}
+                    className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2  ${errors.cardNumber ? 'border-red-500' : ''}`}
                     placeholder="1234 5678 9012 3456"
-                    inputRef={cardNumberRef}
                 />
                 {errors.cardNumber && <p className="text-red-500 text-sm">{errors.cardNumber}</p>}
             </div>
+
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Scadenza</label>
-                    <InputMask
-                        mask="99/99"
-                        maskChar=""
+                    <input
+                        ref={expiryRef} // Passa il ref qui
                         name="expiry"
-                        value={formData.expiry}
-                        onChange={handleChange}
-                        className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.expiry ? 'border-red-500' : ''}`}
+                        className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.expiry ? 'border-red-500' : ''}`}
                         placeholder="MM/AA"
-                        inputRef={expiryRef}
                     />
                     {errors.expiry && <p className="text-red-500 text-sm">{errors.expiry}</p>}
                 </div>
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700">CVV</label>
                     <input
-                        type="text"
+                        ref={cvvRef} // Passa il ref qui
                         name="cvv"
                         value={formData.cvv}
-                        onChange={handleChange}
-                        className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.cvv ? 'border-red-500' : ''}`}
+                        className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.cvv ? 'border-red-500' : ''}`}
                         placeholder="123"
                     />
                     {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
@@ -84,8 +112,7 @@ const PaymentForm = () => {
             </div>
             <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-            >
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors">
                 Paga con Carta di Credito
             </button>
         </form>
