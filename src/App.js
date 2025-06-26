@@ -9,9 +9,10 @@ import {UserContext, UserProvider} from './components/user/UserContext';
 import Carrello from "./components/carrello/Carrello";
 import {CartProvider} from "./components/carrello/CartContext";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query';
 import ScrollToTop from "./components/utils/ScrollToTop";
 import CheckOut from "./components/checkout/CheckOut";
+import axios from "axios";
 
 const queryClient = new QueryClient();
 
@@ -39,8 +40,20 @@ function App() {
     );
 }
 
+const fetchHomepageItems = async () => {
+    const { data } = await axios.get("/api/home/libri");
+    return data;
+}
+
 function Home() {
     const {user} = useContext(UserContext);
+
+    const { data: homepageItems, isLoading, error } = useQuery({
+        queryKey: ['homepageItems'],
+        queryFn: fetchHomepageItems,
+    });
+
+    console.log(homepageItems);
 
     return (
         <div className="App">
