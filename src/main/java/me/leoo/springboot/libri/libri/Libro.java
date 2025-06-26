@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +29,8 @@ public class Libro {
     private String editore;
     private String lingua;
     private String isbn;
+
+    private Date dataAggiunta = new Date();
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Long> recensioni = List.of();
@@ -74,5 +77,13 @@ public class Libro {
         this.isbn = libro.getIsbn();
 
         return this;
+    }
+
+    public boolean isInStock() {
+        return rifornimento != null && rifornimento.getDisponibili() > 0;
+    }
+
+    public boolean isInOfferta() {
+        return rifornimento != null && rifornimento.getSconto() != null;
     }
 }

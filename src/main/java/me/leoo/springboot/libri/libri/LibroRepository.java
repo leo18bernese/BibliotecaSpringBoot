@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
     List<Libro> findByTitoloEqualsIgnoreCase(String keyword);
@@ -24,4 +25,18 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     public Iterable<Libro> advanceSearch(@Param("titolo") String titolo,
                                          @Param("genere") String genere,
                                          @Param("autore") String autore);
+
+
+    @Query(value = "SELECT * FROM libro WHERE in_stock = true AND id NOT IN (:excludeIds) ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
+    List<Libro> findRandomAvailableBooksExcluding(@Param("limit") int limit, @Param("excludeIds") Set<Long> excludeIds);
+
+    List<Libro> findTop10ByOrderByDataAggiuntaDesc();
+
+    @Query("SELECT l FROM Libro l WHERE l.rifornimento.sconto IS NOT NULL")
+    List<Libro> findByInOffertaTrue();
+
+    List<Libro> findTop5ByRifornimento_QuantitaBetweenOrderByRifornimento_QuantitaAsc(int min, int max);
+
+
+
 }
