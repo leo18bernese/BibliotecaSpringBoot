@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.libri;
 
 import lombok.extern.slf4j.Slf4j;
+import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,11 @@ public class LibroController {
 
     @Autowired
     private LibroRepository libroRepository;
+
+    // DTO per le risposte
+    public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzo,
+                                   Sconto sconto) {
+    }
 
     // Tutti i libri
     @GetMapping
@@ -34,6 +40,27 @@ public class LibroController {
        /* return libroRepository.findById(id)
                 .orElse(null);
                 //.orElseThrow(() -> new RuntimeException("Libro non trovato"));*/
+    }
+
+    @GetMapping("/lite/{id}")
+    public ResponseEntity<LiteBookResponse> getLibroLiteById(@PathVariable Long id) {
+        try {
+            Libro libro = libroRepository.findById(id)
+                    .orElseThrow();
+
+            LiteBookResponse response = new LiteBookResponse(
+                    libro.getId(),
+                    libro.getTitolo(),
+                    libro.getAutore(),
+                    libro.getAnnoPubblicazione(),
+                    libro.getRifornimento().getPrezzoTotale(),
+                    libro.getRifornimento().getSconto()
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/exists/{id}")

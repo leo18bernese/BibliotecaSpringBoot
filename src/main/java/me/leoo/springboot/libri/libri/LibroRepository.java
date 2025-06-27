@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.libri;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,8 +28,8 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
                                          @Param("autore") String autore);
 
 
-    @Query(value = "SELECT * FROM libro WHERE in_stock = true AND id NOT IN (:excludeIds) ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
-    List<Libro> findRandomAvailableBooksExcluding(@Param("limit") int limit, @Param("excludeIds") Set<Long> excludeIds);
+    @Query( "SELECT l FROM Libro l WHERE l.rifornimento.quantita > 0 AND l.id NOT IN (:excludeIds)")
+    List<Libro> findRandomAvailableBooksExcluding(Pageable pageable, @Param("excludeIds") Set<Long> excludeIds);
 
     List<Libro> findTop10ByOrderByDataAggiuntaDesc();
 

@@ -3,6 +3,7 @@ package me.leoo.springboot.libri.libri.recommendation;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,7 +32,8 @@ public class LibroRecommendationService {
         if (libri.size() < limit) {
             Set<Long> ids = libri.stream().map(Libro::getId).collect(Collectors.toSet());
 
-            List<Libro> random = libroRepository.findRandomAvailableBooksExcluding(limit - libri.size(), ids);
+            Pageable pageable = Pageable.ofSize(limit - libri.size());
+            List<Libro> random = libroRepository.findRandomAvailableBooksExcluding(pageable, ids);
 
             Collections.shuffle(random);
 

@@ -1,5 +1,7 @@
 package me.leoo.springboot.libri.image;
 
+import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
@@ -8,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +22,10 @@ public class ImageController {
     @Autowired
     ResourceLoader resourceLoader;
 
+    @Autowired
+    private LibroRepository libroRepository;
+
+    @Deprecated
     private static final String UPLOAD_DIR = "src/main/resources/static/images";
 
     @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
@@ -49,24 +54,16 @@ public class ImageController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<?> getImage(@PathVariable Long productId) {
-        try {
-            String finalPath = UPLOAD_DIR + "/" + productId;
-            Path dirPath = Paths.get(finalPath);
+        Libro libro = libroRepository.findById(productId).orElseThrow();
 
-            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
+        try {
+            List<Path> paths = libro.getAllImages();
+
+            if (paths.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
 
-            // Ottieni la lista di file nella directory
-            List<String> fileNames = Files.list(dirPath)
-                    .filter(Files::isRegularFile)
-                    .map(path -> path.getFileName().toString())
-                    .toList();
-
-            return ResponseEntity.ok(fileNames);
-        } catch (AccessDeniedException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.ok(paths.size());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.noContent().build();
@@ -75,76 +72,17 @@ public class ImageController {
 
     @GetMapping("/{productId}/first")
     public ResponseEntity<byte[]> getFirstImage(@PathVariable Long productId) {
-        try {
-            String finalPath = UPLOAD_DIR + "/" + productId;
-            Path dirPath = Paths.get(finalPath);
+        Libro libro = libroRepository.findById(productId).orElseThrow();
 
-            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-                return ResponseEntity.notFound().build();
-            }
-
-            List<File> files = Files.list(dirPath)
-                    .filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .toList();
-
-            if (files.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            File firstFile = files.get(0);
-            byte[] image = Files.readAllBytes(firstFile.toPath());
-
-            return getImageResponse(image, firstFile.getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/{productId}/name/{fileName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long productId, @PathVariable String fileName) {
-        try {
-            String finalPath = UPLOAD_DIR + "/" + productId + "/" + fileName;
-            Path filePath = Paths.get(finalPath);
-
-            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-                return ResponseEntity.notFound().build();
-            }
-
-            byte[] image = Files.readAllBytes(filePath);
-
-            return getImageResponse(image, fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return libro.getPictureResponse(0);
     }
 
     @GetMapping("/{productId}/index/{index}")
-    public ResponseEntity<byte[]> getImageByIndex(@PathVariable Long productId, @PathVariable int index) {
+    public ResponseEntity<byte[]> getImage(@PathVariable Long productId, @PathVariable int index) {
+        Libro libro = libroRepository.findById(productId).orElseThrow();
+
         try {
-            String finalPath = UPLOAD_DIR + "/" + productId;
-            Path dirPath = Paths.get(finalPath);
-
-            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-                return ResponseEntity.notFound().build();
-            }
-
-            List<File> files = Files.list(dirPath)
-                    .filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .toList();
-
-            if (index < 0 || index >= files.size()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            File file = files.get(index);
-
-            byte[] image = Files.readAllBytes(file.toPath());
-
-            return getImageResponse(image, file.getName());
+            return libro.getPictureResponse(index);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
