@@ -31,7 +31,6 @@ const CheckOut = () => {
 
     const location = useLocation();
     const cart = location.state?.cart;
-    console.log(cart);
 
     const [locationType, setLocationType] = useState("");
     const [courierType, setCourierType] = useState("");
@@ -90,6 +89,19 @@ const CheckOut = () => {
     }
 
     const validateDiscountCode = async (code) => {
+        console.log("errors1 ", errors);
+
+        if(!code) {
+            errors.coupon = "Please enter a discount code.";
+            setErrors(errors);
+            console.log("errors2 ", errors);
+
+            return;
+        }
+
+        setErrors({}) ; // Reset coupon error
+console.log("errors3 ", errors);
+
         const params = new URLSearchParams();
         params.append('codice', code);
 
@@ -219,18 +231,24 @@ const CheckOut = () => {
                             <p className="text-sm text-gray-600 mb-4">Se hai un buono sconto, inseriscilo qui:</p>
 
                             <div className="flex flex-grow ">
-                                <input
-                                    type="text"
-                                    id="discountCode"
-                                    placeholder="Inserisci codice sconto"
-                                    className="border border-gray-300 rounded-md w-5/6 mr-4 p-2"
-                                />
+                                <div className=" w-4/6 mr-4">
+                                    <input
+                                        type="text"
+                                        id="discountCode"
+                                        placeholder="Inserisci codice sconto"
+                                        className="border border-gray-300 rounded-md w-full p-2"
+                                    />
+
+                                    {errors.coupon && <p className="text-red-500 text-sm">{errors.coupon}</p>}
+                                </div>
+
 
                                 <button
-                                    className="bg-blue-500 hover:bg-blue-600 text-white rounded p-1 w-1/6 font-semibold "
+                                    className="bg-blue-500 hover:bg-blue-600 text-white rounded p-1 w-2/6 font-semibold "
                                     onClick={() => validateDiscountCode(document.getElementById("discountCode").value)}
                                 > Applica Buono Sconto
                                 </button>
+
                             </div>
 
                         </div>

@@ -1,18 +1,18 @@
 // src/components/SearchBooks.js
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import axios from 'axios';
 import {useNavigate, useParams} from "react-router-dom";
-import Cookies from "js-cookie";
 import ImageGallery from "../images/ImageGallery";
 import {CartContext} from "../../carrello/CartContext";
 import {useQuery} from "@tanstack/react-query";
-import {Toaster} from "react-hot-toast";
+import toast, {Toaster} from "react-hot-toast";
 import BookInfoTabs from "./BookInfoTabs";
 
-const API_URL = 'http://localhost:8080/api/images';
+const API_URL = '/api/images';
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
+    console.log("fetched book data:", data);
     return data;
 };
 
@@ -22,14 +22,14 @@ const fetchBookExists = async (id) => {
     return data;
 }
 
-const fetchImages = async (id) => {
+const fetchImageIds = async (id) => {
     try {
         const {data} = await axios.get(`/api/images/${id}`);
         return data;
     } catch (error) {
         if (error.response && error.response.status === 404) {
             console.warn("No images found for this book:", error);
-            return [];
+            return -1;
         }
 
         throw error; // Rethrow other errors
@@ -38,8 +38,7 @@ const fetchImages = async (id) => {
 
 const fetchReviews = async (id) => {
     const {data} = await axios.get(`/api/recensioni/all/${id}`);
-    console.log("recensioni");
-    console.log(data);
+
     return data;
 };
 
@@ -83,9 +82,9 @@ const BookInfo = () => {
         queryFn: () => fetchBookExists(nextId),
     });
 
-    const {data: images = [], isLoading: areImagesLoading} = useQuery({
+    const {data: images, isLoading: areImagesLoading} = useQuery({
         queryKey: ['images', bookId],
-        queryFn: () => fetchImages(bookId),
+        queryFn: () => fetchImageIds(bookId),
     });
 
     const {data: reviews = [], isLoading: areReviewsLoading} = useQuery({
@@ -113,17 +112,16 @@ const BookInfo = () => {
 
 
     const handleUpload = () => {
+        if (!file) {
+            console.error('No file selected for upload');
+            toast.error('Please upload a file');
+            return;
+        }
+
         const formData = new FormData();
         formData.append('file', file);
 
-        axios.post(`/api/images/${id}`, formData, {
-            headers: { //todo try to remove authorization header
-                "Authorization": `Bearer ${Cookies.get('XSRF-TOKEN')}`,
-                'Content-Type': 'multipart/form-data',
-                'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
-            },
-            withCredentials: true
-        })
+        axios.post(`/api/images/${id}`, formData)
             .then(response => {
                 console.log('File uploaded successfully:', response.data);
             })
@@ -144,14 +142,15 @@ const BookInfo = () => {
     if (!book) {
         return <div className="flex justify-center items-center min-h-screen">Libro non trovato</div>;
     }
-    console.log(book);
-    console.log(cartItem);
+
+    console.log("Book data:", book);
+
     const rifornimento = book.rifornimento;
     const isDisponibile = rifornimento.quantita > 0;
 
     return (
         <>
-            <div className="container mx-auto px-4 py-8" style={{backgroundColor: '#f8fafc'}}>
+            <div className="container mx-auto px-4 py-8">
                 <Toaster/>
 
                 <div className="flex flex-col md:flex-row gap-8">
@@ -231,7 +230,7 @@ const BookInfo = () => {
                 </div>
 
                 <div className="my-8 bg-white p-6 rounded-lg " style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
-                    <BookInfoTabs book={book} />
+                    <BookInfoTabs book={book}/>
                 </div>
 
                 <div className="my-8 bg-white p-6 rounded-lg border-2 border-gray-200 "

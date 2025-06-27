@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 const ImageGallery = ({id, images, API_URL}) => {
-    const [selectedImage, setSelectedImage] = useState(images.length > 0 ? images[0] : null);
+    const [selectedImage, setSelectedImage] = useState(images === -1 ? -1 : 0);
     const [previousImage, setPreviousImage] = useState(selectedImage);
     const [showPopup, setShowPopup] = useState(false);
 
@@ -15,30 +15,31 @@ const ImageGallery = ({id, images, API_URL}) => {
 
     return (
         <div className="relative">
-            {/* Thumbnail image display */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-                {selectedImage && (
+
+            <div className="bg-white p-4 rounded-lg shadow-md" >
+                {selectedImage >= 0 && (
                     <img
-                        src={`${API_URL}/${id}/name/${selectedImage}`}
-                        alt={selectedImage}
+                        src={`${API_URL}/${id}/index/${selectedImage}`}
+                        alt='Cannot load image, please try again later'
                         className="max-w-full h-auto rounded-md mx-auto cursor-pointer"
-                        style={{maxHeight: '500px', objectFit: 'contain'}}
+                        style={{height: '500px', objectFit: 'contain'}}
                         onClick={handleImageClick}
                     />
                 )}
+
                 <div className="mt-4 w-full text-center text-gray-500 text-sm italic">
-                    {selectedImage ? 'Clicca sull\'immagine per ingrandirla' : 'Nessuna immagine disponibile'}
+                    {selectedImage === -1 ?  'Nessuna immagine disponibile':'Clicca sull\'immagine per ingrandirla'}
                 </div>
             </div>
 
             {/* Thumbnail navigation (if you have multiple images) */}
-            {images.length > 1 && (
+            {images > 0 && (
                 <div className="mt-4 flex flex-wrap justify-center">
-                    {images.map((image, index) => (
+                    {Array.from({ length: images }, (_, image) => (
                         <img
-                            key={index}
-                            src={`${API_URL}/${id}/name/${image}`}
-                            alt={`Thumbnail ${index}`}
+                            key={image}
+                            src={`${API_URL}/${id}/index/${image}`}
+                            alt={`Thumbnail ${image}`}
                             className={`w-16 h-16 object-cover rounded cursor-pointer border-2 ${
                                 selectedImage === image ? 'border-red-600' : 'border-gray-200'
                             }`}
@@ -68,9 +69,9 @@ const ImageGallery = ({id, images, API_URL}) => {
                         </button>
 
                         <img
-                            src={`${API_URL}/${id}/name/${selectedImage}`}
+                            src={`${API_URL}/${id}/index/${selectedImage}`}
                             alt={selectedImage}
-                            className="max-w-full h-auto rounded-md mx-auto"
+                            className="max-w-full h-auto rounded-md mx-auto px-5"
                             style={{maxHeight: '80vh', objectFit: 'contain'}}
                         />
                     </div>

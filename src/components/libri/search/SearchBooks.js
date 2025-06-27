@@ -34,7 +34,7 @@ const SearchBooks = () => {
                 {keyword.length > 0 && books.length === 0 && <li>No books found</li>}
 
                 {books.map(book => (
-                    <Link to={`/libri/${book.id}`} key={book.id}>
+                    <Link to={`/book/${book.id}`} key={book.id}>
                         <li>
                             {book.titolo} - {book.autore} - {book.genere}
                         </li>

@@ -5,21 +5,22 @@ import toast from 'react-hot-toast';
 import {Link} from "react-router-dom";
 import {CartContext} from "./CartContext";
 
-const API_URL = 'http://localhost:8080/api/images';
+const API_URL = '/api/images';
 
 const fetchImageByBookId = async (bookId) => {
     try {
         const {data} = await axios.get(`${API_URL}/${bookId}/first`);
         return data;
     } catch (error) {
+
         if (error.response && error.response.status === 404) {
             console.warn(`No image found for book ID: ${bookId}`);
-            // You might want to handle this more gracefully, e.g., return a placeholder
-            return null; // Return null or a placeholder if no image
+            return null;
         }
+
         console.error(`Error fetching image for book ID ${bookId}:`, error);
         toast.error('Errore durante il caricamento dell\'immagine.');
-        throw error; // Re-throw other errors
+        throw error;
     }
 };
 
@@ -33,7 +34,7 @@ const CarrelloItem = ({item}) => {
         isError: isImageError,
         error: imageError
     } = useQuery({
-        queryKey: ['image', item.libroId],
+        queryKey: ['bookFirst', item.libroId],
         queryFn: () => fetchImageByBookId(item.libroId),
         // Only enable if item.libroId is available
         enabled: !!item.libroId,
@@ -74,12 +75,12 @@ const CarrelloItem = ({item}) => {
                     <p className="text-gray-700">di {item.autore}</p>
                     <p className="text-gray-700 mb-4">Scritto nel: {item.annoPubblicazione}</p>
 
-                    <div className="border-2 border-gray-600 rounded-md inline-flex p-1 space-x-2">
-                        <button className="text-gray-600" onClick={() => removeItem(item.libroId, 1)}>-</button>
+                    <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
+                        <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => removeItem(item.libroId, 1)}>-</button>
 
-                        <p className="text-gray-600">{item.quantita}</p>
+                        <p className=" sm:mx-4 md:mx-2 lg:mx-2">{item.quantita}</p>
 
-                        <button className="text-gray-600" onClick={() => addItem(item.libroId, 1)}>+</button>
+                        <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => addItem(item.libroId, 1)}>+</button>
                     </div>
                 </div>
 

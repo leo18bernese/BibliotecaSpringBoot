@@ -10,8 +10,7 @@ const fetchCarrelloByUserId = async (userId) => {
     if (!userId) {
         return [];
     }
-    const {data} = await axios.get(`http://localhost:8080/api/carrello/items`);
-    console.log(data);
+    const {data} = await axios.get(`/api/carrello/items`);
     return data;
 };
 
