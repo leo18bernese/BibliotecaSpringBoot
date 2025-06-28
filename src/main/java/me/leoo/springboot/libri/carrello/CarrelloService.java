@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.carrello;
 
+import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.utente.Utente;
@@ -50,5 +51,36 @@ public class CarrelloService {
                 .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
 
         return carrello.getItem(libro);
+    }
+
+    @Transactional
+    public Carrello addCoupon(Utente utente, Buono coupon) {
+
+        Carrello carrello = getCarrelloByUtente(utente);
+
+        if (carrello.getCouponCodes().contains(coupon)) {
+            throw new RuntimeException("Il coupon è già stato applicato al carrello.");
+        }
+
+        try {
+           coupon.validate(utente, carrello);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+        carrello.getCouponCodes().add(coupon);
+        return carrelloRepository.save(carrello);
+    }
+
+    @Transactional
+    public Carrello removeCoupon(Utente utente, Buono coupon) {
+        Carrello carrello = getCarrelloByUtente(utente);
+
+        if (!carrello.getCouponCodes().contains(coupon)) {
+            throw new RuntimeException("Il coupon non è presente nel carrello.");
+        }
+
+        carrello.getCouponCodes().remove(coupon);
+        return carrelloRepository.save(carrello);
     }
 }

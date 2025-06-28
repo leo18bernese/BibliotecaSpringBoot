@@ -109,8 +109,8 @@ public class Rifornimento {
 
         if (scontoSoldi == 0) return prezzo;
 
-        System.out.println("Prezzo: " + prezzo + ", Sconto: " + scontoSoldi);
-        System.out.println("Prezzo totale: " + String.format("%.2f", prezzo - scontoSoldi));
+        //System.out.println("Prezzo: " + prezzo + ", Sconto: " + scontoSoldi);
+        //System.out.println("Prezzo totale: " + String.format("%.2f", prezzo - scontoSoldi));
 
         return LibriUtils.round(prezzo - scontoSoldi);
     }

@@ -1,5 +1,7 @@
 package me.leoo.springboot.libri.carrello;
 
+import jakarta.transaction.NotSupportedException;
+import me.leoo.springboot.libri.buono.BuonoService;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
@@ -11,7 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,19 +32,26 @@ public class CarrelloController {
     @Autowired
     private CarrelloService carrelloService;
 
+    @Autowired
+    private BuonoService buonoService;
+
     // DTO per le risposte
     public record CarrelloItemResponse(Long libroId, String titolo, String autore, int annoPubblicazione, int quantita,
                                        Date dataAggiunta, double prezzo, Rifornimento rifornimento) {
     }
 
-    public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, int numeroItems, Set<String> couponCodes) {
+    public record CouponResponse(String codice, double percentuale, double valore) {
+    }
+
+    public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale,  double finale, int numeroItems,
+                                   Set<CouponResponse> couponCodes) {
     }
 
     public record ItemRequest(Long libroId, int quantita) {
     }
 
     // Metodo helper per mappare l'entità Carrello al DTO CarrelloResponse
-    private CarrelloResponse mapToCarrelloResponse(Carrello carrello) {
+    private CarrelloResponse mapToCarrelloResponse(Carrello carrello) throws NotSupportedException {
         Set<CarrelloItemResponse> responseItems = carrello.getItems().stream()
                 .map(item -> {
                     Libro libro = item.getLibro();
@@ -60,7 +68,28 @@ public class CarrelloController {
                     );
                 })
                 .collect(Collectors.toSet());
-        return new CarrelloResponse(responseItems, carrello.getTotale(), responseItems.size(), carrello.getCouponCodes());
+
+        System.out.println("dto carrello 1");
+        try {
+            carrello.checkCoupons();
+        }catch (Exception e){
+            System.out.println("Errore durante il controllo dei coupon: " + e.getMessage());
+            throw e;
+        }
+
+        System.out.println("dto carrello 2");
+        Set<CouponResponse> couponResponses = carrello.getCouponCodes().stream()
+                .filter(coupon -> coupon.getSconto() != null)
+                .map(coupon -> new CouponResponse(
+                        coupon.getCodice(),
+                        coupon.getSconto().getPercentuale(),
+                        coupon.getSconto().getValore()
+                ))
+                .collect(Collectors.toSet());
+
+        System.out.println("dto carrello 3");
+
+        return new CarrelloResponse(responseItems, carrello.getSommaPrezzi(), carrello.getPrezzoFinale(), responseItems.size(),couponResponses);
     }
 
     @GetMapping
@@ -70,6 +99,7 @@ public class CarrelloController {
         }
 
         try {
+            System.out.println("Recupero carrello per l'utente: " + utente.getUsername());
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
         } catch (Exception e) {
@@ -105,7 +135,7 @@ public class CarrelloController {
     public ResponseEntity<Double> getCarrelloTotal(@AuthenticationPrincipal Utente utente) {
         try {
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
-            return ResponseEntity.ok(carrello.getTotale());
+            return ResponseEntity.ok(carrello.getSommaPrezzi());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

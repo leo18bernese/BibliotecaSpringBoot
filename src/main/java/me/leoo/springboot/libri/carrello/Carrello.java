@@ -1,15 +1,20 @@
 package me.leoo.springboot.libri.carrello;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.transaction.NotSupportedException;
 import lombok.*;
+import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utils.LibriUtils;
 import me.leoo.springboot.libri.utils.Sconto;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Builder
 @Entity
@@ -36,13 +41,30 @@ public class Carrello {
     @Temporal(TemporalType.TIMESTAMP)
     private Date ultimaModifica;
 
-    @ElementCollection
-    private Set<String> couponCodes = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "carrello_buono",
+            joinColumns = @JoinColumn(name = "carrello_id"),
+            inverseJoinColumns = @JoinColumn(name = "buono_id"))
+    private Set<Buono> couponCodes = new HashSet<>();
 
     public Carrello(Utente utente) {
         this.utente = utente;
         this.dataCreazione = new Date();
         this.ultimaModifica = new Date();
+    }
+
+    public void checkCoupons() {
+        for (Buono coupon : couponCodes) {
+
+            try {
+                coupon.validate(utente, this);
+            } catch (Exception ignored) {
+                System.out.println("Coupon " + coupon.getCodice() + " non valido, rimuovendo dal carrello.");
+                couponCodes.remove(coupon);
+            }
+        }
+
+        System.out.println("after checkCoupons: " + couponCodes.size() + " coupon(s) validi nel carrello.");
     }
 
     public void addItem(Libro libro, int quantita) {
@@ -117,13 +139,41 @@ public class Carrello {
         return item.getQuantita() * libro.getRifornimento().getPrezzoTotale();
     }
 
-    public double getTotale() {
-        double value = items.stream()
-                .map(i -> i.getQuantita() * i.getLibro().getRifornimento().getPrezzoTotale())
-                .reduce(0.0, Double::sum);
+    public double getSommaPrezzi() {
+        return items.stream()
+                .mapToDouble(i -> i.getQuantita() * i.getLibro().getRifornimento().getPrezzoTotale())
+                .sum();
+    }
+
+    public void sortCoupons() {
+        couponCodes = couponCodes.stream()
+                .sorted((b1, b2) -> {
+                    boolean v1 = b1.getSconto().getValore() > 0;
+                    boolean v2 = b2.getSconto().getValore() > 0;
+                    return Boolean.compare(!v1, !v2);
+                })
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public double getPrezzoFinale() throws NotSupportedException {
+        double value = getSommaPrezzi();
+
+        System.out.println("Coupon codes before sorting: " + couponCodes.stream().map(Buono::getCodice).collect(Collectors.joining(", ")));
+        sortCoupons();
+
+        System.out.println("Coupon codes sorted " + couponCodes.stream().map(Buono::getCodice).collect(Collectors.joining(", ")));
+
+        for (Buono coupon : couponCodes) {
+            if (coupon.getSconto() != null) {
+                value -= coupon.getSconto().getSconto(value);
+            }
+        }
+
+        if (value < 0) {
+            throw new NotSupportedException("Funzione non supportata: il totale non può essere negativo");
+        }
 
         return LibriUtils.round(value);
-
     }
 
     public String getDisponibilita(Libro libro) {

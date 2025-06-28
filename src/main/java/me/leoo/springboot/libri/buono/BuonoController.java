@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.buono;
 
+import me.leoo.springboot.libri.carrello.CarrelloService;
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ public class BuonoController {
     @Autowired
     private BuonoService buonoService;
 
+    @Autowired
+    private CarrelloService carrelloService;
+
     @PostMapping("/validate")
     public ResponseEntity<?> validateBuono(@AuthenticationPrincipal Utente utente,
                                            @RequestParam String codice) {
@@ -24,13 +28,9 @@ public class BuonoController {
         }
 
         try {
-            Buono buono = buonoService.getBuonoByCodice(codice);
+            Buono buono = buonoService.getBuonoByCodice(utente, codice);
 
-            buono.validate(utente);
-            System.out.println("user : "+ utente);
-            utente.getCarrello().getCouponCodes().add(codice);
-
-            System.out.println("couponCodes: " + utente.getCarrello().getCouponCodes());
+            carrelloService.addCoupon(utente, buono);
 
             return ResponseEntity.ok(buono);
         } catch (Exception e) {

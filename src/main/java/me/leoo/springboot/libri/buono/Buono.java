@@ -3,6 +3,7 @@ package me.leoo.springboot.libri.buono;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.transaction.NotSupportedException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -63,7 +64,8 @@ public class Buono {
         this.stato = stato;
     }
 
-    public boolean validate(Utente user) {
+    public boolean validate(Utente user, Carrello carrello) {
+        System.out.println("validate: " + this.codice);
         if (this.utente != null) {
             if (!this.utente.getId().equals(user.getId())) {
                 throw new IllegalArgumentException("Il buono non appartiene all'utente specificato.");
@@ -75,17 +77,13 @@ public class Buono {
             throw new IllegalStateException("Il buono non è attivo o è scaduto.");
         }
 
-        Carrello carrello = user.getCarrello();
-        if (carrello == null) {
-            return false;
-        }
         // Controlla se il buono è cumulabile
         if (!carrello.getCouponCodes().isEmpty() && !cumulabile) {
             throw new IllegalStateException("Il buono non è cumulabile con altri buoni attivi.");
         }
 
         // Controlla se la spesa minima è rispettata
-        if (spesaMinima > 0 && carrello.getTotale() < spesaMinima) {
+        if (spesaMinima > 0 && carrello.getSommaPrezzi() < spesaMinima) {
             throw new IllegalStateException("La spesa minima per utilizzare il buono non è stata raggiunta.");
         }
 

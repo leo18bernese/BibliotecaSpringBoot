@@ -103,6 +103,8 @@ public class Libro {
         List<Path> paths = getAllImages();
 
         if(index < 0 || index >= paths.size()) {
+
+
             return ResponseEntity.notFound().build();
         }
 
@@ -114,6 +116,7 @@ public class Libro {
             return ResponseEntity.badRequest().build();
         }
     }
+
 
     public List<Path> getAllImages() {
         try {
