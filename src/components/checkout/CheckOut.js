@@ -44,8 +44,6 @@ const CheckOut = () => {
         country: ''
     });
 
-    const [couponCodes, setCouponCodes] = useState([]);
-
     const {data: places, isLoading: isLoadingPlaces} = useQuery({
         queryKey: ['shippingPlaces'],
         queryFn: fetchPlaces,
@@ -67,10 +65,6 @@ const CheckOut = () => {
     if (isLoading) return <div>Loading...</div>;
     if (errorCouriers) return <div>Error loading couriers: {errorCouriers.message}</div>;
 
-    console.log(places)
-    console.log("selezionato", locationType);
-    console.log("couriers", courierType);
-
     const sommaProdotti = total;
     const spedizione = (courierType && shippingService) ? couriers.find(c => c.id === courierType)?.offerte.find(o => o.tipo === shippingService)?.costo : 0;
 
@@ -89,32 +83,26 @@ const CheckOut = () => {
     }
 
     const validateDiscountCode = async (code) => {
-        console.log("errors1 ", errors);
 
-        if(!code) {
-            errors.coupon = "Please enter a discount code.";
-            setErrors(errors);
-            console.log("errors2 ", errors);
+        if (!code) {
+            setErrors({ coupon: "Please enter a discount code." });
 
             return;
         }
-
-        setErrors({}) ; // Reset coupon error
-console.log("errors3 ", errors);
 
         const params = new URLSearchParams();
         params.append('codice', code);
 
         const {data} = axios.post(`/api/buono/validate`, params)
             .then(response => {
-                console.log(response.data);
+                setErrors({}); // Reset coupon error
+                toast.success("Discount code applied successfully!");
+
+                console.log("coup ", response.data);
             })
             .catch(error => {
-                console.error("Error validating discount code:", error);
-                toast.error(error.response.data);
+                setErrors({ coupon: error.response.data || "Error validating discount code." });
             });
-
-
     }
 
     return <div className="container mx-auto p-4">
@@ -152,7 +140,6 @@ console.log("errors3 ", errors);
                                     <h2 className="text-lg font-semibold my-4">Corriere</h2>
 
                                     {couriers.map((courier) => {
-                                        console.log("courier", courier);
                                         return (
                                             <button
                                                 key={courier.id}
@@ -195,7 +182,8 @@ console.log("errors3 ", errors);
                             <h2 className="text-lg font-semibold my-4">Indirizzo di Spedizione</h2>
 
                             {locationType === "" && (
-                                <p className="text-sm text-gray-600 mb-4">Seleziona un luogo di spedizione per poter scegliere l'indirizzo di spedizione.</p>
+                                <p className="text-sm text-gray-600 mb-4">Seleziona un luogo di spedizione per poter
+                                    scegliere l'indirizzo di spedizione.</p>
                             )}
 
                             {locationType === "HOME" ? (
@@ -228,10 +216,26 @@ console.log("errors3 ", errors);
                              style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
 
                             <h2 className="text-lg font-semibold my-4">Buoni Sconto</h2>
+
+                            {console.log("cart" , cart)}
+
+                            {cart.couponCodes && cart.couponCodes.map((couponCode) => {
+                                console.log("couponCode", couponCode);
+                                return (
+                                    <div key={couponCode.id} className="flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full">
+                                        <button className="mr-3" title="Remove coupon">✖</button>
+
+                                        <span className=" font-semibold">{couponCode.codice}</span>
+                                        <span className="ml-2 text-sm text-gray-600">- {couponCode.sconto.percentuale}%</span>
+                                    </div>
+                                );
+                            })}
+
                             <p className="text-sm text-gray-600 mb-4">Se hai un buono sconto, inseriscilo qui:</p>
 
+
                             <div className="flex flex-grow ">
-                                <div className=" w-4/6 mr-4">
+                                <div className=" w-4/6 mr-4" >
                                     <input
                                         type="text"
                                         id="discountCode"
@@ -239,7 +243,7 @@ console.log("errors3 ", errors);
                                         className="border border-gray-300 rounded-md w-full p-2"
                                     />
 
-                                    {errors.coupon && <p className="text-red-500 text-sm">{errors.coupon}</p>}
+                                    {errors.coupon && <p className="text-red-500 text-sm  mb-2">{errors.coupon}</p>}
                                 </div>
 
 
