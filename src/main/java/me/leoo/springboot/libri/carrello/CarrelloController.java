@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class CarrelloController {
                                        Date dataAggiunta, double prezzo, Rifornimento rifornimento) {
     }
 
-    public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, int numeroItems) {
+    public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, int numeroItems, Set<String> couponCodes) {
     }
 
     public record ItemRequest(Long libroId, int quantita) {
@@ -59,11 +60,15 @@ public class CarrelloController {
                     );
                 })
                 .collect(Collectors.toSet());
-        return new CarrelloResponse(responseItems, carrello.getTotale(), responseItems.size());
+        return new CarrelloResponse(responseItems, carrello.getTotale(), responseItems.size(), carrello.getCouponCodes());
     }
 
     @GetMapping
     public ResponseEntity<?> getCarrello(@AuthenticationPrincipal Utente utente) {
+        if (utente == null) {
+            return ResponseEntity.status(401).body("Utente non autenticato");
+        }
+
         try {
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
@@ -77,6 +82,7 @@ public class CarrelloController {
         if (utente == null) {
             return ResponseEntity.status(401).body("Utente non autenticato");
         }
+
         try {
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
             return ResponseEntity.ok(mapToCarrelloResponse(carrello).items());

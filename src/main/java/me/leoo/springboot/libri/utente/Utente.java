@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.carrello.Carrello;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +40,7 @@ public class Utente implements UserDetails {
     @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Carrello carrello;
+
 
     public Utente(String username, String password, String nome, String cognome, String email) {
         this.username = username;

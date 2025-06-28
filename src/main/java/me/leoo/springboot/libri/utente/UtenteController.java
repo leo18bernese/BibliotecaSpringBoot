@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,6 @@ public class UtenteController {
     private UtenteRepository utenteRepository;
 
     @GetMapping("/id/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Utente> getUtente(@PathVariable Long id) {
         System.out.println("UtenteController: getUtente called " + id);
         try {
@@ -46,17 +46,14 @@ public class UtenteController {
 
     }
 
-    @GetMapping("current")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getCurrentUtente() {
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentUtente(@AuthenticationPrincipal Utente utente) {
         System.out.println("UtenteController: getCurrentUtente called");
+        if (utente == null) {
+            return ResponseEntity.status(403).body("Utente non autenticato");
+        }
+
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("Authentication: " + authentication);
-            String username = authentication.getName();
-
-            Utente utente = utenteRepository.findByUsername(username).orElseThrow();
-
             return ResponseEntity.ok(utente);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();

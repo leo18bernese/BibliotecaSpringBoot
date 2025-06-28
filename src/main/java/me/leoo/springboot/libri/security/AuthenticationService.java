@@ -21,7 +21,7 @@ public class AuthenticationService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         System.out.println("passato authenticationManager.authenticate");
         UserDetails userDetails = utenteService.loadUserByUsername(username);
-        System.out.println("passato userDetails");
+        System.out.println("passato userDetails" + userDetails);
         return jwtService.generateToken(userDetails);
     }
 }

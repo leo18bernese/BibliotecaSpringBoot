@@ -1,25 +1,22 @@
 package me.leoo.springboot.libri.carrello;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utils.LibriUtils;
 import me.leoo.springboot.libri.utils.Sconto;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class Carrello {
 
     @Id
@@ -38,6 +35,9 @@ public class Carrello {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date ultimaModifica;
+
+    @ElementCollection
+    private Set<String> couponCodes = new HashSet<>();
 
     public Carrello(Utente utente) {
         this.utente = utente;

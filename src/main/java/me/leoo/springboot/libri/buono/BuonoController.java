@@ -26,7 +26,11 @@ public class BuonoController {
         try {
             Buono buono = buonoService.getBuonoByCodice(codice);
 
-            buono.validate(utente, new String[0]);
+            buono.validate(utente);
+            System.out.println("user : "+ utente);
+            utente.getCarrello().getCouponCodes().add(codice);
+
+            System.out.println("couponCodes: " + utente.getCarrello().getCouponCodes());
 
             return ResponseEntity.ok(buono);
         } catch (Exception e) {

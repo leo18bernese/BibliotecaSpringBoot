@@ -63,7 +63,7 @@ public class Buono {
         this.stato = stato;
     }
 
-    public boolean validate(Utente user, String[] activeCodes) {
+    public boolean validate(Utente user) {
         if (this.utente != null) {
             if (!this.utente.getId().equals(user.getId())) {
                 throw new IllegalArgumentException("Il buono non appartiene all'utente specificato.");
@@ -75,14 +75,13 @@ public class Buono {
             throw new IllegalStateException("Il buono non è attivo o è scaduto.");
         }
 
-        // Controlla se il buono è cumulabile
-        if (activeCodes.length > 0 && !cumulabile) {
-            throw new IllegalStateException("Il buono non è cumulabile con altri buoni attivi.");
-        }
-
         Carrello carrello = user.getCarrello();
         if (carrello == null) {
             return false;
+        }
+        // Controlla se il buono è cumulabile
+        if (!carrello.getCouponCodes().isEmpty() && !cumulabile) {
+            throw new IllegalStateException("Il buono non è cumulabile con altri buoni attivi.");
         }
 
         // Controlla se la spesa minima è rispettata
