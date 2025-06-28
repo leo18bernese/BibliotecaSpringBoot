@@ -3,9 +3,10 @@ import {UserContext} from "../user/UserContext";
 import {useLocation, useNavigate} from "react-router-dom";
 import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import PaymentTabs from "./PaymentTabs";
 import AdressForm from "./AdressForm";
+import {useCarrello} from "../hook/useCarrello";
 
 const fetchPlaces = async () => {
     const {data} = await axios.get(`/api/spedizione/places`);
@@ -17,24 +18,19 @@ const fetchCouriers = async (type) => {
     return data;
 }
 
-const fetchTotal = async () => {
-    const {data} = await axios.get(`/api/carrello/total`);
-    return data;
-}
-
-
 const CheckOut = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const [errors, setErrors] = useState({});
 
     const location = useLocation();
-    const cart = location.state?.cart;
 
     const [locationType, setLocationType] = useState("");
     const [courierType, setCourierType] = useState("");
     const [shippingService, setShippingService] = useState("");
+
 
     const [shippingAddress, setShippingAddress] = useState({
         name: '',
@@ -55,18 +51,19 @@ const CheckOut = () => {
         enabled: !!locationType, // Only fetch couriers if locationType is set
     });
 
-    const {data: total, isLoading: isLoadingTotal} = useQuery({
-        queryKey: ['cartTotal'],
-        queryFn: fetchTotal,
-    });
+    const {carrello, isLoadingCart, errorCart, isErrorCart} = useCarrello();
 
-    const isLoading = isLoadingPlaces || isLoadingCouriers;
+    console.log(" isLoadingCart: " + isLoadingCart);
+
+    const isLoading = isLoadingPlaces || isLoadingCouriers || isLoadingCart;
 
     if (isLoading) return <div>Loading...</div>;
     if (errorCouriers) return <div>Error loading couriers: {errorCouriers.message}</div>;
+    if (isErrorCart) return <div>Error loading cart: {errorCart.message}</div>;
 
-    const sommaProdotti = total;
+    const sommaProdotti = carrello.totale;
     const spedizione = (courierType && shippingService) ? couriers.find(c => c.id === courierType)?.offerte.find(o => o.tipo === shippingService)?.costo : 0;
+    const prezzoFinale = (parseFloat(carrello.finale) + parseFloat(spedizione)).toFixed(2);
 
     const disabled = !shippingService || !courierType || !locationType;
 
@@ -85,7 +82,7 @@ const CheckOut = () => {
     const validateDiscountCode = async (code) => {
 
         if (!code) {
-            setErrors({ coupon: "Please enter a discount code." });
+            setErrors({coupon: "Please enter a discount code."});
 
             return;
         }
@@ -94,14 +91,16 @@ const CheckOut = () => {
         params.append('codice', code);
 
         const {data} = axios.post(`/api/buono/validate`, params)
-            .then(response => {
+            .then(async response => {
                 setErrors({}); // Reset coupon error
                 toast.success("Discount code applied successfully!");
 
                 console.log("coup ", response.data);
+                await queryClient.invalidateQueries(['carrello', user?.id]);
+
             })
             .catch(error => {
-                setErrors({ coupon: error.response.data || "Error validating discount code." });
+                setErrors({coupon: error.response.data || "Error validating discount code."});
             });
     }
 
@@ -128,7 +127,11 @@ const CheckOut = () => {
                                     <button
                                         key={place.id}
                                         className={`flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full ${locationType === place.id ? 'bg-blue-100 border-blue-500' : 'bg-white'}`}
-                                        onClick={() => setLocationType(place.id)}
+                                        onClick={() => {
+                                            setLocationType(place.id);
+                                            setCourierType("");
+                                            setShippingService("");
+                                        }}
                                     >
                                         {place.description}
                                     </button>
@@ -160,6 +163,8 @@ const CheckOut = () => {
                                     {couriers.find(c => c.id === courierType)?.offerte.map((offerta) => {
 
                                         console.log("offerta", offerta);
+                                        const min = offerta.giorniMinimo;
+                                        const max = offerta.giorniMassimo;
 
                                         return (
                                             <button
@@ -167,7 +172,7 @@ const CheckOut = () => {
                                                 className={`flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full ${shippingService === offerta.tipo ? 'bg-blue-100 border-blue-500' : 'bg-white'}`}
                                                 onClick={() => setShippingService(offerta.tipo)}
                                             >
-                                                {offerta.nome} ({offerta.giorniMinimo}-{offerta.giorniMassimo} giorni)
+                                                {offerta.nome} ({(min === max) ? min : `${min}-${max}`} giorni)
                                                 - {offerta.costo}€
                                             </button>
                                         );
@@ -217,16 +222,25 @@ const CheckOut = () => {
 
                             <h2 className="text-lg font-semibold my-4">Buoni Sconto</h2>
 
-                            {console.log("cart" , cart)}
+                            {console.log("cart", carrello)}
 
-                            {cart.couponCodes && cart.couponCodes.map((couponCode) => {
+                            {carrello.couponCodes && carrello.couponCodes.map((couponCode) => {
                                 console.log("couponCode", couponCode);
                                 return (
-                                    <div key={couponCode.id} className="flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full">
+                                    <div key={couponCode.id}
+                                         className="flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full">
                                         <button className="mr-3" title="Remove coupon">✖</button>
 
                                         <span className=" font-semibold">{couponCode.codice}</span>
-                                        <span className="ml-2 text-sm text-gray-600">- {couponCode.sconto.percentuale}%</span>
+
+                                        {couponCode.percentuale > 0 && (
+                                            <span
+                                                className="ml-2 text-sm text-gray-600">- {couponCode.percentuale}%</span>
+                                        )}
+
+                                        {couponCode.valore > 0 && (
+                                            <span className="ml-2 text-sm text-gray-600">- {couponCode.valore}€</span>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -235,7 +249,7 @@ const CheckOut = () => {
 
 
                             <div className="flex flex-grow ">
-                                <div className=" w-4/6 mr-4" >
+                                <div className=" w-4/6 mr-4">
                                     <input
                                         type="text"
                                         id="discountCode"
@@ -274,9 +288,29 @@ const CheckOut = () => {
                             <h3 className="font-semibold text-right text-gray-800">{shippingService ? `+ ${spedizione} €` : "Da calcolare ..."}</h3>
                         </div>
 
+                        <div className="flex flex-col border-b py-2 text-md ">
+                            <h3 className="font-semibold text-gray-500 pb-4">Coupons</h3>
+
+                            {carrello.couponCodes && carrello.couponCodes.length > 0 ? (
+                                <h3 className="font-semibold text-right text-gray-700">
+                                    {carrello.couponCodes.map(coupon => (
+                                        <div key={coupon.id} className="flex justify-between  text-md">
+                                            <span>{coupon.codice}</span>
+                                            <span>{coupon.percentuale > 0 ? `-${coupon.percentuale}%` : `-${coupon.valore}€`}</span>
+                                        </div>
+                                    ))}
+                                </h3>
+                            ) : (
+                                <h3 className="font-semibold text-right text-gray-800">Nessun coupon applicato</h3>
+                            )}
+
+
+                        </div>
+
+
                         <div className="flex justify-between py-2 text-lg">
                             <h3 className=" font-semibold">Totale:</h3>
-                            <h3 className=" font-semibold text-right text-blue-700">{(parseFloat(sommaProdotti) + parseFloat(spedizione)).toFixed(2)} €</h3>
+                            <h3 className=" font-semibold text-right text-blue-700">{prezzoFinale} €</h3>
                         </div>
 
                         <button

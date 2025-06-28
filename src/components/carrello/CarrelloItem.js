@@ -57,7 +57,7 @@ const CarrelloItem = ({item}) => {
         );
     }
 
-    const imageSource = imageUrl ? `${API_URL}/${item.libroId}/first` : 'placeholder-image-url.jpg'; // Provide a placeholder
+    const imageSource = imageUrl ? `${API_URL}/${item.libroId}/first` : `${API_URL}/nf.jpg`;
 
     return (
         <div key={item.libroId} className="bg-white shadow-md rounded-lg p-4 flex items-center">

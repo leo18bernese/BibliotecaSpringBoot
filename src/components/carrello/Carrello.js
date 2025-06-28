@@ -4,39 +4,16 @@ import {UserContext} from "../user/UserContext";
 import {useQuery} from "@tanstack/react-query";
 import CarrelloItem from "./CarrelloItem";
 import {Toaster} from "react-hot-toast";
-import {useNavigate} from "react-router-dom"; // Import the new component
-
-const fetchCarrelloByUserId = async (userId) => {
-    if (!userId) {
-        return [];
-    }
-    const {data} = await axios.get(`/api/carrello`);
-    return data;
-};
+import {useNavigate} from "react-router-dom";
+import {useCarrello} from "../hook/useCarrello"; // Import the new component
 
 const Carrello = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
 
-    const {
-        data: carrello ,
-        isLoading,
-        error,
-        isError,
-    } = useQuery({
-        queryKey: ['carrello', user?.id],
-        queryFn: () => fetchCarrelloByUserId(user?.id),
-        enabled: !!user?.id,
-        staleTime: 5 * 60 * 1000,
-        select: (data) => {
-            if (data && Array.isArray(data)) {
-                return [...data].sort((a, b) => a.dataAggiunta.localeCompare(b.dataAggiunta));
-            }
-            return data;
-        }
-    });
+    const { carrello, isLoadingCart, errorCart, isErrorCart } = useCarrello();
 
-    if (isLoading) {
+    if (isLoadingCart) {
         return (
             <div className="container mx-auto p-4 flex justify-center items-center h-48">
                 Caricamento carrello...
@@ -44,10 +21,10 @@ const Carrello = () => {
         );
     }
 
-    if (isError) {
+    if (isErrorCart) {
         return (
             <div className="container mx-auto p-4 text-red-600">
-                Errore durante il caricamento del carrello: {error.message}
+                Errore durante il caricamento del carrello: {errorCart.message}
             </div>
         );
     }
@@ -71,7 +48,7 @@ const Carrello = () => {
             <h1 className="text-2xl font-bold mb-4">Carrello</h1>
             <Toaster/>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[80%_20%] gap-4 "style={{ alignItems: 'start' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-[80%_20%] gap-4 " style={{alignItems: 'start'}}>
                 <div>
                     {cartItems.length > 0 ? (
                         <div className="grid grid-cols-1 gap-5 ">
@@ -102,7 +79,7 @@ const Carrello = () => {
                             <div className="mt-4 border-t pt-4">
                                 <button
                                     className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-                                    onClick={() => navigate('/checkout', { state: { cart: carrello } })}>
+                                    onClick={() => navigate('/checkout', {state: {cart: carrello}})}>
                                     Procedi al Checkout
                                 </button>
                             </div>
