@@ -68,7 +68,7 @@ const CarrelloItem = ({item}) => {
 
             <div className="flex-1 flex justify-between items-start">
                 <div>
-                    <Link to={`/libri/${item.libroId}`} className="text-xl font-semibold hover:underline">
+                    <Link to={`/book/${item.libroId}`} className="text-xl font-semibold hover:underline">
                         {item.titolo}
                     </Link>
 

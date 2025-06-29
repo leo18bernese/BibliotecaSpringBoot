@@ -14,6 +14,10 @@ import ScrollToTop from "./components/utils/ScrollToTop";
 import CheckOut from "./components/checkout/CheckOut";
 import axios from "axios";
 import LiteBook from "./components/libri/lite/LiteBook";
+import AccountInfo from "./components/user/AccountInfo";
+import PersonalDetails from "./components/user/pages/PersonalDetails";
+import Ordine from "./components/ordine/Ordine";
+import 'antd/dist/reset.css'
 
 const queryClient = new QueryClient();
 
@@ -30,9 +34,23 @@ function App() {
                             <Route path="/" element={<Home/>}/>
                             <Route path="/search" element={<SearchBooks/>}/>
                             <Route path="/book/:id" element={<BookInfo/>}/>
-                            <Route path="/account" element={<div>Account</div>}/>
+                            <Route path="/ordine/:id" element={<Ordine/>}/>
                             <Route path="/cart" element={<Carrello/>}/>
                             <Route path="/checkout" element={<CheckOut/>}/>
+
+                            <Route path="/account" element={<AccountInfo />}>
+                                <Route index element={<PersonalDetails />} /> {/* Default child route for /account */}
+                                <Route path="personal-details" element={<PersonalDetails />} />
+                                {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
+                                <Route path="orders" element={<OrderHistory />} />
+                                <Route path="shipping" element={<ShippingAddresses />} />
+                                <Route path="payments" element={<PaymentMethods />} />
+                                <Route path="wishlist" element={<Wishlist />} />
+                                <Route path="reviews" element={<ProductReviews />} />
+                                <Route path="returns" element={<ReturnsRefunds />} />
+                                <Route path="settings" element={<AccountSettings />} />
+                                <Route path="support" element={<Support />} /> */}
+                            </Route>
                         </Routes>
                     </Router>
                 </CartProvider>

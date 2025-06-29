@@ -18,6 +18,7 @@ const fetchCouriers = async (type) => {
     return data;
 }
 
+
 const CheckOut = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
@@ -30,7 +31,6 @@ const CheckOut = () => {
     const [locationType, setLocationType] = useState("");
     const [courierType, setCourierType] = useState("");
     const [shippingService, setShippingService] = useState("");
-
 
     const [shippingAddress, setShippingAddress] = useState({
         name: '',
@@ -102,6 +102,31 @@ const CheckOut = () => {
             .catch(error => {
                 setErrors({coupon: error.response.data || "Error validating discount code."});
             });
+    }
+
+
+    const sendOrder = async () => {
+
+        const addr = {
+            nome: shippingAddress.name,
+            indirizzo: shippingAddress.address,
+            citta: shippingAddress.city,
+            cap: shippingAddress.postalCode,
+            provincia: shippingAddress.country, // Assuming country is used as province here
+            telefono: "" // Add phone number if needed
+        }
+
+
+        const {data} = await axios.post(`/api/carrello/invia`, {
+            luogoSpedizione: locationType,
+            corriereId: courierType,
+            tipoSpedizioneId: shippingService,
+            indirizzoSpedizione: addr,
+            speseSpedizione: spedizione,
+            metodoPagamento: ""
+        });
+
+        console.log("Order sent successfully:", data);
     }
 
     return <div className="container mx-auto p-4">
@@ -318,8 +343,9 @@ const CheckOut = () => {
                             onClick={() => {
 
                                 if (validate()) {
+                                    sendOrder();
+
                                     toast.success("Order placed successfully!");
-                                    navigate("/orders");
                                 }
                             }}
                             disabled={!shippingService || !courierType || !locationType}

@@ -100,13 +100,13 @@ const BookInfo = () => {
 
     const handlePreviousBook = () => {
         if (previousBookExists) {
-            navigate(`/libri/${previousId}`);
+            navigate(`/book/${previousId}`);
         }
     }
 
     const handleNextBook = () => {
         if (nextBookExists) {
-            navigate(`/libri/${nextId}`);
+            navigate(`/book/${nextId}`);
         }
     }
 
