@@ -103,53 +103,115 @@ const Ordine = () => {
             <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4  mt-8" style={{alignItems: 'start'}}>
 
                 <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
+                    <div className="p-2 rounded flex items-center font-semibold text-black">
+                        <i className="bx bx-package mr-2 text-2xl text-blue-600"></i>
+                        <span>Articoli Ordinati</span>
+                    </div>
+
+                    {ordine.items.map((item) => (
+                        <OrdineItem book={item} bookId={item.id} key={item.id}/>
+                    ))
+                    }
+                </div>
+
+                <div className="flex flex-col gap-12">
+
+                    <div>
+                        <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
+                            <div className="p-2 rounded flex items-center font-semibold text-black">
+                                <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
+                                <span>Info Ordine</span>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">{ordine.dataCreazione}</h3>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Somma Totale:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">
+                                    € {ordine.sommaTotale.toFixed(2)}
+                                </h3>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Spese Spedizione:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">
+                                    € {ordine.speseSpedizione.toFixed(2)}
+                                </h3>
+                            </div>
+
+                            <div className="flex justify-between py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Coupon:</h3>
+
+                                <h3 className="font-semibold text-right text-gray-800 mt-1">
+                                    {ordine.couponCodes.map((code, index) => (
+                                        <span key={index}
+                                              className="p-2 rounded-2xl font-semibold uppercase text-sm  ml-2"
+                                              style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
+                                    {code.codice} {" "}
+                                </span>
+                                    ))}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
+                            <div className="p-2 rounded flex items-center font-semibold text-black">
+                                <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
+                                <span>Info Spedizione</span>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Corriere:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">
+                                    {ordine.nomeCorriere || 'Non specificato'}
+                                </h3>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Tipo Spedizione:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">
+                                    {ordine.tipoSpedizione || 'Non specificato'}
+                                </h3>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Indirizzo di Spedizione:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">
+                                    {ordine.indirizzoFormat || 'Non specificato'}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
                         <div className="p-2 rounded flex items-center font-semibold text-black">
-                            <i className="bx bx-package mr-2 text-2xl text-blue-600"></i>
-                            <span>Articoli Ordinati</span>
+                            <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
+                            <span>Info Pagamento</span>
                         </div>
 
-                        {ordine.items.map((item) => (
-                            <OrdineItem book={item} bookId={item.id} key={item.id}/>
-                        ))
-                        }
+                        <div className="flex justify-between border-b py-2 text-md ">
+                            <h3 className="font-semibold text-gray-500">Metodo:</h3>
+                            <h3 className="font-semibold text-right text-gray-800">
+                                {ordine.metodoPagamento || 'Errore nel recupero'}
+                            </h3>
+                        </div>
+
+                        <div className="flex justify-between border-b py-2 text-md ">
+                            <h3 className="font-semibold text-gray-500">Id Transazione:</h3>
+                            <h3 className="font-semibold text-right text-gray-800">
+                                {ordine.idTransazione || 'Non trovato'}
+                            </h3>
+                        </div>
+                    </div>
+
+
                 </div>
 
-                <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
-                    <div className="p-2 rounded flex items-center font-semibold text-black">
-                        <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
-                        <span>Info Ordine</span>
-                    </div>
-
-                    <div className="flex justify-between border-b py-2 text-md ">
-                        <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
-                        <h3 className="font-semibold text-right text-gray-800">{ordine.dataCreazione}</h3>
-                    </div>
-
-                    <div className="flex justify-between border-b py-2 text-md ">
-                        <h3 className="font-semibold text-gray-500">Somma Totale:</h3>
-                        <h3 className="font-semibold text-right text-gray-800">
-                            € {ordine.sommaTotale.toFixed(2)}
-                        </h3>
-                    </div>
-
-                    <div className="flex justify-between border-b py-2 text-md ">
-                        <h3 className="font-semibold text-gray-500">Spese Spedizione:</h3>
-                        <h3 className="font-semibold text-right text-gray-800">
-                            € {ordine.speseSpedizione.toFixed(2)}
-                        </h3>
-                    </div>
-
-                    <div className="flex justify-between border-b py-2 text-md ">
-                        <h3 className="font-semibold text-gray-500">Coupon:</h3>
-                        <h3 className="font-semibold text-right text-gray-800">
-                            {ordine.couponCodes.map((code, index) => (
-                                <span key={index} className="text-green-600">
-                                    {code.codice}{index < ordine.couponCodes.length - 1 ? ', ' : ''}
-                                </span>
-                            ))}
-                        </h3>
-                    </div>
-                </div>
             </div>
         </div>
     );
