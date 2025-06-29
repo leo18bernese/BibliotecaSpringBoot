@@ -30,6 +30,7 @@ public class OrdineItem {
     @JoinColumn(name = "libro_id", nullable = false)
     private Libro libro;
 
+    private String titolo;
     private int quantita;
     private double prezzo;
 
@@ -37,6 +38,7 @@ public class OrdineItem {
 
     public OrdineItem(Libro libro, int quantita) {
         this.libro = libro;
+        this.titolo = libro.getTitolo();
         this.quantita = quantita;
         this.prezzo = libro.getRifornimento().getPrezzoTotale();
         this.sconto = libro.getRifornimento().getSconto();
