@@ -4,6 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 import {useNavigate, useParams} from "react-router-dom";
 import {Toaster} from "react-hot-toast";
 import Timeline from "./Timeline";
+import OrdineItem from "./OrdineItem";
 
 const fetchExistOrdine = async (id) => {
     const response = await axios.get(`/api/ordini/${id}/exists`);
@@ -13,6 +14,25 @@ const fetchExistOrdine = async (id) => {
 const fetchOrdine = async (id) => {
     const response = await axios.get(`/api/ordini/${id}`);
     return response.data;
+}
+
+const fetchBookById = async (id) => {
+    const {data} = await axios.get(`/api/libri/lite/${id}`);
+    return data;
+}
+
+const fetchBookImage = async (id) => {
+    try {
+        const {data} = await axios.get(`/api/images/${id}/first`);
+        return data;
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            console.warn(`No image found for book ID: ${id}`);
+            return null;
+        }
+        console.error(`Error fetching image for book ID ${id}:`, error);
+        throw error;
+    }
 }
 
 const Ordine = () => {
@@ -37,6 +57,7 @@ const Ordine = () => {
         },
         enabled: !existsLoading && exists // Only fetch ordine if it exists
     });
+
 
     if (existsLoading || isLoading) return <div>Caricamento...</div>;
     if (!exists) return <div className="p-4 ">
@@ -73,9 +94,62 @@ const Ordine = () => {
                             </span>
                 </div>
 
-                <Timeline current={ordine.stato} />
+                <Timeline current={ordine.stato}/>
 
+                <p className="text-center mt-8">{ordine.statoDescrizione}</p>
+                <p className="text-center">{ordine.statoNext}</p>
+            </div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4  mt-8" style={{alignItems: 'start'}}>
+
+                <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
+                        <div className="p-2 rounded flex items-center font-semibold text-black">
+                            <i className="bx bx-package mr-2 text-2xl text-blue-600"></i>
+                            <span>Articoli Ordinati</span>
+                        </div>
+
+                        {ordine.items.map((item) => (
+                            <OrdineItem book={item} bookId={item.id} key={item.id}/>
+                        ))
+                        }
+                </div>
+
+                <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
+                    <div className="p-2 rounded flex items-center font-semibold text-black">
+                        <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
+                        <span>Info Ordine</span>
+                    </div>
+
+                    <div className="flex justify-between border-b py-2 text-md ">
+                        <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
+                        <h3 className="font-semibold text-right text-gray-800">{ordine.dataCreazione}</h3>
+                    </div>
+
+                    <div className="flex justify-between border-b py-2 text-md ">
+                        <h3 className="font-semibold text-gray-500">Somma Totale:</h3>
+                        <h3 className="font-semibold text-right text-gray-800">
+                            € {ordine.sommaTotale.toFixed(2)}
+                        </h3>
+                    </div>
+
+                    <div className="flex justify-between border-b py-2 text-md ">
+                        <h3 className="font-semibold text-gray-500">Spese Spedizione:</h3>
+                        <h3 className="font-semibold text-right text-gray-800">
+                            € {ordine.speseSpedizione.toFixed(2)}
+                        </h3>
+                    </div>
+
+                    <div className="flex justify-between border-b py-2 text-md ">
+                        <h3 className="font-semibold text-gray-500">Coupon:</h3>
+                        <h3 className="font-semibold text-right text-gray-800">
+                            {ordine.couponCodes.map((code, index) => (
+                                <span key={index} className="text-green-600">
+                                    {code.codice}{index < ordine.couponCodes.length - 1 ? ', ' : ''}
+                                </span>
+                            ))}
+                        </h3>
+                    </div>
+                </div>
             </div>
         </div>
     );

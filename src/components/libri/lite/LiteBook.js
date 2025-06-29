@@ -35,8 +35,6 @@ const LiteBook = ({bookId}) => {
         enabled: !!bookId, // Only fetch if bookId is available
     });
 
-    console.log("lite ", book);
-
     if(isBookLoading) {
         return <div>Loading...</div>;
     }
