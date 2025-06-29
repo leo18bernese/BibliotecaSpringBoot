@@ -99,7 +99,6 @@ public class Rifornimento {
     /**
      * @return discounted price if present
      */
-    @Transient
     public double getPrezzoTotale() {
         if (sconto == null) {
             return prezzo;
@@ -116,7 +115,6 @@ public class Rifornimento {
     }
 
     // Status
-    @Transient
     public String getStatus() {
         //int disponibili = getDisponibili();
         int disponibili = quantita;
@@ -138,7 +136,6 @@ public class Rifornimento {
         return "Disponibile. Consegna in " + giorniConsegna + " giorni";
     }
 
-    @Transient
     public String getColor() {
         //int disponibili = getDisponibili();
         int disponibili = quantita;

@@ -4,7 +4,12 @@ import jakarta.transaction.NotSupportedException;
 import me.leoo.springboot.libri.buono.BuonoService;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
+import me.leoo.springboot.libri.ordini.Ordine;
+import me.leoo.springboot.libri.ordini.OrdineRepository;
+import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
+import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
+import me.leoo.springboot.libri.spedizione.SpedizioneLuogo;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +40,11 @@ public class CarrelloController {
     @Autowired
     private BuonoService buonoService;
 
+    @Autowired
+    private OrdineRepository ordineRepository;
+    @Autowired
+    private OrdineService ordineService;
+
     // DTO per le risposte
     public record CarrelloItemResponse(Long libroId, String titolo, String autore, int annoPubblicazione, int quantita,
                                        Date dataAggiunta, double prezzo, Rifornimento rifornimento) {
@@ -43,11 +53,16 @@ public class CarrelloController {
     public record CouponResponse(String codice, double percentuale, double valore) {
     }
 
-    public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale,  double finale, int numeroItems,
+    public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, double finale, int numeroItems,
                                    Set<CouponResponse> couponCodes) {
     }
 
     public record ItemRequest(Long libroId, int quantita) {
+    }
+
+    public record InviaOrdineRequest(String luogoSpedizione, String corriereId, String tipoSpedizioneId,
+                                     SpedizioneIndirizzo indirizzoSpedizione, double speseSpedizione,
+                                     String metodoPagamento) {
     }
 
     // Metodo helper per mappare l'entità Carrello al DTO CarrelloResponse
@@ -72,7 +87,7 @@ public class CarrelloController {
         System.out.println("dto carrello 1");
         try {
             carrello.checkCoupons();
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Errore durante il controllo dei coupon: " + e.getMessage());
             throw e;
         }
@@ -89,7 +104,7 @@ public class CarrelloController {
 
         System.out.println("dto carrello 3");
 
-        return new CarrelloResponse(responseItems, carrello.getSommaPrezzi(), carrello.getPrezzoFinale(), responseItems.size(),couponResponses);
+        return new CarrelloResponse(responseItems, carrello.getSommaPrezzi(), carrello.getPrezzoFinale(), responseItems.size(), couponResponses);
     }
 
     @GetMapping
@@ -187,4 +202,29 @@ public class CarrelloController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    //ordine
+    @PostMapping("/invia")
+    public ResponseEntity<?> inviaOrdine(@AuthenticationPrincipal Utente utente,
+                                         @RequestBody InviaOrdineRequest request) {
+        try {
+            System.out.println("Invio ordine per l'utente: " + utente.getUsername());
+            Carrello carrello = carrelloService.getCarrelloByUtente(utente);
+            if (carrello.getItems().isEmpty()) {
+                return ResponseEntity.badRequest().body("Il carrello è vuoto");
+            }
+            System.out.println("Carrello recuperato con " + carrello.getItems().size() + " item");
+
+            SpedizioneLuogo spedizioneLuogo = SpedizioneLuogo.valueOf(request.luogoSpedizione().toUpperCase());
+
+            System.out.println("carrello1");
+            Ordine ordine = new Ordine(carrello, spedizioneLuogo, request.corriereId(), request.tipoSpedizioneId(), request.indirizzoSpedizione(), request.speseSpedizione(), request.metodoPagamento());
+            System.out.println("carrello2");
+            return ResponseEntity.ok(ordineService.inviaOrdine(ordine));
+        } catch (Exception e) {
+            System.out.println("Errore durante l'invio dell'ordine: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Errore nell'invio dell'ordine: " + e.getMessage());
+        }
+    }
+
 }

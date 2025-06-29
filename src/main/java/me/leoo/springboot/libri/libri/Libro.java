@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.libri;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -89,15 +90,15 @@ public class Libro {
         return this;
     }
 
+    @JsonIgnore
     public boolean isInStock() {
         return rifornimento != null && rifornimento.getDisponibili() > 0;
     }
 
+    @JsonIgnore
     public boolean isInOfferta() {
         return rifornimento != null && rifornimento.getSconto() != null;
     }
-
-
 
     public ResponseEntity<byte[]> getPictureResponse(int index) {
         List<Path> paths = getAllImages();
