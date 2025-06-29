@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.carrello.CarrelloItem;
-import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
-import me.leoo.springboot.libri.spedizione.SpedizioneLuogo;
+import me.leoo.springboot.libri.spedizione.*;
 import me.leoo.springboot.libri.utente.Utente;
 
 import java.util.Date;
@@ -52,7 +51,11 @@ public class Ordine {
 
     //spedizione
     private SpedizioneLuogo luogoSpedizione;
+
+    @JsonIgnore
     private String corriereId;
+
+    @JsonIgnore
     private String tipoSpedizioneId;
 
     private SpedizioneIndirizzo indirizzoSpedizione;
@@ -102,6 +105,34 @@ public class Ordine {
         // Imposta l'utente dell'ordine
         this.utente = carrello.getUtente();
     }
+
+    public String getNomeCorriere() {
+        Spedizioniere spedizione = Spedizione.getById(corriereId);
+        if (spedizione == null) {
+            return "Corriere non trovato";
+        }
+
+        return spedizione.displayName();
+    }
+
+    public String getTipoSpedizione() {
+        try {
+            TipoSpedizione.Tipo tipo = TipoSpedizione.Tipo.valueOf(tipoSpedizioneId);
+
+            return tipo.getNome();
+        } catch (Exception ignored) {
+            return "Non specificato/disponibile";
+        }
+    }
+
+    public String getIndirizzoFormat() {
+        if (indirizzoSpedizione == null) {
+            return "Non specificato";
+        }
+
+        return indirizzoSpedizione.getFullAddress();
+    }
+
 
     public String getStatoName() {
         return stato.getDisplayName();
