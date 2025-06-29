@@ -21,4 +21,4 @@ public enum StatoOrdine {
     private final String displayName;
     private final String description;
     private final String nextStepOrInfo;
-    }
+}

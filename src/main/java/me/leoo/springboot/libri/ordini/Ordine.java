@@ -102,4 +102,16 @@ public class Ordine {
         // Imposta l'utente dell'ordine
         this.utente = carrello.getUtente();
     }
+
+    public String getStatoName() {
+        return stato.getDisplayName();
+    }
+
+    public String getStatoDescrizione() {
+        return stato.getDescription();
+    }
+
+    public String getStatoNext() {
+        return stato.getNextStepOrInfo();
+    }
 }
