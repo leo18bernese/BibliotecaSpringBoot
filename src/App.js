@@ -2,7 +2,7 @@
 import React, {useContext} from 'react';
 import './App.css';
 import NavBar from "./components/navbar/NavBar";
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import SearchBooks from "./components/libri/search/SearchBooks";
 import BookInfo from "./components/libri/details/BookInfo";
 import {UserContext, UserProvider} from './components/user/UserContext';
@@ -15,9 +15,10 @@ import CheckOut from "./components/checkout/CheckOut";
 import axios from "axios";
 import LiteBook from "./components/libri/lite/LiteBook";
 import AccountInfo from "./components/user/AccountInfo";
-import PersonalDetails from "./components/user/pages/PersonalDetails";
+import OrderHistory from "./components/user/pages/OrderHistory";
 import Ordine from "./components/ordine/Ordine";
 import 'antd/dist/reset.css'
+import PersonalDetails from "./components/user/pages/PersonalDetails";
 
 const queryClient = new QueryClient();
 
@@ -39,10 +40,10 @@ function App() {
                             <Route path="/checkout" element={<CheckOut/>}/>
 
                             <Route path="/account" element={<AccountInfo />}>
-                                <Route index element={<PersonalDetails />} /> {/* Default child route for /account */}
-                                <Route path="personal-details" element={<PersonalDetails />} />
-                                {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
+                                <Route index element={<Navigate to="personal-details" replace />} />
+                                <Route  path="personal-details" element={<PersonalDetails />} />
                                 <Route path="orders" element={<OrderHistory />} />
+                                {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
                                 <Route path="shipping" element={<ShippingAddresses />} />
                                 <Route path="payments" element={<PaymentMethods />} />
                                 <Route path="wishlist" element={<Wishlist />} />
@@ -70,6 +71,7 @@ function Home() {
     const {data: homepageItems, isLoading, error} = useQuery({
         queryKey: ['homepageItems'],
         queryFn: fetchHomepageItems,
+        staleTime: Infinity, // Impedisce il refetch automatico
     });
 
     return (

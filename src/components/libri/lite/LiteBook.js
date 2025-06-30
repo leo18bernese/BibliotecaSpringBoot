@@ -35,39 +35,39 @@ const LiteBook = ({bookId}) => {
         enabled: !!bookId, // Only fetch if bookId is available
     });
 
-    if(isBookLoading) {
+    if (isBookLoading) {
         return <div>Loading...</div>;
     }
 
-    if(bookError) {
+    if (bookError) {
         return <div>Error loading book details.</div>;
     }
 
     return (
         <>
             <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-                <Link to={`/book/${bookId}`}>
-                    <div className="book-card">
+                <div className="book-card">
 
-                        { bookImage ? (
+                    <Link to={`/book/${bookId}`}>
+                        {bookImage ? (
                             <img
                                 src={`/api/images/${bookId}/first`}
                                 alt={`Cover of ${book.titolo}`}
                                 className="w-full h-64 object-cover rounded-md mb-5"
-                                style={{height:'250px'}}
+                                style={{height: '250px'}}
                             />
                         ) : (
                             <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-md mb-5"
-                                 style={{height:'250px'}}>
+                                 style={{height: '250px'}}>
                                 <span className="text-gray-500">No image available</span>
                             </div>
                         )}
+                    </Link>
 
 
-                        <h3>{book.titolo}</h3>
-                        <p>by {book.autore}</p>
-                    </div>
-                </Link>
+                    <h3>{book.titolo}</h3>
+                    <p>by {book.autore}</p>
+                </div>
             </div>
         </>
     );

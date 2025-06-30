@@ -125,7 +125,7 @@ const Ordine = () => {
 
                             <div className="flex justify-between border-b py-2 text-md ">
                                 <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
-                                <h3 className="font-semibold text-right text-gray-800">{ordine.dataCreazione}</h3>
+                                <h3 className="font-semibold text-right text-gray-800">{new Date(ordine.dataCreazione).toLocaleString()}</h3>
                             </div>
 
                             <div className="flex justify-between border-b py-2 text-md ">
