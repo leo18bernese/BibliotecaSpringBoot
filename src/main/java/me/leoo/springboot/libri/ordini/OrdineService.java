@@ -5,11 +5,14 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class OrdineService {
 
     @Autowired
     private OrdineRepository ordineRepository;
+
 
     public Ordine getOrdineById(Utente utente, long id) {
         Ordine ordine = ordineRepository.findByIdAndUtente(id, utente)
@@ -21,6 +24,14 @@ public class OrdineService {
         return ordine;
     }
 
+    public List<Ordine> getAllOrdini(Utente utente) {
+        List<Ordine> ordini = ordineRepository.findAllByUtente(utente);
+
+        for (Ordine ordine : ordini) {
+        }
+        return ordini;
+    }
+
     public boolean existsOrdine(Utente utente, long id) {
         return ordineRepository.existsByIdAndUtente(id, utente);
     }
@@ -28,4 +39,5 @@ public class OrdineService {
     public Ordine inviaOrdine(Ordine ordine) {
         return ordineRepository.save(ordine);
     }
+
 }

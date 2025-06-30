@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/ordini")
 public class OrdineController {
@@ -43,5 +45,18 @@ public class OrdineController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllOrdini(@AuthenticationPrincipal Utente utente) {
+        if (utente == null) {
+            return ResponseEntity.badRequest().body("Utente non autenticato.");
+        }
+
+        try {
+            List<Ordine> ordini = ordineService.getAllOrdini(utente);
+            return ResponseEntity.ok(ordini);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore nel recupero degli ordini: " + e.getMessage());
+        }
+    }
 
 }

@@ -2,6 +2,7 @@ package me.leoo.springboot.libri.ordini;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.transaction.NotSupportedException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class Ordine {
     private Date ultimaModifica;
 
     private double sommaTotale;
+    private double prezzoFinale;
     private double speseSpedizione;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -67,7 +69,7 @@ public class Ordine {
     //errori
     private String errori;
 
-    public Ordine(Carrello carrello, SpedizioneLuogo luogoSpedizione, String corriereId, String tipoSpedizioneId, SpedizioneIndirizzo indirizzoSpedizione, double speseSpedizione, String metodoPagamento) {
+    public Ordine(Carrello carrello, SpedizioneLuogo luogoSpedizione, String corriereId, String tipoSpedizioneId, SpedizioneIndirizzo indirizzoSpedizione, double speseSpedizione, String metodoPagamento) throws NotSupportedException {
         this.utente = carrello.getUtente();
         this.stato = StatoOrdine.IN_ATTESA;
 
@@ -75,6 +77,7 @@ public class Ordine {
         this.ultimaModifica = new Date();
 
         this.sommaTotale = carrello.getSommaPrezzi();
+        this.prezzoFinale = carrello.getPrezzoFinale();
         this.speseSpedizione = speseSpedizione;
 
         this.luogoSpedizione = luogoSpedizione;
@@ -132,7 +135,6 @@ public class Ordine {
 
         return indirizzoSpedizione.getFullAddress();
     }
-
 
     public String getStatoName() {
         return stato.getDisplayName();
