@@ -102,11 +102,14 @@ public class Ordine {
         for (Buono buono : carrello.getCouponCodes()) {
             if (buono.validate(utente, carrello)) {
                 couponCodes.add(buono);
+                buono.addUse();
             }
         }
 
         // Imposta l'utente dell'ordine
         this.utente = carrello.getUtente();
+
+        carrello.clear();
     }
 
     public String getNomeCorriere() {

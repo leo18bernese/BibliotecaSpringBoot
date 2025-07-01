@@ -140,7 +140,12 @@ public class CarrelloController {
     public ResponseEntity<Integer> getCarrelloAmount(@AuthenticationPrincipal Utente utente) {
         try {
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
-            return ResponseEntity.ok(carrello.getItems().size());
+
+            int sum = carrello.getItems().stream()
+                    .mapToInt(CarrelloItem::getQuantita)
+                    .sum();
+
+            return ResponseEntity.ok(sum);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

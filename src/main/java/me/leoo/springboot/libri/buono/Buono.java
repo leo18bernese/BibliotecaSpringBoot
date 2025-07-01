@@ -3,7 +3,6 @@ package me.leoo.springboot.libri.buono;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.transaction.NotSupportedException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,6 +61,10 @@ public class Buono {
         this.cumulabile = cumulabile;
         this.utente = utente;
         this.stato = stato;
+    }
+
+    public void addUse() {
+        utilizzi++;
     }
 
     public boolean validate(Utente user, Carrello carrello) {

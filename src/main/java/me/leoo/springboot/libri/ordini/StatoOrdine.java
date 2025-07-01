@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum StatoOrdine {
 
-    IN_ATTESA("In attesa", "L'ordine è stato ricevuto e in attesa di elaborazione.", "A breve gli articolo saranno raccolti e preparati per la spedizione."),
+    IN_ATTESA("In attesa", "L'ordine è stato ricevuto e in attesa di elaborazione.", "A breve gli articoli saranno raccolti e preparati per la spedizione."),
     IN_PREPARAZIONE("In preparazione", "L'ordine è in fase di preparazione.", "Gli articoli sono in fase di raccolta e imballaggio."),
     SPEDITO("Spedito", "L'ordine è stato spedito e in transito verso la destinazione.", "Puoi tracciare il tuo ordine con il numero di tracciamento fornito."),
     IN_CONSEGNA("In consegna", "L'ordine è in consegna e arriverà a breve.", "Assicurati di essere disponibile per ricevere il pacco. " +

@@ -10,8 +10,7 @@ public record SpedizioneIndirizzo(String nome, String indirizzo, String citta, S
                indirizzo != null && !indirizzo.isBlank() &&
                citta != null && !citta.isBlank() &&
                provincia != null && !provincia.isBlank() &&
-               cap != null && !cap.isBlank() &&
-               telefono != null && !telefono.isBlank();
+               cap != null && !cap.isBlank();
     }
 
     public String getFullAddress() {

@@ -194,8 +194,10 @@ public class Carrello {
         return item.getLibro().getRifornimento().getSconto();
     }
 
-    public void svuota() {
+    public void clear() {
         items.clear();
+        couponCodes.clear();
+        dataCreazione = new Date();
         ultimaModifica = new Date();
     }
 
