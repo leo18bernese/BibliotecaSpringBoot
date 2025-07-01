@@ -2,11 +2,26 @@
 import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
 import {UserContext} from "../user/UserContext";
-import { FaShoppingCart } from 'react-icons/fa';
+import {FaShoppingCart} from 'react-icons/fa';
+import axios from "axios";
+import {useCarrello} from "../hook/useCarrello";
+import {useQuery} from "@tanstack/react-query";
+
+const fetchCartItemsCount = async () => {
+    const {data} = await axios.get('/api/carrello/count');
+    return data;
+}
 
 const NavBar = () => {
     const {user} = useContext(UserContext);
-    const {cart} = useContext(UserContext);
+
+    const {data: count, isLoadingCart, errorCart, isErrorCart} = useQuery({
+        queryKey: ['cartItemsCount'],
+        queryFn: fetchCartItemsCount,
+        staleTime: Infinity, // Impedisce il refetch automatico
+    });
+
+    const carrello = count || 0; // Default to 0 if count is undefined
 
     return (
         <nav className="bg-gray-800 text-white shadow-md">
@@ -34,12 +49,12 @@ const NavBar = () => {
                         </Link>
                     )}
                     <Link to="/cart" className="text-white hover:text-gray-300 relative">
-                        <FaShoppingCart size={24} />
+                        <FaShoppingCart size={24}/>
 
                         {/* Optional: Add a badge for cart items count */}
                         <span
                             className="absolute -top-2 -right-4 bg-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-
+                            {carrello}
                         </span>
                     </Link>
                 </div>
