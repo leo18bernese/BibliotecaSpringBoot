@@ -1,11 +1,11 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {UserContext} from "../user/UserContext";
 import {useLocation, useNavigate} from "react-router-dom";
 import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import PaymentTabs from "./PaymentTabs";
-import AdressForm from "./AdressForm";
+import AddressForm from "./AddressForm";
 import {useCarrello} from "../hook/useCarrello";
 
 const fetchPlaces = async () => {
@@ -40,6 +40,14 @@ const CheckOut = () => {
         country: ''
     });
 
+    const handleAddressChange = (e) => {
+        const {name, value} = e.target;
+        setShippingAddress(prev => ({...prev, [name]: value}));
+        if (errors[name]) {
+            setErrors(prev => ({...prev, [name]: null}));
+        }
+    };
+
     const {data: places, isLoading: isLoadingPlaces} = useQuery({
         queryKey: ['shippingPlaces'],
         queryFn: fetchPlaces,
@@ -70,14 +78,27 @@ const CheckOut = () => {
     const validate = () => {
         const newErrors = {};
 
+
+
         if (!locationType || !courierType || !shippingService) {
             newErrors.shipping = "Please select a shipping method, courier, and service.";
+        }
+
+        if (locationType === 'HOME') {
+            if (!shippingAddress.name) newErrors.name = 'Name is required.';
+            if (!shippingAddress.address) newErrors.address = 'Address is required.';
+            if (!shippingAddress.city) newErrors.city = 'City is required.';
+            if (!shippingAddress.postalCode) newErrors.postalCode = 'Postal code is required.';
+            if (!shippingAddress.country) newErrors.country = 'Country is required.';
         }
 
         setErrors(newErrors);
 
         return Object.keys(newErrors).length === 0;
     }
+
+
+
 
     const validateDiscountCode = async (code) => {
 
@@ -109,7 +130,7 @@ const CheckOut = () => {
 
         const addr = {
             nome: shippingAddress.name,
-            indirizzo: shippingAddress.address,
+            indirizzo: shippingAddress.address + " " + (shippingAddress.houseNumber || ""),
             citta: shippingAddress.city,
             cap: shippingAddress.postalCode,
             provincia: shippingAddress.country, // Assuming country is used as province here
@@ -128,6 +149,7 @@ const CheckOut = () => {
 
         console.log("Order sent successfully:", data);
     }
+
 
     return <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Check Out</h1>
@@ -218,11 +240,18 @@ const CheckOut = () => {
 
                             {locationType === "HOME" ? (
                                 <div>
-                                    <h3 className="text-md font-semibold mb-2">Indirizzo di casa</h3>
+                                    <p className="text-sm text-gray-600 mb-4">Inserisci i dettagli dell'indirizzo che
+                                        desideri utilizzare per questa spedizione.</p>
+                                    <p className="text-sm text-gray-600 mb-4">È possibile modificare l'indirizzo scelta
+                                        PRIMA che l'ordine venga impacchettato. <br/>
+                                        Se commetti un errore correggilo il prima possibile essendo che l'ordine viene
+                                        poi gestito dal corriere e non da noi.</p>
 
-                                    <p className="text-sm text-gray-600 mb-4">Inserisci il tuo indirizzo di casa:</p>
-
-                                    <AdressForm/>
+                                    <AddressForm
+                                        addressData={shippingAddress}
+                                        handleChange={handleAddressChange}
+                                        errors={errors}
+                                    />
 
                                 </div>
                             ) : (
