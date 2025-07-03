@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/libri")
@@ -28,9 +30,15 @@ public class LibroController {
     // ID
     @GetMapping("/{id}")
     public ResponseEntity<Libro> getLibroById(@PathVariable Long id) {
+
+        Optional<Libro> libroOptional = libroRepository.findById(id);
+        if (libroOptional.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+
         try {
-            Libro libro = libroRepository.findById(id)
-                    .orElseThrow();
+            Libro libro = libroOptional.get();
 
             return ResponseEntity.ok(libro);
         } catch (Exception e) {

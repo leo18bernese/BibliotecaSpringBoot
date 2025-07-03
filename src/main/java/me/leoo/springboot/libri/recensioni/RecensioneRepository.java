@@ -7,4 +7,6 @@ import java.util.Set;
 public interface RecensioneRepository extends JpaRepository<Recensione, Long> {
 
     Set<Recensione> findByLibroId(Long libroId);
+
+    Set<Recensione> findByUtenteId(Long utenteId);
 }

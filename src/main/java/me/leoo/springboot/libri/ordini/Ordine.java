@@ -92,7 +92,7 @@ public class Ordine {
 
         // Copia gli articoli dal carrello all'ordine
         for (CarrelloItem item : carrello.getItems()) {
-            OrdineItem ordineItem = new OrdineItem(item.getLibro(), item.getQuantita());
+            OrdineItem ordineItem = new OrdineItem(item.getLibro(), item.getQuantita(), item.getAggiunta());
             ordineItem.setOrdine(this); // Imposta l'ordine corrente
 
             items.add(ordineItem);

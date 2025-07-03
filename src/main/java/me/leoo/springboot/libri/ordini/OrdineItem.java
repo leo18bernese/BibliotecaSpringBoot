@@ -33,14 +33,16 @@ public class OrdineItem {
     private String titolo;
     private int quantita;
     private double prezzo;
+    private Date dataAggiunta;
 
     private Sconto sconto;
 
-    public OrdineItem(Libro libro, int quantita) {
+    public OrdineItem(Libro libro, int quantita, Date dataAggiunta) {
         this.libro = libro;
         this.titolo = libro.getTitolo();
         this.quantita = quantita;
         this.prezzo = libro.getRifornimento().getPrezzoTotale();
         this.sconto = libro.getRifornimento().getSconto();
+        this.dataAggiunta = dataAggiunta;
     }
 }

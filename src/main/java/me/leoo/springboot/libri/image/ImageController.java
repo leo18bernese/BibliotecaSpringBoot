@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/images")
@@ -54,7 +55,11 @@ public class ImageController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<?> getImage(@PathVariable Long productId) {
-        Libro libro = libroRepository.findById(productId).orElseThrow();
+        Optional<Libro> optionalLibro = libroRepository.findById(productId);
+        if (optionalLibro.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Libro libro = optionalLibro.get();
 
         try {
             List<Path> paths = libro.getAllImages();

@@ -69,7 +69,7 @@ public class DataLoader implements CommandLineRunner {
 
         for (Libro libro : libri) {
             for (int i = 0; i < 3; i++) {
-                Recensione recensione = new Recensione(libro.getId(), uu.getId(), "Molto bello", "Ottimo libro, lo consiglio", 4, true, true, new Date(), new Date());
+                Recensione recensione = new Recensione(libro.getId(), uu.getId(), "Molto bello", "Ottimo libro, lo consiglio", 4, true, true);
                 Recensione r = recensioneRepository.save(recensione);
 
                 libro.getRecensioni().add(r.getId());

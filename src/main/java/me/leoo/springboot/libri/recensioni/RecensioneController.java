@@ -4,10 +4,8 @@ import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
@@ -24,6 +22,32 @@ public class RecensioneController {
     public record RecensioneResponse(
             Recensione recensione, String username
     ) {
+    }
+
+    public record RecensionePublish(
+            String titolo,
+            String testo,
+            int stelle,
+            boolean approvato,
+            boolean consigliato
+    ) {
+    }
+
+    @GetMapping("/all/user")
+    public ResponseEntity<RecensioneResponse[]> getRecensioniByUtenteId(@AuthenticationPrincipal Utente utente) {
+
+
+        try {
+            Set<Recensione> recensioni = recensioneRepository.findByUtenteId(utente.getId());
+
+            RecensioneResponse[] recensioniResponse = recensioni.stream()
+                    .map(this::getResponse)
+                    .toArray(RecensioneResponse[]::new);
+
+            return ResponseEntity.ok(recensioniResponse);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/all/{libroId}")
@@ -50,6 +74,31 @@ public class RecensioneController {
             return ResponseEntity.ok(getResponse(recensione));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<RecensioneResponse> addRecensione(@PathVariable Long id,
+                                                            @RequestBody RecensionePublish recensionePublish) {
+        Utente utente = utenteRepository.findById(id).orElseThrow();
+
+        System.out.println("ottenuto response " + recensionePublish);
+
+        try {
+            Recensione recensione = new Recensione(
+                    id,
+                    utente.getId(),
+                    recensionePublish.titolo(),
+                    recensionePublish.testo(),
+                    recensionePublish.stelle(),
+                    recensionePublish.approvato(),
+                    recensionePublish.consigliato()
+            );
+
+            Recensione savedRecensione = recensioneRepository.save(recensione);
+            return ResponseEntity.ok(getResponse(savedRecensione));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

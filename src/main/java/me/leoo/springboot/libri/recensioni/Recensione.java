@@ -33,7 +33,7 @@ public class Recensione {
     private Date dataCreazione;
     private Date dataModifica;
 
-    public Recensione(Long libroId, Long utenteId, String titolo, String testo, int stelle, boolean approvato, boolean consigliato, Date dataCreazione, Date dataModifica) {
+    public Recensione(Long libroId, Long utenteId, String titolo, String testo, int stelle, boolean approvato, boolean consigliato) {
         this.libroId = libroId;
         this.utenteId = utenteId;
         this.titolo = titolo;
@@ -41,7 +41,7 @@ public class Recensione {
         this.stelle = stelle;
         this.approvato = approvato;
         this.consigliato = consigliato;
-        this.dataCreazione = dataCreazione;
-        this.dataModifica = dataModifica;
+        this.dataCreazione = new Date();
+        this.dataModifica = new Date();
     }
 }
