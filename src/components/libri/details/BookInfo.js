@@ -7,6 +7,7 @@ import {CartContext} from "../../carrello/CartContext";
 import {useQuery} from "@tanstack/react-query";
 import toast, {Toaster} from "react-hot-toast";
 import BookInfoTabs from "./BookInfoTabs";
+import NuovaRecensione from "../../recensioni/NuovaRecensione";
 
 const API_URL = '/api/images';
 
@@ -70,6 +71,9 @@ const BookInfo = () => {
         queryKey: ['book', bookId],
         queryFn: () => fetchBookById(bookId),
     });
+
+    console.log("Book is loading:", isBookLoading);
+    console.log("Book error:", bookError);
 
     const {data: previousBookExists} = useQuery({
         queryKey: ['bookExists', previousId],
@@ -140,7 +144,19 @@ const BookInfo = () => {
     }
 
     if (!book) {
-        return <div className="flex justify-center items-center min-h-screen">Libro non trovato</div>;
+        return <div className="p-4 ">
+            Non siamo riusciti a trovare il libro che stavi cercando.
+            Possibili cause:
+
+            <ul className="my-5 " style={{listStyleType: 'disc', paddingLeft: '20px'}}>
+                <li>Il libro non esiste o è stato rimosso.</li>
+                <li>Il libro è stato spostato o il suo ID è errato.</li>
+                <li>Il libro non è ancora stato pubblicato.</li>
+            </ul>
+
+            La preghiamo di assicurarsi che l'ID del libro sia corretto e che il libro sia disponibile nel nostro catalogo.<br/>
+            Se il problema persiste, contatti il supporto clienti.
+        </div>;
     }
 
     console.log("Book data:", book);
@@ -260,7 +276,7 @@ const BookInfo = () => {
 
                                 {recensione.testo !== "" && <p className="mb-4">{recensione.testo}</p>}
 
-                                <div className="flex gap-4 text-sm">
+                                <div className="flex gap-4 ">
                                     {recensione.approvato &&
                                         <span className="text-green-600 font-bold">Approvato</span>
                                     }
@@ -275,6 +291,14 @@ const BookInfo = () => {
                                     </p>}
                             </div>
                         })}
+                    </div>
+
+                    <div className="mt-6 text-center">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl transition"
+                        onClick={() => navigate(`/book/${bookId}/recensioni/nuova`)}>
+                            Pubblica una recensione
+                        </button>
                     </div>
                 </div>
 

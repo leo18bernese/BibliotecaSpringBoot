@@ -55,7 +55,14 @@ const Ordine = () => {
         onError: (err) => {
             setError(err.message);
         },
-        enabled: !existsLoading && exists // Only fetch ordine if it exists
+        enabled: !existsLoading && exists, // Only fetch ordine if it exists
+        select: (data) => {
+            if (data && data.items && Array.isArray(data.items)) {
+                const sortedItems = [...data.items].sort((a, b) => a.dataAggiunta.localeCompare(b.dataAggiunta));
+                return { ...data, items: sortedItems };
+            }
+            return data;
+        },
     });
 
 
@@ -146,6 +153,14 @@ const Ordine = () => {
                                 <h3 className="font-semibold text-gray-500">Coupon:</h3>
 
                                 <h3 className="font-semibold text-right text-gray-800 mt-1">
+
+                                    {ordine.couponCodes.length === 0 && (
+                                        <span className="p-2 rounded-2xl font-semibold uppercase text-sm"
+                                                style={{backgroundColor: '#fef3c7', color: '#92400e'}}>
+                                            Nessun coupon applicato
+                                        </span>
+                                    ) }
+
                                     {ordine.couponCodes.map((code, index) => (
                                         <span key={index}
                                               className="p-2 rounded-2xl font-semibold uppercase text-sm  ml-2"

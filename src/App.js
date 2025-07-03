@@ -2,7 +2,7 @@
 import React, {useContext} from 'react';
 import './App.css';
 import NavBar from "./components/navbar/NavBar";
-import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
+import {BrowserRouter as Router, Navigate, Route, Routes, useParams} from "react-router-dom";
 import SearchBooks from "./components/libri/search/SearchBooks";
 import BookInfo from "./components/libri/details/BookInfo";
 import {UserContext, UserProvider} from './components/user/UserContext';
@@ -19,6 +19,8 @@ import OrderHistory from "./components/user/pages/OrderHistory";
 import Ordine from "./components/ordine/Ordine";
 import 'antd/dist/reset.css'
 import PersonalDetails from "./components/user/pages/PersonalDetails";
+import NuovaRecensione from "./components/recensioni/NuovaRecensione";
+import ReviewHistory from "./components/user/pages/ReviewHistory";
 
 const queryClient = new QueryClient();
 
@@ -34,15 +36,22 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Home/>}/>
                             <Route path="/search" element={<SearchBooks/>}/>
+
                             <Route path="/book/:id" element={<BookInfo/>}/>
+                            <Route path="/libri/:id" element={<RedirectToBook/>}/> <Route
+                            path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+                            <Route path="/libro/:id" element={<RedirectToBook/>}/>
+                            <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+
                             <Route path="/ordine/:id" element={<Ordine/>}/>
                             <Route path="/cart" element={<Carrello/>}/>
                             <Route path="/checkout" element={<CheckOut/>}/>
 
-                            <Route path="/account" element={<AccountInfo />}>
-                                <Route index element={<Navigate to="personal-details" replace />} />
-                                <Route  path="personal-details" element={<PersonalDetails />} />
-                                <Route path="orders" element={<OrderHistory />} />
+                            <Route path="/account" element={<AccountInfo/>}>
+                                <Route index element={<Navigate to="personal-details" replace/>}/>
+                                <Route path="personal-details" element={<PersonalDetails/>}/>
+                                <Route path="orders" element={<OrderHistory/>}/>
+                                <Route path="reviews" element={<ReviewHistory />}/>
                                 {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
                                 <Route path="shipping" element={<ShippingAddresses />} />
                                 <Route path="payments" element={<PaymentMethods />} />
@@ -58,6 +67,11 @@ function App() {
             </UserProvider>
         </QueryClientProvider>
     );
+}
+
+function RedirectToBook() {
+    const {id} = useParams();
+    return <Navigate to={`/book/${id}`} replace/>;
 }
 
 const fetchHomepageItems = async () => {
@@ -96,7 +110,7 @@ function Home() {
                     <p>Error loading items: {error.message}</p>
                 ) : (
                     homepageItems.map(item => (
-                        <LiteBook bookId={item} key={item} />
+                        <LiteBook bookId={item} key={item}/>
                     ))
                 )}
             </div>
