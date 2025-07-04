@@ -20,6 +20,7 @@ public class OrdineService {
 
         Hibernate.initialize(ordine.getItems());
         Hibernate.initialize(ordine.getCouponCodes());
+        Hibernate.initialize(ordine.getStati());
 
         return ordine;
     }

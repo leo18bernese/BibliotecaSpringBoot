@@ -13,9 +13,7 @@ import me.leoo.springboot.libri.carrello.CarrelloItem;
 import me.leoo.springboot.libri.spedizione.*;
 import me.leoo.springboot.libri.utente.Utente;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @Entity
@@ -33,8 +31,6 @@ public class Ordine {
     @JsonIgnore
     private Utente utente;
 
-    private StatoOrdine stato;
-
     private Date dataCreazione;
     private Date ultimaModifica;
 
@@ -50,6 +46,13 @@ public class Ordine {
 
     @OneToMany(mappedBy = "ordine", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrdineItem> items = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "ordine_stati", joinColumns = @JoinColumn(name = "ordine_id"))
+    @MapKeyColumn(name = "stato")
+    @MapKeyEnumerated(EnumType.STRING)
+    @Column(name = "data_aggiornamento")
+    private Map<StatoOrdine, Date> stati = new HashMap<>();
 
     //spedizione
     private SpedizioneLuogo luogoSpedizione;
@@ -71,7 +74,8 @@ public class Ordine {
 
     public Ordine(Carrello carrello, SpedizioneLuogo luogoSpedizione, String corriereId, String tipoSpedizioneId, SpedizioneIndirizzo indirizzoSpedizione, double speseSpedizione, String metodoPagamento) throws NotSupportedException {
         this.utente = carrello.getUtente();
-        this.stato = StatoOrdine.IN_ATTESA;
+
+        updateStato(StatoOrdine.IN_ATTESA);
 
         this.dataCreazione = new Date();
         this.ultimaModifica = new Date();
@@ -139,15 +143,35 @@ public class Ordine {
         return indirizzoSpedizione.getFullAddress();
     }
 
+    // Stato
+    public void updateStato(StatoOrdine nuovoStato) {
+        if (nuovoStato == null) {
+            throw new IllegalArgumentException("Nuovo stato non può essere null");
+        }
+
+        stati.put(nuovoStato, new Date());
+    }
+
+    public StatoOrdine getStato() {
+        if (stati.isEmpty()) {
+            return StatoOrdine.IN_ATTESA;
+        }
+
+        Optional<StatoOrdine> ultimoStato = stati.keySet().stream()
+                .reduce((first, second) -> second);
+
+        return ultimoStato.orElse(StatoOrdine.IN_ATTESA);
+    }
+
     public String getStatoName() {
-        return stato.getDisplayName();
+        return getStato().getDisplayName();
     }
 
     public String getStatoDescrizione() {
-        return stato.getDescription();
+        return getStato().getDescription();
     }
 
     public String getStatoNext() {
-        return stato.getNextStepOrInfo();
+        return getStato().getNextStepOrInfo();
     }
 }
