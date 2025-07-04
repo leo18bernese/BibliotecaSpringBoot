@@ -39,3 +39,18 @@
 .user-info {
   color: whitesmoke;
 }
+
+/* Review */
+@keyframes highlightAnimation {
+  0% {
+    background-color: #e6faff;
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: highlightAnimation 4s ease-out;
+}

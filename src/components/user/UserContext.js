@@ -1,71 +1,53 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, {createContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
 export const UserContext = createContext();
 
-export const UserProvider = ({ children }) => {
+export const UserProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-
-        const authenticateUser = async () => {
-            const loginResponse = await axios.post("/api/auth/login", {
-                username: "Daniel18",
-                password: "ciao1234"
-            });
-
-            if (loginResponse.status !== 200) {
-                console.error("Errore durante il login:", loginResponse.statusText);
-                setIsLoading(false);
-                return;
-            }
-
-            Cookies.set('jwt-token', loginResponse.data.token, { expires: 7 }); // 7 days expiration
+    const fetchAndSetUser = async (jwtToken) => {
+        if (!jwtToken) {
+            setIsLoading(false);
+            return;
         }
 
-        const validateTokenAndFetchUser = async () => {
-            authenticateUser();
+        console.log("Token trovato, provo a validarlo.");
+        axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`;
 
-            console.log("Controllo il token JWT...");
+        try {
+            const userResponse = await axios.get("/api/utenti/current");
+            setUser(userResponse.data);
+            console.log("Utente validato con successo:", userResponse.data);
+        } catch (error) {
+            console.error("Token non valido o scaduto:", error.response?.data || error.message);
+            Cookies.remove('jwt-token');
+            delete axios.defaults.headers.common['Authorization'];
+            setUser(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-            const jwtToken = Cookies.get('jwt-token');
-
-            if (!jwtToken) {
-                console.log("Nessun token trovato. Utente non loggato.");
-                setIsLoading(false);
-                return;
-            }
-
-            console.log("Token trovato, provo a validarlo.");
-
-            axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`;
-
-            try {
-                const userResponse = await axios.get("/api/utenti/current");
-                setUser(userResponse.data);
-                console.log("Utente validato con successo:", userResponse.data);
-            } catch (error) {
-                console.error("Token non valido o scaduto:", error.response?.data || error.message);
-
-                Cookies.remove('jwt-token');
-
-                delete axios.defaults.headers.common['Authorization'];
-
-                setUser(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        validateTokenAndFetchUser();
+    useEffect(() => {
+        const jwtToken = Cookies.get('jwt-token');
+        fetchAndSetUser(jwtToken);
     }, []);
+
+    const logout = () => {
+        Cookies.remove('jwt-token');
+        delete axios.defaults.headers.common['Authorization'];
+        setUser(null);
+    };
 
     const authContextValue = {
         user,
         setUser,
-        isLoading, // Esponiamo lo stato di caricamento
+        isLoading,
+        fetchAndSetUser, // Esponi la nuova funzione
+        logout, // Esponi anche la funzione di logout
     };
 
     if (isLoading) {

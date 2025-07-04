@@ -21,6 +21,10 @@ import 'antd/dist/reset.css'
 import PersonalDetails from "./components/user/pages/PersonalDetails";
 import NuovaRecensione from "./components/recensioni/NuovaRecensione";
 import ReviewHistory from "./components/user/pages/ReviewHistory";
+import Wishlist from "./components/user/pages/wishlist/Wishlist";
+import Shipping from "./components/user/pages/Shipping";
+import Login from "./components/user/login/Login";
+import {Toaster} from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -47,15 +51,19 @@ function App() {
                             <Route path="/cart" element={<Carrello/>}/>
                             <Route path="/checkout" element={<CheckOut/>}/>
 
+                            <Route path="/login" element={<Login />}/>
+
                             <Route path="/account" element={<AccountInfo/>}>
                                 <Route index element={<Navigate to="personal-details" replace/>}/>
                                 <Route path="personal-details" element={<PersonalDetails/>}/>
                                 <Route path="orders" element={<OrderHistory/>}/>
                                 <Route path="reviews" element={<ReviewHistory />}/>
+                                <Route path="wishlist" element={<Wishlist />}/>
+                                <Route path="shipping" element={<Shipping />} />
+
+
                                 {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
-                                <Route path="shipping" element={<ShippingAddresses />} />
                                 <Route path="payments" element={<PaymentMethods />} />
-                                <Route path="wishlist" element={<Wishlist />} />
                                 <Route path="reviews" element={<ProductReviews />} />
                                 <Route path="returns" element={<ReturnsRefunds />} />
                                 <Route path="settings" element={<AccountSettings />} />
@@ -90,6 +98,9 @@ function Home() {
 
     return (
         <div className="App container mx-auto">
+
+            <Toaster />
+
             <header className="App-header ">
 
                 {!user ? (

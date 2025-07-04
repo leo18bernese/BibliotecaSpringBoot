@@ -19,6 +19,7 @@ const NavBar = () => {
         queryKey: ['cartItemsCount'],
         queryFn: fetchCartItemsCount,
         staleTime: Infinity, // Impedisce il refetch automatico
+        enabled: !!user // Esegui la query solo se l'utente è autenticato
     });
 
     const carrello = count || 0; // Default to 0 if count is undefined
@@ -43,9 +44,13 @@ const NavBar = () => {
                 {/* Right side - User and Cart icons */}
                 <div className="flex items-center space-x-4">
 
-                    {user && (
+                    {user ? (
                         <Link to="/account" className="text-white hover:text-gray-300">
                             {user.username}
+                        </Link>
+                    ):(
+                        <Link to="/login" className="text-white hover:text-gray-300">
+                            Login
                         </Link>
                     )}
                     <Link to="/cart" className="text-white hover:text-gray-300 relative">

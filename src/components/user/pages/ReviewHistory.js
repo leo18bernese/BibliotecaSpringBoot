@@ -49,26 +49,33 @@ const ReviewHistory = () => {
                     <table className="min-w-full divide-y divide-gray-200 mt-8">
                         <thead className="bg-gray-200">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review
                                 #
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book
+                                #
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stars</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {reviews.map((order) => (
-                            <tr key={order.id} onClick={() => navigate(`/ordine/${order.id}`)}
-                                className="cursor-pointer hover:bg-gray-100">
-                                <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">#{order.id}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-500">{new Date(order.dataCreazione).toLocaleString()}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700">€ {order.prezzoFinale}</td>
-                                <td className="px-6 py-4 whitespace-nowrap  text-gray-900">
-                                    <div className="bg-gray-300 p-2 rounded-md text-center ">{order.statoName}</div>
-                                </td>
-                            </tr>
-                        ))}
+                        {reviews.map((r) => {
+                            const review = r.recensione;
+
+                            return (
+                                <tr key={review.id}
+                                    onClick={() => navigate(`/book/${review.libroId}?focusReview=${review.id}`)}
+                                    className="cursor-pointer hover:bg-gray-100">
+                                    <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">#{review.id}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-500">{new Date(review.dataCreazione).toLocaleString()}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700">{review.libroId}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700">{review.stelle}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700">{review.titolo}</td>
+                                </tr>
+                            );
+                        })}
                         </tbody>
                     </table>
                 </div>

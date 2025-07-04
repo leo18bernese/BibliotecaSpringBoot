@@ -1,10 +1,10 @@
 // src/components/SearchBooks.js
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import axios from 'axios';
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ImageGallery from "../images/ImageGallery";
 import {CartContext} from "../../carrello/CartContext";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import toast, {Toaster} from "react-hot-toast";
 import BookInfoTabs from "./BookInfoTabs";
 import NuovaRecensione from "../../recensioni/NuovaRecensione";
@@ -55,9 +55,19 @@ const fetchCartItem = async (bookId) => {
     }
 }
 
+const fetchHasWishlisted = async (id) => {
+    const {data} = await axios.get(`/api/wishlist/has/${id}`);
+
+    console.log("Has wishlisted:", data);
+
+    return data;
+}
+
+
 const BookInfo = () => {
     const {id} = useParams();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const {addItem} = useContext(CartContext);
 
@@ -67,13 +77,16 @@ const BookInfo = () => {
 
     const [file, setFile] = useState(null);
 
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const focusReview = params.get("focusReview");
+
+
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['book', bookId],
         queryFn: () => fetchBookById(bookId),
     });
 
-    console.log("Book is loading:", isBookLoading);
-    console.log("Book error:", bookError);
 
     const {data: previousBookExists} = useQuery({
         queryKey: ['bookExists', previousId],
@@ -101,6 +114,11 @@ const BookInfo = () => {
         queryFn: () => fetchCartItem(bookId),
     });
 
+    const {data: hasWishlisted} = useQuery({
+        queryKey: ['hasWishlisted', bookId],
+        queryFn: () => fetchHasWishlisted(bookId),
+    });
+
 
     const handlePreviousBook = () => {
         if (previousBookExists) {
@@ -113,7 +131,6 @@ const BookInfo = () => {
             navigate(`/book/${nextId}`);
         }
     }
-
 
     const handleUpload = () => {
         if (!file) {
@@ -134,7 +151,48 @@ const BookInfo = () => {
             });
     }
 
+
+    const addToWishlist = async (bookId) => {
+        try {
+            const {data} = await axios.post(`/api/wishlist/${bookId}`);
+            await queryClient.invalidateQueries(['hasWishlisted', bookId]);
+
+            return data;
+        } catch (error) {
+            console.error("Error adding to wishlist:", error);
+            throw error;
+        }
+    }
+
+    const removeFromWishlist = async (bookId) => {
+        try {
+            const {data} = await axios.delete(`/api/wishlist/${bookId}`);
+            await queryClient.invalidateQueries(['hasWishlisted', bookId]);
+
+            return data;
+        } catch (error) {
+            console.error("Error removing from wishlist:", error);
+            throw error;
+        }
+    }
+
     const isLoading = isBookLoading || areImagesLoading || areReviewsLoading;
+
+    useEffect(() => {
+        if (!isLoading && !areReviewsLoading && focusReview) {
+            const element = document.getElementById(`review-${focusReview}`);
+            if (element) {
+                element.classList.add("highlight");
+                element.scrollIntoView({behavior: "smooth"});
+                element.focus();
+
+                setTimeout(() => {
+                    element.classList.remove("highlight");
+                }, 2000);
+            }
+        }
+    }, [areReviewsLoading, focusReview, isLoading]);
+
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-screen">Caricamento...</div>;
     }
@@ -154,10 +212,12 @@ const BookInfo = () => {
                 <li>Il libro non è ancora stato pubblicato.</li>
             </ul>
 
-            La preghiamo di assicurarsi che l'ID del libro sia corretto e che il libro sia disponibile nel nostro catalogo.<br/>
+            La preghiamo di assicurarsi che l'ID del libro sia corretto e che il libro sia disponibile nel nostro
+            catalogo.<br/>
             Se il problema persiste, contatti il supporto clienti.
         </div>;
     }
+
 
     console.log("Book data:", book);
 
@@ -206,6 +266,23 @@ const BookInfo = () => {
 
                             <p className="mt-6 "><b className="font-bold"
                                                     style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
+
+                            <p className="mt-1 mb-4">
+                                <b className="text-red-500 font-bold">
+                                    {hasWishlisted ?
+                                        <>
+                                            <button onClick={() => removeFromWishlist(bookId)}>
+                                                <i className="bxr bxs-heart mr-1.5"></i></button>
+                                            Questo libro è nella tua wishlist!
+                                        </> :
+                                        <>
+                                            <button onClick={() => addToWishlist(bookId)}>
+                                                <i className="bxr bx-heart mr-1.5"></i>
+                                            </button>
+                                            Aggiungi alla wishlist
+                                        </>}
+                                </b>
+                            </p>
 
                             {cartItem && cartItem.quantita > 0 ?
                                 <p className="mt-1 mb-4"><b className="text-blue-500 font-bold">Hai
@@ -261,7 +338,9 @@ const BookInfo = () => {
                         {reviews.map((r) => {
                             const recensione = r.recensione;
 
-                            return <div className="border-b border-gray-200 pb-4 last:border-0" key={recensione.id}>
+                            return <div className="border-b border-gray-200 pb-4 last:border-0 "
+                                        key={recensione.id} id={`review-${recensione.id}`} tabIndex="-1"
+                            >
 
                                 <div className="flex items-center  mb-1 ">
                                     <span
@@ -269,6 +348,7 @@ const BookInfo = () => {
 
                                     <span className="ml-2 font-bold">{recensione.titolo}</span>
                                 </div>
+
                                 <p className="text-gray-500 text-sm mb-4">
                                     Pubblicato
                                     il {new Date(recensione.dataCreazione).toLocaleDateString()} da {r.username}
@@ -296,7 +376,7 @@ const BookInfo = () => {
                     <div className="mt-6 text-center">
                         <button
                             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl transition"
-                        onClick={() => navigate(`/book/${bookId}/recensioni/nuova`)}>
+                            onClick={() => navigate(`/book/${bookId}/recensioni/nuova`)}>
                             Pubblica una recensione
                         </button>
                     </div>
