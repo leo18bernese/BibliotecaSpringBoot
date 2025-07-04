@@ -40,7 +40,7 @@ const AccountInfo = () => {
 
                         <div >
                             {linkItem('user', 'Personal Details', '/account/personal-details')}
-                            {linkItem('cog', 'Account Info', '/account/info')}
+                            {linkItem('lock-keyhole-open', 'Security Settings', '/account/security')}
                             {linkItem('package', 'Order History', '/account/orders')}
                             {linkItem('location', 'Shipping Addresses', '/account/shipping')}
                             {linkItem('credit-card', 'Payment Methods', '/account/payments')}

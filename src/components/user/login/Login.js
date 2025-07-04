@@ -1,6 +1,6 @@
 import {useContext} from "react";
 import {UserContext} from "../UserContext";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import toast, {Toaster} from "react-hot-toast";
@@ -33,12 +33,12 @@ const Login = () => {
             // Usa la funzione dal contesto per aggiornare l'utente
             await fetchAndSetUser(jwtToken);
 
-            toast.success("Login successful!");
+            toast.success("Register successful!");
             navigate("/");
 
         } catch (error) {
             console.error("Errore durante il login:", error.response?.data.errore || error.message);
-            toast.error(error.response?.data?.errore || "Login failed");
+            toast.error(error.response?.data?.errore || "Register failed");
         }
     }
 
@@ -49,7 +49,7 @@ const Login = () => {
             <h2 className="text-2xl font-bold mb-4">Login</h2>
 
             <p className="text-gray-600">Please log in to access your account.</p>
-            <p className="text-gray-600">If you don't have an account, please register first.</p>
+            <p className="text-gray-600">If you don't have an account, please <Link to="/register" className="text-gray-700 underline">click here</Link> to create one.</p>
 
             <form className="mt-10" onSubmit={handleLogin}>
 

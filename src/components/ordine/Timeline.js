@@ -1,5 +1,5 @@
 import React from 'react';
-import { Steps } from 'antd';
+import {Steps} from 'antd';
 import {
     ContainerOutlined,
     InboxOutlined,
@@ -8,7 +8,7 @@ import {
     CheckCircleOutlined
 } from '@ant-design/icons';
 
-const { Step } = Steps;
+const {Step} = Steps;
 
 // Stile per il cerchio che conterrà l'icona
 const iconWrapperStyle = {
@@ -35,37 +35,37 @@ const customTimelineStyles = `
 const allSteps = [
     {
         title: 'Ordine Creato',
-        apiStatus: ['IN_ATTESA', 'CONFERMATO'],
-        icon: <div style={iconWrapperStyle}><ContainerOutlined /></div>,
+        apiStatus: ['IN_ATTESA'],
+        icon: <div style={iconWrapperStyle}><ContainerOutlined/></div>,
         description: null
     },
     {
         title: 'In Preparazione',
         apiStatus: ['IN_PREPARAZIONE'],
-        icon: <div style={iconWrapperStyle}><InboxOutlined /></div>,
+        icon: <div style={iconWrapperStyle}><InboxOutlined/></div>,
         description: null
     },
     {
         title: 'Spedito',
         apiStatus: ['SPEDITO'],
-        icon: <div style={iconWrapperStyle}><TruckOutlined /></div>,
+        icon: <div style={iconWrapperStyle}><TruckOutlined/></div>,
         description: null
     },
     {
         title: 'In Consegna',
         apiStatus: ['IN_CONSEGNA'],
-        icon: <div style={iconWrapperStyle}><HomeOutlined /></div>,
+        icon: <div style={iconWrapperStyle}><HomeOutlined/></div>,
         description: null
     },
     {
         title: 'Consegnato',
         apiStatus: ['CONSEGNATO'],
-        icon: <div style={iconWrapperStyle}><CheckCircleOutlined /></div>,
+        icon: <div style={iconWrapperStyle}><CheckCircleOutlined/></div>,
         description: null
     },
 ];
 
-const Timeline = ({ current }) => {
+const Timeline = ({current, stati}) => {
     // Trova l'indice dello stato attuale
     const currentStepIndex = allSteps.findIndex(step => step.apiStatus.includes(current));
 
@@ -84,14 +84,19 @@ const Timeline = ({ current }) => {
             current={currentStepIndex}
             labelPlacement="vertical"
         >
-            {allSteps.map((step, index) => (
-                <Step
+            {allSteps.map((step, index) =>  {
+                const statusKey = step.apiStatus[0];
+                const date = stati[statusKey] ;
+                const description = date ? new Date(date).toLocaleString() : null;
+
+                return (<Step
                     key={step.title}
                     title={step.title}
                     icon={step.icon}
                     status={getStatusForStep(index)}
-                />
-            ))}
+                description={description}
+                />);
+            })}
         </Steps>
     );
 };

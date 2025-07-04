@@ -101,7 +101,7 @@ const Ordine = () => {
                             </span>
                 </div>
 
-                <Timeline current={ordine.stato}/>
+                <Timeline current={ordine.stato} stati={ordine.stati} />
 
                 <p className="text-center mt-8">{ordine.statoDescrizione}</p>
                 <p className="text-center">{ordine.statoNext}</p>

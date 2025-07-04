@@ -25,6 +25,7 @@ import Wishlist from "./components/user/pages/wishlist/Wishlist";
 import Shipping from "./components/user/pages/Shipping";
 import Login from "./components/user/login/Login";
 import {Toaster} from "react-hot-toast";
+import Register from "./components/user/register/Register";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ function App() {
                             <Route path="/checkout" element={<CheckOut/>}/>
 
                             <Route path="/login" element={<Login />}/>
+                            <Route path="/register" element={<Register />}/>
 
                             <Route path="/account" element={<AccountInfo/>}>
                                 <Route index element={<Navigate to="personal-details" replace/>}/>
