@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.carrello.Carrello;
+import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -41,6 +42,16 @@ public class Utente implements UserDetails {
     @JsonIgnore
     private Carrello carrello;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "utente_wishlist",
+            joinColumns = @JoinColumn(name = "utente_id"),
+            inverseJoinColumns = @JoinColumn(name = "libro_id"))
+    @JsonIgnore
+    private Set<Libro> wishlist = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "utente_indirizzi", joinColumns = @JoinColumn(name = "utente_id"))
+    private Set<SpedizioneIndirizzo> indirizzi = new HashSet<>();
 
     public Utente(String username, String password, String nome, String cognome, String email) {
         this.username = username;
@@ -59,6 +70,30 @@ public class Utente implements UserDetails {
 
     public void removeRuolo(String ruolo) {
         ruoli.remove(ruolo);
+    }
+
+    // Wishlist
+    public void addToWishlist(Libro libro) {
+        if (libro != null) {
+            wishlist.add(libro);
+        }
+    }
+
+    public void removeFromWishlist(Long libroId) {
+        wishlist.removeIf(libro -> libro.getId().equals(libroId));
+    }
+
+    // Indirizzi di spedizione
+    public void addIndirizzo(SpedizioneIndirizzo indirizzo) {
+        if (indirizzo == null || !indirizzo.isValid()) {
+            throw new IllegalArgumentException("Indirizzo non valido");
+        }
+
+        indirizzi.add(indirizzo);
+    }
+
+    public void removeIndirizzo(SpedizioneIndirizzo indirizzo) {
+        indirizzi.remove(indirizzo);
     }
 
     // Authorization

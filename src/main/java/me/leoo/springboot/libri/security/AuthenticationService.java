@@ -17,7 +17,6 @@ public class AuthenticationService {
 
     public String login(String username, String password) {
         System.out.println("AuthenticationService: login called " + username + " " + password);
-
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         System.out.println("passato authenticationManager.authenticate");
         UserDetails userDetails = utenteService.loadUserByUsername(username);

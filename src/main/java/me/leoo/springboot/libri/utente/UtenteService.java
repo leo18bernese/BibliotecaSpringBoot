@@ -14,14 +14,20 @@ public class UtenteService implements UserDetailsService {
     private final UtenteRepository utenteRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return utenteRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + username));
+    public Utente getUtenteById(Long id) {
+        return utenteRepository.findById(id).orElseThrow();
     }
 
-    public boolean isRegistered(String username) {
-        return utenteRepository.existsByUsername(username);
+    @Override
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        // Tenta di trovare l'utente per email
+        return utenteRepository.findByEmail(identifier)
+                .or(() -> utenteRepository.findByUsername(identifier)) // Se non trovato per email, tenta per username
+                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato con username o email: " + identifier));
+    }
+
+    public boolean isRegistered(String username, String email) {
+        return utenteRepository.existsByUsername(username) || utenteRepository.existsByEmail(email);
     }
 
     public Utente register(Utente utente) throws IllegalArgumentException {
@@ -42,9 +48,11 @@ public class UtenteService implements UserDetailsService {
         return utenteRepository.save(utente);
     }
 
-    public void delete(String username) {
-        Utente utente = utenteRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + username));
+    public void delete(String identifier) {
+        // Modificato per permettere la cancellazione tramite username o email
+        Utente utente = utenteRepository.findByUsername(identifier)
+                .or(() -> utenteRepository.findByEmail(identifier))
+                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + identifier));
 
         utenteRepository.delete(utente);
     }

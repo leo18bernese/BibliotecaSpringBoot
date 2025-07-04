@@ -7,6 +7,7 @@ import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.carrello.CarrelloRepository;
 import me.leoo.springboot.libri.recensioni.Recensione;
 import me.leoo.springboot.libri.recensioni.RecensioneRepository;
+import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import me.leoo.springboot.libri.utente.UtenteService;
@@ -55,13 +56,19 @@ public class DataLoader implements CommandLineRunner {
         libroRepository.save(new Libro("Va' dove ti porta il cuore", "Susanna Tamaro", "Romanzo", 1994, 192, "Baldini & Castoldi", "Italiano", "978-8884901962", 60, 10.00));
         libroRepository.save(new Libro("I Promessi Sposi", "Alessandro Manzoni", "Romanzo storico", 1840, 700, "Ferrara", "Italiano", "978-8809766940", 25, 14.50));
         libroRepository.save(new Libro("Introduzione alla Programmazione in Java", "Herbert Schildt", "Informatica", 2019, 1000, "McGraw-Hill Education", "Italiano", "978-0078022171", 15, 45.00));
-        libroRepository.save(new Libro("La Cucina Italiana: Il Ricettario Completo", "AA.VV.", "Cucina", 2010, 600, "Editoriale Domus", "Italiano", "978-8872126285", 20, 30.00));
+        Libro l = libroRepository.save(new Libro("La Cucina Italiana: Il Ricettario Completo", "AA.VV.", "Cucina", 2010, 600, "Editoriale Domus", "Italiano", "978-8872126285", 20, 30.00));
         libroRepository.save(new Libro("L'Alienista", "Caleb Carr", "Thriller psicologico", 1994, 480, "Rizzoli", "Italiano", "978-8817024469", 35, 16.25));
 
         List<Libro> libri = libroRepository.findAll();
         System.out.println("Libri caricati nel database: " + libri.size());
 
+        SpedizioneIndirizzo ind1 = new SpedizioneIndirizzo("Mario Rossi", "Via Roma 1", "Milano", "MI", "20100", "1234567890");
+        SpedizioneIndirizzo ind2 = new SpedizioneIndirizzo("Luigi Bianchi", "Via Milano 2", "Roma", "RM", "00100", "0987654321");
+
         Utente u = new Utente("Daniel18", "ciao1234", "Daniel", "Bello", "daniel@gmail.com");
+        u.addToWishlist(l);
+        u.addIndirizzo(ind1);
+        u.addIndirizzo(ind2);
         Utente uu = utenteService.register(u);
 
         Carrello carrello = new Carrello(uu);

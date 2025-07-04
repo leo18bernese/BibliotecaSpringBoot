@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.utente;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,11 +19,14 @@ public class UtenteController {
     @Autowired
     private UtenteRepository utenteRepository;
 
+    @Autowired
+    private UtenteService utenteService;
+
     @GetMapping("/id/{id}")
     public ResponseEntity<Utente> getUtente(@PathVariable Long id) {
         System.out.println("UtenteController: getUtente called " + id);
         try {
-            Utente utente = utenteRepository.findById(id).orElseThrow();
+            Utente utente = utenteService.getUtenteById(id);
 
             if (!checkUtenteAccess(utente)) {
                 return ResponseEntity.status(403).build();
@@ -38,7 +42,8 @@ public class UtenteController {
     public ResponseEntity<String> getUsernameById(@PathVariable Long id) {
         System.out.println("UtenteController: getUsernameById called " + id);
         try {
-            Utente utente = utenteRepository.findById(id).orElseThrow();
+            Utente utente = utenteService.getUtenteById(id);
+
             return ResponseEntity.ok(utente.getUsername());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -52,6 +57,8 @@ public class UtenteController {
         if (utente == null) {
             return ResponseEntity.status(403).body("Utente non autenticato");
         }
+
+        System.out.println(utente);
 
         try {
             return ResponseEntity.ok(utente);

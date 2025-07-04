@@ -31,9 +31,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // Abilita e usa il bean CorsConfigurationSource
                 .authorizeHttpRequests(authorize -> authorize
                         // Endpoints pubblici
-                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/h2-console/**", "/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/home/**", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione
-                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/recensioni/**", "/api/buono/**", "/api/ordini/**", "/api/home/**").authenticated()
+                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/recensioni/**", "/api/buono/**", "/api/ordini/**", "/api/wishlist/**").authenticated()
                         // Proteggi tutti gli altri endpoint per default
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
