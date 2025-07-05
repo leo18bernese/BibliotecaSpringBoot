@@ -16,25 +16,6 @@ const fetchOrdine = async (id) => {
     return response.data;
 }
 
-const fetchBookById = async (id) => {
-    const {data} = await axios.get(`/api/libri/lite/${id}`);
-    return data;
-}
-
-const fetchBookImage = async (id) => {
-    try {
-        const {data} = await axios.get(`/api/images/${id}/first`);
-        return data;
-    } catch (error) {
-        if (error.response && error.response.status === 404) {
-            console.warn(`No image found for book ID: ${id}`);
-            return null;
-        }
-        console.error(`Error fetching image for book ID ${id}:`, error);
-        throw error;
-    }
-}
-
 const Ordine = () => {
     const {id} = useParams();
     const navigate = useNavigate();
