@@ -1,10 +1,13 @@
 package me.leoo.springboot.libri.resi;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum MotivoReso {
 
     DIFETTOSO(
@@ -92,7 +95,16 @@ public enum MotivoReso {
     private final String descrizione;
     private final String esempi;
 
+    @JsonIgnore
     private final boolean restituzioneSempre;
+
+    @JsonIgnore
     private final boolean speseRestituzione;
+
+    @JsonIgnore
     private final boolean proveRichieste;
+
+    public String getName() {
+        return name();
     }
+}

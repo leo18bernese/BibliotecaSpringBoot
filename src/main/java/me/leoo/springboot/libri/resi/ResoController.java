@@ -56,4 +56,10 @@ public class ResoController {
         Messaggio nuovoMessaggio = resoService.aggiungiMessaggio(resoId, request);
         return new ResponseEntity<>(nuovoMessaggio, HttpStatus.CREATED);
     }
+
+    @GetMapping("/reasons")
+    public ResponseEntity<MotivoReso[]> getMotiviReso() {
+        MotivoReso[] motivi = MotivoReso.values();
+        return ResponseEntity.ok(motivi);
+    }
 }
