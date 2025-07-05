@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.leoo.springboot.libri.ordini.Ordine;
+import me.leoo.springboot.libri.ordini.OrdineItem;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -22,5 +25,27 @@ public class ResoItem {
     @JsonIgnore
     private Reso reso;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ordine_item_id", nullable = false)
+    private OrdineItem ordineItem;
+
+    private MotivoReso motivo;
+    private String descrizione;
+
+    private int quantita;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "reso_item_prove_foto", joinColumns = @JoinColumn(name = "reso_item_id"))
+    @Column(name = "foto_path")
+    private Set<String> proveFoto;
+
+    public ResoItem(OrdineItem ordineItem, MotivoReso motivo, String descrizione, int quantita) {
+        this.ordineItem = ordineItem;
+        this.motivo = motivo;
+        this.descrizione = descrizione;
+        this.quantita = quantita;
+
+        this.proveFoto = new HashSet<>();
+    }
 
 }
