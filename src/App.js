@@ -26,6 +26,7 @@ import Shipping from "./components/user/pages/Shipping";
 import Login from "./components/user/login/Login";
 import {Toaster} from "react-hot-toast";
 import Register from "./components/user/register/Register";
+import NuovoReso from "./components/reso/NuovoReso";
 
 const queryClient = new QueryClient();
 
@@ -43,25 +44,25 @@ function App() {
                             <Route path="/search" element={<SearchBooks/>}/>
 
                             <Route path="/book/:id" element={<BookInfo/>}/>
-                            <Route path="/libri/:id" element={<RedirectToBook/>}/> <Route
-                            path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
-                            <Route path="/libro/:id" element={<RedirectToBook/>}/>
+                            <Route path="/libri/:id" element={<RedirectToBook/>}/>
                             <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+                            <Route path="/libro/:id" element={<RedirectToBook/>}/>
 
                             <Route path="/ordine/:id" element={<Ordine/>}/>
+                            <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
                             <Route path="/cart" element={<Carrello/>}/>
                             <Route path="/checkout" element={<CheckOut/>}/>
 
-                            <Route path="/login" element={<Login />}/>
-                            <Route path="/register" element={<Register />}/>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/register" element={<Register/>}/>
 
                             <Route path="/account" element={<AccountInfo/>}>
                                 <Route index element={<Navigate to="personal-details" replace/>}/>
                                 <Route path="personal-details" element={<PersonalDetails/>}/>
                                 <Route path="orders" element={<OrderHistory/>}/>
-                                <Route path="reviews" element={<ReviewHistory />}/>
-                                <Route path="wishlist" element={<Wishlist />}/>
-                                <Route path="shipping" element={<Shipping />} />
+                                <Route path="reviews" element={<ReviewHistory/>}/>
+                                <Route path="wishlist" element={<Wishlist/>}/>
+                                <Route path="shipping" element={<Shipping/>}/>
 
 
                                 {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
@@ -101,7 +102,7 @@ function Home() {
     return (
         <div className="App container mx-auto">
 
-            <Toaster />
+            <Toaster/>
 
             <header className="App-header ">
 
