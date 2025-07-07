@@ -101,7 +101,6 @@ public enum MotivoReso {
     @JsonIgnore
     private final boolean speseRestituzione;
 
-    @JsonIgnore
     private final boolean proveRichieste;
 
     public String getName() {
