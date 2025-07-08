@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import {UserContext} from "../UserContext";
 import toast, {Toaster} from "react-hot-toast";
-import {Link, Navigate, useLocation} from "react-router-dom";
+import {Link, Navigate, useLocation, Outlet} from "react-router-dom";
 
 const ProtectedRoute = ({children}) => {
     const {user} = useContext(UserContext);
@@ -29,7 +29,7 @@ const ProtectedRoute = ({children}) => {
         );
     }
 
-    return children;
+    return <Outlet />;
 }
 
 export default ProtectedRoute;

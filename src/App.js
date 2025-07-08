@@ -56,14 +56,11 @@ function App() {
 
                             <Route element={<ProtectedRoute/>}>
                                 <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
-
                                 <Route path="/ordine/:id" element={<Ordine/>}/>
                                 <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
-
                                 <Route path="/reso/:id" element={<Reso/>}/>
 
-
-                                <Route path="/account" element={<AccountInfo/>}>
+                                <Route path="/account/*" element={<AccountInfo/>}>
                                     <Route index element={<Navigate to="personal-details" replace/>}/>
                                     <Route path="personal-details" element={<PersonalDetails/>}/>
                                     <Route path="orders" element={<OrderHistory/>}/>
@@ -71,14 +68,6 @@ function App() {
                                     <Route path="wishlist" element={<Wishlist/>}/>
                                     <Route path="shipping" element={<Shipping/>}/>
                                     <Route path="returns" element={<ReturnsHistory/>}/>
-
-
-                                    {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
-                                <Route path="payments" element={<PaymentMethods />} />
-                                <Route path="reviews" element={<ProductReviews />} />
-                                <Route path="returns" element={<ReturnsRefunds />} />
-                                <Route path="settings" element={<AccountSettings />} />
-                                <Route path="support" element={<Support />} /> */}
                                 </Route>
                             </Route>
 
@@ -87,24 +76,6 @@ function App() {
 
                             <Route path="/login" element={<Login/>}/>
                             <Route path="/register" element={<Register/>}/>
-
-                            <Route path="/account" element={<AccountInfo/>}>
-                                <Route index element={<Navigate to="personal-details" replace/>}/>
-                                <Route path="personal-details" element={<PersonalDetails/>}/>
-                                <Route path="orders" element={<OrderHistory/>}/>
-                                <Route path="reviews" element={<ReviewHistory/>}/>
-                                <Route path="wishlist" element={<Wishlist/>}/>
-                                <Route path="shipping" element={<Shipping/>}/>
-                                <Route path="returns" element={<ReturnsHistory/>}/>
-
-
-                                {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
-                                <Route path="payments" element={<PaymentMethods />} />
-                                <Route path="reviews" element={<ProductReviews />} />
-                                <Route path="returns" element={<ReturnsRefunds />} />
-                                <Route path="settings" element={<AccountSettings />} />
-                                <Route path="support" element={<Support />} /> */}
-                            </Route>
                         </Routes>
                     </Router>
                 </CartProvider>

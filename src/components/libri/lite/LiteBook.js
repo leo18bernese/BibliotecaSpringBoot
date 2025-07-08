@@ -67,6 +67,10 @@ const LiteBook = ({bookId}) => {
 
                     <h3>{book.titolo}</h3>
                     <p>by {book.autore}</p>
+
+                    <h3 className="text-gray-600 text-lg">
+                        {book.prezzo ? `€${book.prezzo.toFixed(2)}` : 'Price not available'}
+                    </h3>
                 </div>
             </div>
         </>

@@ -34,7 +34,7 @@ const customTimelineStyles = `
 // Definisci tutti gli step fuori dal componente per evitare di ricrearli ad ogni render
 const allSteps = [
     {
-        title: 'Reso Creato',
+        title: 'Ordine Creato',
         apiStatus: ['IN_ATTESA'],
         icon: <div style={iconWrapperStyle}><ContainerOutlined/></div>,
         description: null
