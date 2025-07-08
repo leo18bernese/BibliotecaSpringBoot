@@ -33,7 +33,7 @@ public class SecurityConfig {
                         // Endpoints pubblici
                         .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/home/**", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione
-                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/recensioni/**", "/api/buono/**", "/api/ordini/**", "/api/wishlist/**").authenticated()
+                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/recensioni/**", "/api/buono/**", "/api/ordini/**", "api/resi/**", "/api/wishlist/**").authenticated()
                         // Proteggi tutti gli altri endpoint per default
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -3,6 +3,7 @@ package me.leoo.springboot.libri.buono;
 import me.leoo.springboot.libri.carrello.CarrelloService;
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ public class BuonoController {
     public ResponseEntity<?> validateBuono(@AuthenticationPrincipal Utente utente,
                                            @RequestParam String codice) {
         if (utente == null) {
-            return ResponseEntity.badRequest().body("Utente non autenticato.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
         try {

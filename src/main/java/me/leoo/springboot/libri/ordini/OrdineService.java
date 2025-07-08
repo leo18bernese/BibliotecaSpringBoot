@@ -28,8 +28,6 @@ public class OrdineService {
     public List<Ordine> getAllOrdini(Utente utente) {
         List<Ordine> ordini = ordineRepository.findAllByUtente(utente);
 
-        for (Ordine ordine : ordini) {
-        }
         return ordini;
     }
 

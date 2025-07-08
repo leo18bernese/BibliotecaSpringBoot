@@ -13,6 +13,7 @@ import me.leoo.springboot.libri.spedizione.SpedizioneLuogo;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -110,7 +111,7 @@ public class CarrelloController {
     @GetMapping
     public ResponseEntity<?> getCarrello(@AuthenticationPrincipal Utente utente) {
         if (utente == null) {
-            return ResponseEntity.status(401).body("Utente non autenticato");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
         try {
@@ -125,7 +126,7 @@ public class CarrelloController {
     @GetMapping("/items")
     public ResponseEntity<?> getCarrelloItems(@AuthenticationPrincipal Utente utente) {
         if (utente == null) {
-            return ResponseEntity.status(401).body("Utente non autenticato");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
         try {
@@ -165,7 +166,7 @@ public class CarrelloController {
     public ResponseEntity<?> addLibro(@AuthenticationPrincipal Utente utente,
                                       @RequestBody ItemRequest request) {
         if (utente == null) {
-            return ResponseEntity.status(401).body("Utente non autenticato");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
         try {
             Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.quantita());

@@ -40,6 +40,8 @@ public class Reso {
     @OrderBy("timestamp ASC")
     private List<Messaggio> messaggi;
 
+    private Date dataCreazione = new Date();
+
     // Inizializza un nuovo reso associato a un ordine
     // Segue l'aggiunta degli item del reso attraverso altri metodi
     public Reso(Ordine ordine){
@@ -71,6 +73,14 @@ public class Reso {
                 .reduce((first, second) -> second);
 
         return ultimoStato.orElse(StatoReso.IN_ATTESA);
+    }
+
+    public String getStatoName() {
+        return getStato().getDisplayName();
+    }
+
+    public String getStatoDescrizione() {
+        return getStato().getDescrizione();
     }
 
     // Aggiunge un messaggio al reso

@@ -7,8 +7,12 @@ import me.leoo.springboot.libri.ordini.OrdineItem;
 import me.leoo.springboot.libri.ordini.OrdineItemRepository;
 import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
+import me.leoo.springboot.libri.utente.Utente;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +54,7 @@ public class ResoService {
         }
 
         reso.addMessaggio(messaggio);
-        
+
         // Poiché la relazione è CascadeType.ALL, salvando il reso si salverà anche il nuovo messaggio.
         resoRepository.save(reso);
 
@@ -60,7 +64,38 @@ public class ResoService {
 
     @Transactional(readOnly = true)
     public Reso getResoById(Long id) {
-        return resoRepository.findById(id)
+        Reso reso = resoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reso non trovato con ID: " + id));
+
+        initialize(reso);
+
+        return reso;
+    }
+
+    @Transactional(readOnly = true)
+    public Reso getResoByIdAndUtente(Long id, Utente utente) {
+        Reso reso = resoRepository.findByIdAndOrdineUtenteId(id, utente.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Reso con ID " + id + " non trovato per l'utente specificato."));
+
+        initialize(reso);
+
+        return reso;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isAssociatedWithUtente(Long id, Utente utente) {
+        return resoRepository.existsByIdAndOrdineUtenteId(id, utente.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Reso> getAllByUtente(Utente utente) {
+        return resoRepository.getAllByOrdineUtenteId(utente.getId());
+    }
+
+    private void initialize(Reso reso) {
+        Hibernate.initialize(reso.getOrdine());
+        Hibernate.initialize(reso.getItems());
+        Hibernate.initialize(reso.getStati());
+        Hibernate.initialize(reso.getMessaggi());
     }
 }

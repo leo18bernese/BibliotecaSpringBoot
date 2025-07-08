@@ -2,6 +2,7 @@ package me.leoo.springboot.libri.ordini;
 
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class OrdineController {
     public ResponseEntity<?> checkOrdineExists(@AuthenticationPrincipal Utente utente,
                                                @PathVariable String id) {
         if (utente == null) {
-            return ResponseEntity.badRequest().body("Utente non autenticato.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
         try {
@@ -34,7 +35,7 @@ public class OrdineController {
     public ResponseEntity<?> getOrdineById(@AuthenticationPrincipal Utente utente,
                                            @PathVariable String id) {
         if (utente == null) {
-            return ResponseEntity.badRequest().body("Utente non autenticato.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
         try {
@@ -48,7 +49,7 @@ public class OrdineController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllOrdini(@AuthenticationPrincipal Utente utente) {
         if (utente == null) {
-            return ResponseEntity.badRequest().body("Utente non autenticato.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
         try {
