@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
+
     List<Libro> findByTitoloEqualsIgnoreCase(String keyword);
 
     List<Libro> findByTitoloIsContainingIgnoreCase(String keyword);
