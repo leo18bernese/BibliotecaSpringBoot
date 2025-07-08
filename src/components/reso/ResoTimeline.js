@@ -65,7 +65,7 @@ const allSteps = [
     },
 ];
 
-const Timeline = ({current, stati}) => {
+const ResoTimeline = ({current, stati}) => {
     // Trova l'indice dello stato attuale
     const currentStepIndex = allSteps.findIndex(step => step.apiStatus.includes(current));
 
@@ -101,4 +101,4 @@ const Timeline = ({current, stati}) => {
     );
 };
 
-export default Timeline;
+export default ResoTimeline;

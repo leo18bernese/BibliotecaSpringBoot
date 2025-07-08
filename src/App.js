@@ -27,6 +27,9 @@ import Login from "./components/user/login/Login";
 import {Toaster} from "react-hot-toast";
 import Register from "./components/user/register/Register";
 import NuovoReso from "./components/reso/NuovoReso";
+import ReturnsHistory from "./components/user/pages/RefundHistory";
+import Reso from "./components/reso/Reso";
+import ProtectedRoute from "./components/user/login/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +53,35 @@ function App() {
 
                             <Route path="/ordine/:id" element={<Ordine/>}/>
                             <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+
+                            <Route element={<ProtectedRoute/>}>
+                                <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+
+                                <Route path="/ordine/:id" element={<Ordine/>}/>
+                                <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+
+                                <Route path="/reso/:id" element={<Reso/>}/>
+
+
+                                <Route path="/account" element={<AccountInfo/>}>
+                                    <Route index element={<Navigate to="personal-details" replace/>}/>
+                                    <Route path="personal-details" element={<PersonalDetails/>}/>
+                                    <Route path="orders" element={<OrderHistory/>}/>
+                                    <Route path="reviews" element={<ReviewHistory/>}/>
+                                    <Route path="wishlist" element={<Wishlist/>}/>
+                                    <Route path="shipping" element={<Shipping/>}/>
+                                    <Route path="returns" element={<ReturnsHistory/>}/>
+
+
+                                    {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
+                                <Route path="payments" element={<PaymentMethods />} />
+                                <Route path="reviews" element={<ProductReviews />} />
+                                <Route path="returns" element={<ReturnsRefunds />} />
+                                <Route path="settings" element={<AccountSettings />} />
+                                <Route path="support" element={<Support />} /> */}
+                                </Route>
+                            </Route>
+
                             <Route path="/cart" element={<Carrello/>}/>
                             <Route path="/checkout" element={<CheckOut/>}/>
 
@@ -63,6 +95,7 @@ function App() {
                                 <Route path="reviews" element={<ReviewHistory/>}/>
                                 <Route path="wishlist" element={<Wishlist/>}/>
                                 <Route path="shipping" element={<Shipping/>}/>
+                                <Route path="returns" element={<ReturnsHistory/>}/>
 
 
                                 {/* <Route path="info" element={<SomeAccountDetailsComponent />} />
