@@ -194,6 +194,10 @@ public class Carrello {
         return item.getLibro().getRifornimento().getSconto();
     }
 
+    public boolean canCheckout() {
+        return !items.isEmpty() && items.stream().allMatch(i -> i.getLibro().getRifornimento().isDisponibile(i.getQuantita()));
+    }
+
     public void clear() {
         items.clear();
         couponCodes.clear();

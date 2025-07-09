@@ -55,7 +55,7 @@ public class CarrelloController {
     }
 
     public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, double finale, int numeroItems,
-                                   Set<CouponResponse> couponCodes) {
+                                   Set<CouponResponse> couponCodes, boolean checkoutEnabled) {
     }
 
     public record ItemRequest(Long libroId, int quantita) {
@@ -105,7 +105,7 @@ public class CarrelloController {
 
         System.out.println("dto carrello 3");
 
-        return new CarrelloResponse(responseItems, carrello.getSommaPrezzi(), carrello.getPrezzoFinale(), responseItems.size(), couponResponses);
+        return new CarrelloResponse(responseItems, carrello.getSommaPrezzi(), carrello.getPrezzoFinale(), responseItems.size(), couponResponses, carrello.canCheckout());
     }
 
     @GetMapping
