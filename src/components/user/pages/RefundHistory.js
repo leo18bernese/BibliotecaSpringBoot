@@ -38,7 +38,6 @@ const ReturnsHistory = () => {
             {returns.length === 0 ? (
                 <div className="text-center text-gray-500">
                     <p>No returns found.</p>
-                    <p>Start shopping to see your returns here!</p>
                 </div>
             ) : (
                 <div>

@@ -79,7 +79,7 @@ const Carrello = () => {
                             <div className="mt-4 border-t pt-4">
                                 <button
                                     className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-                                    onClick={() => navigate('/checkout', {state: {cart: carrello}})}>
+                                    onClick={() => navigate('/checkout')}>
                                     Procedi al Checkout
                                 </button>
                             </div>

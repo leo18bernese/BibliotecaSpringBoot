@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIMask } from 'react-imask';
 
-const AddressForm = ({ addressData, handleChange, errors }) => {
+const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [addressSuggestions, setAddressSuggestions] = useState([]);
 
@@ -65,7 +65,8 @@ const AddressForm = ({ addressData, handleChange, errors }) => {
         <div className="space-y-4">
             <div>
                 <label className="block text-sm font-medium text-gray-700">Nome</label>
-                <input ref={nameRef} type="text" name="name" defaultValue={addressData.name} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.name ? 'border-red-500' : ''}`} />
+                <input ref={node => { nameRef.current = node; if (errors.name) errorRef.current = node; }} type="text" name="name" defaultValue={addressData.name} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.name ? 'border-red-500' : ''}`} />
+
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
             </div>
 
@@ -87,7 +88,7 @@ const AddressForm = ({ addressData, handleChange, errors }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Indirizzo</label>
-                    <input type="text" name="address" value={addressData.address} onChange={handleChange} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.address ? 'border-red-500' : ''}`} />
+                    <input ref={errors.address ? errorRef : null} type="text" name="address" value={addressData.address} onChange={handleChange} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.address ? 'border-red-500' : ''}`} />
                     {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
                 </div>
                 <div>
@@ -99,20 +100,20 @@ const AddressForm = ({ addressData, handleChange, errors }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">CAP</label>
-                    <input ref={postalCodeRef} type="text" name="postalCode" defaultValue={addressData.postalCode} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.postalCode ? 'border-red-500' : ''}`} placeholder="es. 00100" />
-                    {errors.postalCode && <p className="text-red-500 text-sm">{errors.postalCode}</p>}
+                    <label className="block text-sm font-medium text-gray-700">Città</label>
+                    <input ref={node => { cityRef.current = node; if (errors.city) errorRef.current = node; }} type="text" name="city" defaultValue={addressData.city} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.city ? 'border-red-500' : ''}`} />
+                    {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Città</label>
-                    <input ref={cityRef} type="text" name="city" defaultValue={addressData.city} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.city ? 'border-red-500' : ''}`} />
-                    {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+                    <label className="block text-sm font-medium text-gray-700">CAP</label>
+                    <input ref={node => { postalCodeRef.current = node; if (errors.postalCode) errorRef.current = node; }} type="text" name="postalCode" defaultValue={addressData.postalCode} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.postalCode ? 'border-red-500' : ''}`} />
+                    {errors.postalCode && <p className="text-red-500 text-sm">{errors.postalCode}</p>}
                 </div>
             </div>
 
             <div>
                 <label className="block text-sm font-medium text-gray-700">Provincia</label>
-                <input ref={countryRef} type="text" name="country" defaultValue={addressData.country} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.country ? 'border-red-500' : ''}`} />
+                <input ref={node => { countryRef.current = node; if (errors.country) errorRef.current = node; }} type="text" name="country" defaultValue={addressData.country} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.country ? 'border-red-500' : ''}`} />
                 {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
             </div>
         </div>

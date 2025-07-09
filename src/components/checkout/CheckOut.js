@@ -1,6 +1,6 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {UserContext} from "../user/UserContext";
-import {useLocation, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
@@ -25,8 +25,7 @@ const CheckOut = () => {
     const queryClient = useQueryClient();
 
     const [errors, setErrors] = useState({});
-
-    const location = useLocation();
+    const errorRef = useRef(null);
 
     const [locationType, setLocationType] = useState("");
     const [courierType, setCourierType] = useState("");
@@ -48,6 +47,13 @@ const CheckOut = () => {
         }
     };
 
+    useEffect(() => {
+        if (Object.keys(errors).length > 0 && errorRef.current) {
+            errorRef.current.focus();
+            errorRef.current.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+    }, [errors]);
+
     const {data: places, isLoading: isLoadingPlaces} = useQuery({
         queryKey: ['shippingPlaces'],
         queryFn: fetchPlaces,
@@ -60,6 +66,27 @@ const CheckOut = () => {
     });
 
     const {carrello, isLoadingCart, errorCart, isErrorCart} = useCarrello();
+    const [countdown, setCountdown] = useState(5);
+
+    useEffect(() => {
+        if (!isLoadingCart && carrello && !carrello.canCheckout) {
+
+            console.log("counter", countdown);
+
+            if (countdown <= 0) {
+                navigate("/cart", {replace: true});
+                return;
+            }
+
+            const countdownInterval = setInterval(() => {
+                setCountdown(prevCountdown => prevCountdown > 0 ? prevCountdown - 1 : 0);
+            }, 1000);
+
+            return () => {
+                clearInterval(countdownInterval);
+            };
+        }
+    }, [carrello, countdown, isLoadingCart, navigate]);
 
     console.log(" isLoadingCart: " + isLoadingCart);
 
@@ -69,6 +96,26 @@ const CheckOut = () => {
     if (errorCouriers) return <div>Error loading couriers: {errorCouriers.message}</div>;
     if (isErrorCart) return <div>Error loading cart: {errorCart.message}</div>;
 
+    if (!carrello.canCheckout) {
+        return <div className="container mx-auto p-4 text-gray-700">
+            <h1 className="text-2xl font-bold mb-4">Checkout Not Available</h1>
+
+            <p><span className="underline">Your cart is not eligible for checkout</span>, it may be empty or contain
+                items may be out of stock.</p>
+
+            <h3 className="mt-8">You will be automatically redirected to your cart in <span
+                className="underline text-lg text-blue-700 font-bold">{countdown}</span> seconds. <br/>
+                If you are not redirected, click
+
+                <Link to="/cart" replace={true} className="text-blue-700 underline mx-1.5">
+                    here
+                </Link>
+
+                to go to your cart.
+            </h3>
+        </div>;
+    }
+
     const sommaProdotti = carrello.totale;
     const spedizione = (courierType && shippingService) ? couriers.find(c => c.id === courierType)?.offerte.find(o => o.tipo === shippingService)?.costo : 0;
     const prezzoFinale = (parseFloat(carrello.finale) + parseFloat(spedizione)).toFixed(2);
@@ -77,7 +124,6 @@ const CheckOut = () => {
 
     const validate = () => {
         const newErrors = {};
-
 
 
         if (!locationType || !courierType || !shippingService) {
@@ -96,9 +142,6 @@ const CheckOut = () => {
 
         return Object.keys(newErrors).length === 0;
     }
-
-
-
 
     const validateDiscountCode = async (code) => {
 
@@ -251,6 +294,7 @@ const CheckOut = () => {
                                         addressData={shippingAddress}
                                         handleChange={handleAddressChange}
                                         errors={errors}
+                                        errorRef={errorRef}
                                     />
 
                                 </div>
