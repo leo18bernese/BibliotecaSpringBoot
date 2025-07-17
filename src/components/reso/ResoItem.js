@@ -17,7 +17,10 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const ResoItem = ({book, bookId}) => {
+const ResoItem = ({item}) => {
+
+    const ordineItem = item.ordineItem;
+    const bookId = ordineItem?.id;
 
     const {data: bookImage, isLoading: isImageLoading, error: imageError} = useQuery({
         queryKey: ['bookFirst', bookId],
@@ -25,25 +28,26 @@ const ResoItem = ({book, bookId}) => {
         enabled: !!bookId, // Only fetch if bookId is available
     });
 
+
     return (
-        <div key={book.id} className="bg-white border border-gray-300 rounded-xl p-4 flex items-center my-3">
+        <div key={item.id} className="bg-white border border-gray-300 rounded-xl p-4 flex items-center my-3">
 
             <img
                 src={`/api/images/${bookId}/first`}
-                alt={book.titolo}
+                alt={item.titolo}
                 className="w-24 h-32 object-cover rounded-md mr-4"/>
 
             <div className="flex-1 flex justify-between items-start">
                 <div>
-                    <Link to={`/book/${book.id}`} className="text-xl font-semibold hover:underline">
-                        {book.titolo}
+                    <Link to={`/book/${ordineItem.id}`} className="text-xl font-semibold hover:underline">
+                        {ordineItem.titolo}
                     </Link>
 
-                    <p className="text-gray-700">Quantità: {book.quantita}</p>
+                    <p className="text-gray-700">Quantità di reso: {item.quantita} di {ordineItem.quantita}</p>
                 </div>
 
                 <div className="text-right font-semibold text-lg ml-4">
-                    <p className="text-gray-500">€ {book.prezzo} {book.quantita > 1 && "cad."}</p>
+                    <p className="text-gray-500">€ {ordineItem.prezzo} {item.quantita > 1 && "cad."}</p>
                 </div>
             </div>
         </div>

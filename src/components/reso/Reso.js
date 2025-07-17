@@ -40,7 +40,7 @@ const Reso = () => {
         select: (data) => {
             if (data && data.items && Array.isArray(data.items)) {
                 const sortedItems = [...data.items].sort((a, b) => a.dataAggiunta.localeCompare(b.dataAggiunta));
-                return { ...data, items: sortedItems };
+                return {...data, items: sortedItems};
             }
             return data;
         },
@@ -67,6 +67,8 @@ const Reso = () => {
 
     console.log(reso);
 
+    const warn = reso.statoWarning;
+
     return (
         <div className="container mx-auto px-4 py-8">
             <Toaster/>
@@ -77,12 +79,14 @@ const Reso = () => {
 
                 <div className="mt-4 mb-10">
                 <span className="p-2 rounded-2xl font-semibold uppercase text-sm mb "
-                      style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
+                      style={warn ? {backgroundColor: '#fee2e2', color: '#991b1b'} : {backgroundColor: '#d1fae5', color: '#065f46'}}>
                                 <span className="">{reso.statoName}</span>
                             </span>
                 </div>
 
-                <ResoTimeline current={reso.stato} stati={reso.stati} />
+                {!reso.statoWarning && (
+                    <ResoTimeline current={reso.stato} stati={reso.stati}/>
+                )}
 
                 <p className="text-center mt-8">{reso.statoDescrizione}</p>
                 <p className="text-center">{reso.statoNext}</p>
@@ -93,11 +97,11 @@ const Reso = () => {
                 <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
                     <div className="p-2 rounded flex items-center font-semibold text-black">
                         <i className="bx bx-package mr-2 text-2xl text-blue-600"></i>
-                        <span>Articoli Ordinati</span>
+                        <span>Articoli di Reso</span>
                     </div>
 
                     {reso.items.map((item) => (
-                        <ResoItem book={item} bookId={item.id} key={item.id}/>
+                        <ResoItem item={item} key={item.id}/>
                     ))
                     }
                 </div>
@@ -108,106 +112,16 @@ const Reso = () => {
                         <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
                             <div className="p-2 rounded flex items-center font-semibold text-black">
                                 <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
-                                <span>Info Ordine</span>
+                                <span>Info Reso</span>
                             </div>
 
                             <div className="flex justify-between border-b py-2 text-md ">
                                 <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
                                 <h3 className="font-semibold text-right text-gray-800">{new Date(reso.dataCreazione).toLocaleString()}</h3>
                             </div>
-
-                            <div className="flex justify-between border-b py-2 text-md ">
-                                <h3 className="font-semibold text-gray-500">Somma Totale:</h3>
-                                <h3 className="font-semibold text-right text-gray-800">
-                                    € {reso.sommaTotale.toFixed(2)}
-                                </h3>
-                            </div>
-
-                            <div className="flex justify-between border-b py-2 text-md ">
-                                <h3 className="font-semibold text-gray-500">Spese Spedizione:</h3>
-                                <h3 className="font-semibold text-right text-gray-800">
-                                    € {reso.speseSpedizione.toFixed(2)}
-                                </h3>
-                            </div>
-
-                            <div className="flex justify-between py-2 text-md ">
-                                <h3 className="font-semibold text-gray-500">Coupon:</h3>
-
-                                <h3 className="font-semibold text-right text-gray-800 mt-1">
-
-                                    {reso.couponCodes.length === 0 && (
-                                        <span className="p-2 rounded-2xl font-semibold uppercase text-sm"
-                                                style={{backgroundColor: '#fef3c7', color: '#92400e'}}>
-                                            Nessun coupon applicato
-                                        </span>
-                                    ) }
-
-                                    {reso.couponCodes.map((code, index) => (
-                                        <span key={index}
-                                              className="p-2 rounded-2xl font-semibold uppercase text-sm  ml-2"
-                                              style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
-                                    {code.codice} {" "}
-                                </span>
-                                    ))}
-                                </h3>
-                            </div>
                         </div>
                     </div>
-
-                    <div>
-                        <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
-                            <div className="p-2 rounded flex items-center font-semibold text-black">
-                                <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
-                                <span>Info Spedizione</span>
-                            </div>
-
-                            <div className="flex justify-between border-b py-2 text-md ">
-                                <h3 className="font-semibold text-gray-500">Corriere:</h3>
-                                <h3 className="font-semibold text-right text-gray-800">
-                                    {reso.nomeCorriere || 'Non specificato'}
-                                </h3>
-                            </div>
-
-                            <div className="flex justify-between border-b py-2 text-md ">
-                                <h3 className="font-semibold text-gray-500">Tipo Spedizione:</h3>
-                                <h3 className="font-semibold text-right text-gray-800">
-                                    {reso.tipoSpedizione || 'Non specificato'}
-                                </h3>
-                            </div>
-
-                            <div className="flex justify-between border-b py-2 text-md ">
-                                <h3 className="font-semibold text-gray-500">Indirizzo di Spedizione:</h3>
-                                <h3 className="font-semibold text-right text-gray-800">
-                                    {reso.indirizzoFormat || 'Non specificato'}
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
-                        <div className="p-2 rounded flex items-center font-semibold text-black">
-                            <i className="bx bx-info-circle mr-2 text-2xl text-blue-600"></i>
-                            <span>Info Pagamento</span>
-                        </div>
-
-                        <div className="flex justify-between border-b py-2 text-md ">
-                            <h3 className="font-semibold text-gray-500">Metodo:</h3>
-                            <h3 className="font-semibold text-right text-gray-800">
-                                {reso.metodoPagamento || 'Errore nel recupero'}
-                            </h3>
-                        </div>
-
-                        <div className="flex justify-between border-b py-2 text-md ">
-                            <h3 className="font-semibold text-gray-500">Id Transazione:</h3>
-                            <h3 className="font-semibold text-right text-gray-800">
-                                {reso.idTransazione || 'Non trovato'}
-                            </h3>
-                        </div>
-                    </div>
-
-
                 </div>
-
             </div>
         </div>
     );

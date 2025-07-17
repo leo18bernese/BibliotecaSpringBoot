@@ -10,9 +10,20 @@ export const CartProvider = ({children}) => {
     const {user} = useContext(UserContext);
     const queryClient = useQueryClient();
 
+    const directBuy = async (itemId, quantity) => {
+        if (!user) {
+            console.error("User not logged in");
+            toast.error("Devi essere loggato per acquistare un elemento.");
+            return;
+        }
+
+
+    }
+
     const addItem = async (itemId, quantity) => {
         if (!user) {
             console.error("User not logged in");
+            toast.error("Devi essere loggato per aggiungere un elemento al carrello.");
             return;
         }
 
@@ -40,6 +51,7 @@ export const CartProvider = ({children}) => {
     const removeItem = async (itemId, quantity) => {
         if (!user) {
             console.error("User not logged in");
+            toast.error("Devi essere loggato per rimuovere un elemento dal carrello.");
             return;
         }
 

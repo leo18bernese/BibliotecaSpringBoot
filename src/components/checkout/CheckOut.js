@@ -69,7 +69,7 @@ const CheckOut = () => {
     const [countdown, setCountdown] = useState(5);
 
     useEffect(() => {
-        if (!isLoadingCart && carrello && !carrello.canCheckout) {
+        if (!carrello || !isLoadingCart ||  !carrello.canCheckout) {
 
             console.log("counter", countdown);
 
@@ -79,7 +79,9 @@ const CheckOut = () => {
             }
 
             const countdownInterval = setInterval(() => {
-                setCountdown(prevCountdown => prevCountdown > 0 ? prevCountdown - 1 : 0);
+                if(!carrello.canCheckout) {
+                    setCountdown(prevCountdown => prevCountdown > 0 ? prevCountdown - 1 : 0);
+                }
             }, 1000);
 
             return () => {
@@ -88,15 +90,14 @@ const CheckOut = () => {
         }
     }, [carrello, countdown, isLoadingCart, navigate]);
 
-    console.log(" isLoadingCart: " + isLoadingCart);
-
     const isLoading = isLoadingPlaces || isLoadingCouriers || isLoadingCart;
 
     if (isLoading) return <div>Loading...</div>;
     if (errorCouriers) return <div>Error loading couriers: {errorCouriers.message}</div>;
     if (isErrorCart) return <div>Error loading cart: {errorCart.message}</div>;
 
-    if (!carrello.canCheckout) {
+
+    if (!carrello || !carrello.canCheckout) {
         return <div className="container mx-auto p-4 text-gray-700">
             <h1 className="text-2xl font-bold mb-4">Checkout Not Available</h1>
 

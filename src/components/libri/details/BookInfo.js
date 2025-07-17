@@ -8,6 +8,8 @@ import {useQuery, useQueryClient} from "@tanstack/react-query";
 import toast, {Toaster} from "react-hot-toast";
 import BookInfoTabs from "./BookInfoTabs";
 import NuovaRecensione from "../../recensioni/NuovaRecensione";
+import {UserContext} from "../../user/UserContext";
+import {useAuth} from "../../user/AuthContext";
 
 const API_URL = '/api/images';
 
@@ -65,6 +67,9 @@ const fetchHasWishlisted = async (id) => {
 
 
 const BookInfo = () => {
+    const {user} = useContext(UserContext);
+    const {showLoginPrompt} = useAuth();
+
     const {id} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -112,11 +117,13 @@ const BookInfo = () => {
     const {data: cartItem} = useQuery({
         queryKey: ['cartItem', bookId],
         queryFn: () => fetchCartItem(bookId),
+        enabled: !!user
     });
 
     const {data: hasWishlisted} = useQuery({
         queryKey: ['hasWishlisted', bookId],
         queryFn: () => fetchHasWishlisted(bookId),
+        enabled: !!user
     });
 
 
@@ -153,6 +160,10 @@ const BookInfo = () => {
 
 
     const addToWishlist = async (bookId) => {
+        if (!user) {
+            showLoginPrompt();
+            return;
+        }
         try {
             const {data} = await axios.post(`/api/wishlist/${bookId}`);
             await queryClient.invalidateQueries(['hasWishlisted', bookId]);
@@ -165,6 +176,10 @@ const BookInfo = () => {
     }
 
     const removeFromWishlist = async (bookId) => {
+        if (!user) {
+            showLoginPrompt();
+            return;
+        }
         try {
             const {data} = await axios.delete(`/api/wishlist/${bookId}`);
             await queryClient.invalidateQueries(['hasWishlisted', bookId]);
@@ -292,7 +307,7 @@ const BookInfo = () => {
                             <div className="flex flex-col gap-2">
                                 <button
                                     className={` ${!isDisponibile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded-xl transition`}
-                                    onClick={() => addItem(book.id, 1)}
+                                    onClick={() => user ? addItem(book.id, 1) : showLoginPrompt()}
                                     disabled={!isDisponibile}>
                                     Aggiungi al carrello
                                 </button>

@@ -34,34 +34,34 @@ const customTimelineStyles = `
 // Definisci tutti gli step fuori dal componente per evitare di ricrearli ad ogni render
 const allSteps = [
     {
-        title: 'Reso Creato',
-        apiStatus: ['IN_ATTESA'],
+        title: 'Richiesto',
+        apiStatus: ['RICHIESTO'],
         icon: <div style={iconWrapperStyle}><ContainerOutlined/></div>,
-        description: null
     },
     {
-        title: 'In Preparazione',
-        apiStatus: ['IN_PREPARAZIONE'],
+        title: 'Da Restituire',
+        apiStatus: ['DA_RESTITUIRE'],
         icon: <div style={iconWrapperStyle}><InboxOutlined/></div>,
-        description: null
     },
     {
         title: 'Spedito',
         apiStatus: ['SPEDITO'],
         icon: <div style={iconWrapperStyle}><TruckOutlined/></div>,
-        description: null
     },
     {
-        title: 'In Consegna',
-        apiStatus: ['IN_CONSEGNA'],
+        title: 'Ricevuto',
+        apiStatus: ['RICEVUTO'],
         icon: <div style={iconWrapperStyle}><HomeOutlined/></div>,
-        description: null
     },
     {
-        title: 'Consegnato',
-        apiStatus: ['CONSEGNATO'],
+        title: 'Elaborato',
+        apiStatus: ['ELABORATO'],
         icon: <div style={iconWrapperStyle}><CheckCircleOutlined/></div>,
-        description: null
+    },
+    {
+        title: 'Effettuato',
+        apiStatus: ['EFFETTUATO'],
+        icon: <div style={iconWrapperStyle}><CheckCircleOutlined/></div>,
     },
 ];
 
@@ -84,9 +84,9 @@ const ResoTimeline = ({current, stati}) => {
             current={currentStepIndex}
             labelPlacement="vertical"
         >
-            {allSteps.map((step, index) =>  {
+            {allSteps.map((step, index) => {
                 const statusKey = step.apiStatus[0];
-                const date = stati[statusKey] ;
+                const date = stati[statusKey];
                 const description = date ? new Date(date).toLocaleString() : null;
 
                 return (<Step
@@ -94,7 +94,7 @@ const ResoTimeline = ({current, stati}) => {
                     title={step.title}
                     icon={step.icon}
                     status={getStatusForStep(index)}
-                description={description}
+                    description={description}
                 />);
             })}
         </Steps>

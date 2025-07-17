@@ -8,6 +8,8 @@ import BookInfo from "./components/libri/details/BookInfo";
 import {UserContext, UserProvider} from './components/user/UserContext';
 import Carrello from "./components/carrello/Carrello";
 import {CartProvider} from "./components/carrello/CartContext";
+import {AuthProvider} from "./components/user/AuthContext";
+import './components/user/Auth.css';
 
 import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query';
 import ScrollToTop from "./components/utils/ScrollToTop";
@@ -39,44 +41,47 @@ function App() {
             <UserProvider>
                 <CartProvider>
                     <Router>
-                        <ScrollToTop/>
+                        <AuthProvider>
+                            <ScrollToTop/>
 
-                        <NavBar/>
-                        <Routes>
-                            <Route path="/" element={<Home/>}/>
-                            <Route path="/search" element={<SearchBooks/>}/>
+                            <Toaster position="top-center" reverseOrder={false}/>
+                            <NavBar/>
+                            <Routes>
+                                <Route path="/" element={<Home/>}/>
+                                <Route path="/search" element={<SearchBooks/>}/>
 
-                            <Route path="/book/:id" element={<BookInfo/>}/>
-                            <Route path="/libri/:id" element={<RedirectToBook/>}/>
-                            <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
-                            <Route path="/libro/:id" element={<RedirectToBook/>}/>
-
-                            <Route path="/ordine/:id" element={<Ordine/>}/>
-                            <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
-
-                            <Route element={<ProtectedRoute/>}>
+                                <Route path="/book/:id" element={<BookInfo/>}/>
+                                <Route path="/libri/:id" element={<RedirectToBook/>}/>
                                 <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+                                <Route path="/libro/:id" element={<RedirectToBook/>}/>
+
                                 <Route path="/ordine/:id" element={<Ordine/>}/>
                                 <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
-                                <Route path="/reso/:id" element={<Reso/>}/>
 
-                                <Route path="/account/*" element={<AccountInfo/>}>
-                                    <Route index element={<Navigate to="personal-details" replace/>}/>
-                                    <Route path="personal-details" element={<PersonalDetails/>}/>
-                                    <Route path="orders" element={<OrderHistory/>}/>
-                                    <Route path="reviews" element={<ReviewHistory/>}/>
-                                    <Route path="wishlist" element={<Wishlist/>}/>
-                                    <Route path="shipping" element={<Shipping/>}/>
-                                    <Route path="returns" element={<ReturnsHistory/>}/>
+                                <Route element={<ProtectedRoute/>}>
+                                    <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+                                    <Route path="/ordine/:id" element={<Ordine/>}/>
+                                    <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+                                    <Route path="/reso/:id" element={<Reso/>}/>
+
+                                    <Route path="/account/*" element={<AccountInfo/>}>
+                                        <Route index element={<Navigate to="personal-details" replace/>}/>
+                                        <Route path="personal-details" element={<PersonalDetails/>}/>
+                                        <Route path="orders" element={<OrderHistory/>}/>
+                                        <Route path="reviews" element={<ReviewHistory/>}/>
+                                        <Route path="wishlist" element={<Wishlist/>}/>
+                                        <Route path="shipping" element={<Shipping/>}/>
+                                        <Route path="returns" element={<ReturnsHistory/>}/>
+                                    </Route>
                                 </Route>
-                            </Route>
 
-                            <Route path="/cart" element={<Carrello/>}/>
-                            <Route path="/checkout" element={<CheckOut/>}/>
+                                <Route path="/cart" element={<Carrello/>}/>
+                                <Route path="/checkout" element={<CheckOut/>}/>
 
-                            <Route path="/login" element={<Login/>}/>
-                            <Route path="/register" element={<Register/>}/>
-                        </Routes>
+                                <Route path="/login" element={<Login/>}/>
+                                <Route path="/register" element={<Register/>}/>
+                            </Routes>
+                        </AuthProvider>
                     </Router>
                 </CartProvider>
             </UserProvider>

@@ -119,11 +119,14 @@ const NuovoReso = () => {
         };
 
         try {
-            await axios.post(`/api/resi`, finalRequest);
+            const {data} = await axios.post(`/api/resi`, finalRequest);
+
             toast.success('Richiesta di reso inviata con successo!');
+
             setTimeout(() => {
-                navigate(`/profilo/ordini`); // O dove preferisci reindirizzare l'utente
+                navigate(`/reso/${data.id}`);
             }, 1500);
+
         } catch (error) {
             console.error("Errore durante l'invio del reso:", error);
             toast.error(error.response?.data?.message || 'Si è verificato un errore.');
@@ -165,7 +168,7 @@ const NuovoReso = () => {
                                             acquistata: {item.quantita}</p>
 
                                         {resoRequest.items[index]?.selected && (
-                                            <div className="mt-4 space-y-4" >
+                                            <div className="mt-4 space-y-4">
                                                 <div>
                                                     <label htmlFor={`quantita-${item.id}`}
                                                            className="block text-sm font-medium text-gray-700">Quantità
@@ -191,7 +194,7 @@ const NuovoReso = () => {
                                                         required={resoRequest.items[index]?.quantita > 0}
                                                         className="mt-1 block w-full border-gray-300 bg-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2"
                                                     >
-                                                        <option value="" disabled >Seleziona un motivo</option>
+                                                        <option value="" disabled>Seleziona un motivo</option>
 
                                                         {motivi.map((motivo) => (
                                                             <option key={motivo.name}

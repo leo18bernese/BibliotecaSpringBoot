@@ -9,6 +9,7 @@ const NuovaRecensione = () => {
 
     // The state is a single object 'response' which holds all form data.
     const [response, setResponse] = useState({
+        id: id,
         titolo: '',
         testo: '',
         stelle: 5,
@@ -49,9 +50,10 @@ const NuovaRecensione = () => {
         }
 
         try {
-            // The entire 'response' object is sent in the POST request.
-            await axios.post(`/api/recensioni/${id}`, response); // Sending the whole 'response' object
+            await axios.post(`/api/recensioni/${id}`, response);
+
             toast.success('Recensione inviata con successo!');
+
             setTimeout(() => {
                 navigate(`/libri/${id}`);
             }, 1500);

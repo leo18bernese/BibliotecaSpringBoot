@@ -2,8 +2,7 @@ import React, {useState} from 'react';
 
 const ImageGallery = ({id, images, API_URL}) => {
     const [selectedImage, setSelectedImage] = useState(images === -1 ? -1 : 0);
-    const [previousImage, setPreviousImage] = useState(selectedImage);
-    const [showPopup, setShowPopup] = useState(false);
+       const [showPopup, setShowPopup] = useState(false);
 
     const handleImageClick = () => {
         setShowPopup(true);
@@ -34,22 +33,27 @@ const ImageGallery = ({id, images, API_URL}) => {
 
             {/* Thumbnail navigation (if you have multiple images) */}
             {images > 0 && (
-                <div className="mt-4 flex flex-wrap justify-center">
-                    {Array.from({ length: images }, (_, image) => (
-                        <img
-                            key={image}
-                            src={`${API_URL}/${id}/index/${image}`}
-                            alt={`Thumbnail ${image}`}
-                            className={`w-16 h-16 object-cover rounded cursor-pointer border-2 ${
-                                selectedImage === image ? 'border-red-600' : 'border-gray-200'
-                            }`}
-                            onClick={() => {
-                                setSelectedImage(image);
-                                setPreviousImage(selectedImage);
-                            }}
-                            onMouseEnter={() => setSelectedImage(image)}
-                            onMouseLeave={() => setSelectedImage(previousImage)}
-                        />
+                <div className="mt-4 flex flex-wrap justify-center items-center">
+
+                    {Array.from({ length: Math.min(images, 10) }, (_, image) => (
+                        <div key={image} className="relative cursor-pointer " onMouseEnter={() => {
+                            setSelectedImage(image);
+                        }}>
+                            <img
+                                src={`${API_URL}/${id}/index/${image}`}
+                                alt={`Thumbnail ${image}`}
+                                className={`w-16 h-16 object-cover rounded border-2 ${
+                                    selectedImage === image ? 'border-red-600' : 'border-gray-200'
+                                }`}
+                            />
+
+                            {image === 9 && images > 10 && (
+                                <div
+                                    className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white text-lg font-bold rounded">
+                                    +{images - 10}
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
             )}
