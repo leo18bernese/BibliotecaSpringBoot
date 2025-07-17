@@ -5,6 +5,7 @@ import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,10 @@ public class WishlistController {
     @GetMapping("/has/{id}")
     public ResponseEntity<Boolean> hasWishlistItem(@AuthenticationPrincipal Utente user,
                                                    @PathVariable Long id) {
+        if(user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
             boolean hasWishlist = user.getWishlist().stream()
                     .anyMatch(libro -> libro.getId().equals(id));

@@ -1,4 +1,4 @@
-package me.leoo.springboot.libri.resi;
+package me.leoo.springboot.libri.resi.stato;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

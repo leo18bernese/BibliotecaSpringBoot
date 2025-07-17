@@ -3,6 +3,7 @@ package me.leoo.springboot.libri.recensioni;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class RecensioneController {
     }
 
     public record RecensionePublish(
+            Long id,
             String titolo,
             String testo,
             int stelle,
@@ -35,8 +37,6 @@ public class RecensioneController {
 
     @GetMapping("/all/user")
     public ResponseEntity<RecensioneResponse[]> getRecensioniByUtenteId(@AuthenticationPrincipal Utente utente) {
-
-
         try {
             Set<Recensione> recensioni = recensioneRepository.findByUtenteId(utente.getId());
 
@@ -78,21 +78,21 @@ public class RecensioneController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<RecensioneResponse> addRecensione(@PathVariable Long id,
-                                                            @RequestBody RecensionePublish recensionePublish) {
-        Utente utente = utenteRepository.findById(id).orElseThrow();
-
-        System.out.println("ottenuto response " + recensionePublish);
+    public ResponseEntity<RecensioneResponse> addRecensione(@AuthenticationPrincipal Utente utente,
+                                                            @RequestBody RecensionePublish publish) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         try {
             Recensione recensione = new Recensione(
-                    id,
+                    publish.id(),
                     utente.getId(),
-                    recensionePublish.titolo(),
-                    recensionePublish.testo(),
-                    recensionePublish.stelle(),
-                    recensionePublish.approvato(),
-                    recensionePublish.consigliato()
+                    publish.titolo(),
+                    publish.testo(),
+                    publish.stelle(),
+                    publish.approvato(),
+                    publish.consigliato()
             );
 
             Recensione savedRecensione = recensioneRepository.save(recensione);

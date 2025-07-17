@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.ordini.OrdineItem;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
+import me.leoo.springboot.libri.resi.stato.StatoReso;
+import me.leoo.springboot.libri.resi.stato.StatoResoStorico;
 
 import java.util.*;
 
@@ -29,12 +31,9 @@ public class Reso {
     @OneToMany(mappedBy = "reso", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ResoItem> items = new HashSet<>();
 
-    @ElementCollection
-    @CollectionTable(name = "reso_stati", joinColumns = @JoinColumn(name = "reso_id"))
-    @MapKeyColumn(name = "stato")
-    @MapKeyEnumerated(EnumType.STRING)
-    @Column(name = "data_aggiornamento")
-    private Map<StatoReso, Date> stati = new HashMap<>();
+    @OneToMany(mappedBy = "reso", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dataAggiornamento ASC")
+    private List<StatoResoStorico> stati = new ArrayList<>();
 
     @OneToMany(mappedBy = "reso", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("timestamp ASC")
@@ -42,17 +41,19 @@ public class Reso {
 
     private Date dataCreazione = new Date();
 
-    // Inizializza un nuovo reso associato a un ordine
-    // Segue l'aggiunta degli item del reso attraverso altri metodi
     public Reso(Ordine ordine){
         this.ordine = ordine;
 
         this.items = new HashSet<>();
         this.messaggi = new ArrayList<>();
-        this.stati = new HashMap<>();
-        // Imposta lo stato iniziale del reso
-        this.stati.put(StatoReso.IN_ATTESA, new Date());
+        this.stati = new ArrayList<>();
 
+        addStato(StatoReso.RICHIESTO, "non va bene proprio");
+    }
+
+    public void addStato(StatoReso stato, String messaggio) {
+        StatoResoStorico nuovoStato = new StatoResoStorico(this, stato, messaggio);
+        this.stati.add(nuovoStato);
     }
 
     // Stato
@@ -61,7 +62,7 @@ public class Reso {
             throw new IllegalArgumentException("Nuovo stato non può essere null");
         }
 
-        stati.put(nuovoStato, new Date());
+        addStato(nuovoStato, "");
     }
 
     public StatoReso getStato() {
@@ -69,7 +70,8 @@ public class Reso {
             return StatoReso.IN_ATTESA;
         }
 
-        Optional<StatoReso> ultimoStato = stati.keySet().stream()
+        Optional<StatoReso> ultimoStato = stati.stream()
+                .map(StatoResoStorico::getStato)
                 .reduce((first, second) -> second);
 
         return ultimoStato.orElse(StatoReso.IN_ATTESA);
@@ -81,6 +83,11 @@ public class Reso {
 
     public String getStatoDescrizione() {
         return getStato().getDescrizione();
+    }
+
+    public boolean isStatoWarning() {
+        return getStato() == StatoReso.ANNULLATO_DA_CLIENTE || getStato() == StatoReso.ANNULLATO_DA_SUPPORTO
+                || getStato() == StatoReso.RESPINTO ;
     }
 
     // Aggiunge un messaggio al reso

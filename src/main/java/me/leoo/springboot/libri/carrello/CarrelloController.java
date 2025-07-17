@@ -55,7 +55,7 @@ public class CarrelloController {
     }
 
     public record CarrelloResponse(Set<CarrelloItemResponse> items, double totale, double finale, int numeroItems,
-                                   Set<CouponResponse> couponCodes, boolean checkoutEnabled) {
+                                   Set<CouponResponse> couponCodes, boolean canCheckout) {
     }
 
     public record ItemRequest(Long libroId, int quantita) {

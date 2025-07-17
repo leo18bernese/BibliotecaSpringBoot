@@ -32,9 +32,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/assets/**", "/favicon.ico").permitAll()
                         // Endpoints pubblici
-                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/home/**", "/h2-console/**", "/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**","/api/home/**", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione
-                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/recensioni/**", "/api/buono/**", "/api/ordini/**", "api/resi/**", "/api/wishlist/**").authenticated()
+                        .requestMatchers("/api/utenti/current", "/api/carrello/**",  "/api/buono/**", "/api/ordini/**", "api/resi/**", "/api/wishlist/**").authenticated()
                         // Proteggi tutti gli altri endpoint per default
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
