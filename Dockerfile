@@ -10,7 +10,10 @@ WORKDIR /app
 # se solo i file sorgente cambiano, non i file di configurazione di Gradle.
 COPY build.gradle settings.gradle ./
 COPY gradlew gradlew.bat ./
-COPY gradle gradle ./
+COPY gradle ./gradle/
+
+# Rendi lo script gradlew eseguibile
+RUN chmod +x ./gradlew
 
 # Esegui un build per scaricare le dipendenze.
 # Questo strato sarà cachato da Docker e riutilizzato.
