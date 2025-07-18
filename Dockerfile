@@ -27,7 +27,7 @@ RUN ./gradlew build --no-daemon
 
 # Fase 2: Crea un'immagine leggera con solo il JAR eseguibile
 # Usa un'immagine JRE (Java Runtime Environment) leggera, senza strumenti di build.
-FROM openjdk:17-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 
 # Imposta la directory di lavoro per l'applicazione finale
 WORKDIR /app
