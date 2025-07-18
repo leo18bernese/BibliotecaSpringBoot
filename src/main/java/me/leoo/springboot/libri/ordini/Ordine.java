@@ -42,17 +42,17 @@ public class Ordine {
     @JoinTable(name = "ordine_buono",
             joinColumns = @JoinColumn(name = "ordine_id"),
             inverseJoinColumns = @JoinColumn(name = "buono_id"))
-    private Set<Buono> couponCodes = new HashSet<>();
+    private final Set<Buono> couponCodes = new HashSet<>();
 
     @OneToMany(mappedBy = "ordine", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrdineItem> items = new HashSet<>();
+    private final Set<OrdineItem> items = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "ordine_stati", joinColumns = @JoinColumn(name = "ordine_id"))
     @MapKeyColumn(name = "stato")
     @MapKeyEnumerated(EnumType.STRING)
     @Column(name = "data_aggiornamento")
-    private Map<StatoOrdine, Date> stati = new HashMap<>();
+    private final Map<StatoOrdine, Date> stati = new HashMap<>();
 
     //spedizione
     private SpedizioneLuogo luogoSpedizione;

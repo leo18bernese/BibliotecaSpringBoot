@@ -33,7 +33,7 @@ public class Carrello {
     private Utente utente;
 
     @OneToMany(mappedBy = "carrello", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CarrelloItem> items = new HashSet<>();
+    private final Set<CarrelloItem> items = new HashSet<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCreazione;
@@ -45,12 +45,15 @@ public class Carrello {
     @JoinTable(name = "carrello_buono",
             joinColumns = @JoinColumn(name = "carrello_id"),
             inverseJoinColumns = @JoinColumn(name = "buono_id"))
-    private Set<Buono> couponCodes = new HashSet<>();
+    private Set<Buono> couponCodes ;
 
     public Carrello(Utente utente) {
         this.utente = utente;
         this.dataCreazione = new Date();
         this.ultimaModifica = new Date();
+
+        this.couponCodes = new LinkedHashSet<>();
+
     }
 
     public void checkCoupons() {

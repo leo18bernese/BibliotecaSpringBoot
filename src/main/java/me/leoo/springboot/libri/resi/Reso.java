@@ -29,11 +29,11 @@ public class Reso {
     private Ordine ordine;
 
     @OneToMany(mappedBy = "reso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ResoItem> items = new HashSet<>();
+    private Set<ResoItem> items;
 
     @OneToMany(mappedBy = "reso", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("dataAggiornamento ASC")
-    private List<StatoResoStorico> stati = new ArrayList<>();
+    private List<StatoResoStorico> stati;
 
     @OneToMany(mappedBy = "reso", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("timestamp ASC")
