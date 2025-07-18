@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.ordini.OrdineItem;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,10 @@ public class ResoItem {
     private Set<String> proveFoto;
 
     public ResoItem(OrdineItem ordineItem, MotivoReso motivo, String descrizione, int quantita) {
+        if (quantita > ordineItem.getQuantita()) {
+            throw new IllegalArgumentException("La quantità del reso non può essere maggiore della quantità ordinata.");
+        }
+
         this.ordineItem = ordineItem;
         this.motivo = motivo;
         this.descrizione = descrizione;
@@ -48,4 +53,15 @@ public class ResoItem {
         this.proveFoto = new HashSet<>();
     }
 
+    public int getQuantita() {
+        return Math.min(quantita, ordineItem.getQuantita());
+    }
+
+    public double getPrezzoTotale() {
+        return ordineItem.getPrezzo() * getQuantita();
+    }
+
+    public Date getDataAggiunta() {
+        return ordineItem.getDataAggiunta();
+    }
 }

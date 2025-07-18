@@ -22,7 +22,8 @@ public class ResoController {
 
     public record CreaResoRequest(
             Long ordineId,
-            Set<CreaResoItemRequest> items
+            Set<CreaResoItemRequest> items,
+            MetodoRimborso metodoRimborso
     ) {
     }
 
@@ -133,5 +134,11 @@ public class ResoController {
     public ResponseEntity<MotivoReso[]> getMotiviReso() {
         MotivoReso[] motivi = MotivoReso.values();
         return ResponseEntity.ok(motivi);
+    }
+
+    @GetMapping("/refund-methods")
+    public ResponseEntity<MetodoRimborso[]> getMetodiRimborso() {
+        MetodoRimborso[] metodi = MetodoRimborso.values();
+        return ResponseEntity.ok(metodi);
     }
 }

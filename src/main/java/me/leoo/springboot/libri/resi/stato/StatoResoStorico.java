@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.resi.stato;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class StatoResoStorico {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reso_id", nullable = false)
+    @JsonIgnore
     private Reso reso;
 
     @Enumerated(EnumType.STRING)

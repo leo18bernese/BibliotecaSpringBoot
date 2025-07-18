@@ -27,7 +27,7 @@ public class ResoService {
         Ordine ordine = ordineRepository.findById(request.ordineId())
                 .orElseThrow(() -> new EntityNotFoundException("Ordine non trovato con ID: " + request.ordineId()));
 
-        Reso reso = new Reso(ordine);
+        Reso reso = new Reso(ordine, request.metodoRimborso());
 
         for (ResoController.CreaResoItemRequest itemRequest : request.items()) {
             OrdineItem ordineItem = ordineItemRepository.findById(itemRequest.ordineItemId())

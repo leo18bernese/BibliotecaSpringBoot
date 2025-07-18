@@ -41,14 +41,23 @@ public class Reso {
 
     private Date dataCreazione = new Date();
 
-    public Reso(Ordine ordine){
+    private MetodoRimborso metodoRimborso;
+
+    public Reso(Ordine ordine, MetodoRimborso metodoRimborso) {
         this.ordine = ordine;
 
         this.items = new HashSet<>();
         this.messaggi = new ArrayList<>();
         this.stati = new ArrayList<>();
+        this.metodoRimborso = metodoRimborso;
 
         addStato(StatoReso.RICHIESTO, "non va bene proprio");
+    }
+
+    public double getTotaleReso() {
+        return items.stream()
+                .mapToDouble(item -> item.getOrdineItem().getPrezzo() * item.getQuantita())
+                .sum();
     }
 
     public void addStato(StatoReso stato, String messaggio) {
@@ -63,6 +72,13 @@ public class Reso {
         }
 
         addStato(nuovoStato, "");
+    }
+
+    public StatoResoStorico getUltimoStato() {
+        if (stati.isEmpty()) {
+            return null;
+        }
+        return stati.get(stati.size() - 1);
     }
 
     public StatoReso getStato() {
@@ -85,9 +101,23 @@ public class Reso {
         return getStato().getDescrizione();
     }
 
+    public String getStatoMessaggio() {
+        StatoResoStorico ultimoStato = getUltimoStato();
+
+        if (ultimoStato == null) {
+            return null;
+        }
+
+        if (ultimoStato.getMessaggio() != null) {
+            return ultimoStato.getMessaggio();
+        }
+
+        return "";
+    }
+
     public boolean isStatoWarning() {
         return getStato() == StatoReso.ANNULLATO_DA_CLIENTE || getStato() == StatoReso.ANNULLATO_DA_SUPPORTO
-                || getStato() == StatoReso.RESPINTO ;
+                || getStato() == StatoReso.RESPINTO;
     }
 
     // Aggiunge un messaggio al reso
