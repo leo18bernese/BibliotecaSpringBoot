@@ -39,7 +39,7 @@ public class Reso {
     @OrderBy("timestamp ASC")
     private List<Messaggio> messaggi;
 
-    private Date dataCreazione = new Date();
+    private final Date dataCreazione = new Date();
 
     private MetodoRimborso metodoRimborso;
 
