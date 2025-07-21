@@ -32,6 +32,7 @@ import NuovoReso from "./components/reso/NuovoReso";
 import ReturnsHistory from "./components/user/pages/RefundHistory";
 import Reso from "./components/reso/Reso";
 import ProtectedRoute from "./components/user/login/ProtectedRoute";
+import ResoChat from "./components/reso/ResoChat";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,8 @@ function App() {
                                     <Route path="/ordine/:id" element={<Ordine/>}/>
                                     <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
                                     <Route path="/reso/:id" element={<Reso/>}/>
+                                    <Route path="/reso/:id/chat" element={<ResoChat/>}/>
+
 
                                     <Route path="/account/*" element={<AccountInfo/>}>
                                         <Route index element={<Navigate to="personal-details" replace/>}/>
