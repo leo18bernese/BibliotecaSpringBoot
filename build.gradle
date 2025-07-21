@@ -45,6 +45,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {

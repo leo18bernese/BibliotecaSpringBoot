@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disabilita CSRF
                 .cors(Customizer.withDefaults()) // Abilita e usa il bean CorsConfigurationSource
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/assets/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/assets/**", "/favicon.ico", "/ws/**").permitAll()
                         // Endpoints pubblici
                         .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**","/api/home/**", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione

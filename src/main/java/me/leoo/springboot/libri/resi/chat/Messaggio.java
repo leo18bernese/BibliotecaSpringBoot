@@ -46,4 +46,11 @@ public class Messaggio {
     protected void onCreate() {
         timestamp = LocalDateTime.now();
     }
+
+    public Messaggio(Reso reso, String testo, TipoMittente mittente) {
+        this.reso = reso;
+        this.testo = testo;
+        this.mittente = mittente;
+        this.timestamp = LocalDateTime.now();
+    }
 }

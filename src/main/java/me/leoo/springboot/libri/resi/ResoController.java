@@ -5,6 +5,7 @@ import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.utente.Utente;
+import me.leoo.springboot.libri.websocket.ChatWebSocketController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ public class ResoController {
 
     private final ResoService resoService;
     private final OrdineService ordineService;
+    private final ChatWebSocketController chatWebSocketController;
 
     public record CreaResoRequest(
             Long ordineId,
@@ -110,7 +112,7 @@ public class ResoController {
         }
     }
 
-    @PostMapping("/{id}/messaggi")
+    @PostMapping("/{id}/chat")
     public ResponseEntity<?> aggiungiMessaggio(@AuthenticationPrincipal Utente utente,
                                                @PathVariable Long id,
                                                @RequestBody CreaMessaggioRequest request) {
@@ -124,6 +126,7 @@ public class ResoController {
             }
 
             Messaggio nuovoMessaggio = resoService.aggiungiMessaggio(id, request);
+            chatWebSocketController.notifyNewMessage(id.toString(), nuovoMessaggio);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuovoMessaggio);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore durante l'aggiunta del messaggio al reso " + id + ": " + e.getMessage());

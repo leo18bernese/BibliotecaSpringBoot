@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.ordini.OrdineItem;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
+import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.resi.stato.StatoReso;
 import me.leoo.springboot.libri.resi.stato.StatoResoStorico;
 
@@ -50,6 +51,16 @@ public class Reso {
         this.messaggi = new ArrayList<>();
         this.stati = new ArrayList<>();
         this.metodoRimborso = metodoRimborso;
+
+        //add default messages
+        addMessaggio(new Messaggio(this, "ciao, come posso aiutarti?", TipoMittente.OPERATORE));
+        addMessaggio(new Messaggio(this, "ciao, ho ricevuto un prodotto sbagliato", TipoMittente.UTENTE));
+        addMessaggio(new Messaggio(this, "mi dispiace per l'errore", TipoMittente.OPERATORE));
+        addMessaggio(new Messaggio(this, "puoi dirmi cosa hai ricevuto?", TipoMittente.OPERATORE));
+        addMessaggio(new Messaggio(this, "sì, ho ordinato un telefono ma ho ricevuto delle cuffie", TipoMittente.UTENTE));
+        addMessaggio(new Messaggio(this, "capito", TipoMittente.OPERATORE));
+        addMessaggio(new Messaggio(this, "procederemo subito con una sostituzione", TipoMittente.OPERATORE));
+        addMessaggio(new Messaggio(this, "ok, grazie mille", TipoMittente.UTENTE));
 
         addStato(StatoReso.RICHIESTO, "non va bene proprio");
     }
