@@ -45,4 +45,8 @@ public class OrdineItem {
         this.sconto = libro.getRifornimento().getSconto();
         this.dataAggiunta = dataAggiunta;
     }
+
+    public Long getLibroId() {
+        return libro != null ? libro.getId() : null;
+    }
 }

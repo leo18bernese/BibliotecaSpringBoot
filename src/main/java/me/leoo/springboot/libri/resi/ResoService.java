@@ -62,7 +62,7 @@ public class ResoService {
         return reso.getMessaggi().get(reso.getMessaggi().size() - 1);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Reso getResoById(Long id) {
         Reso reso = resoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reso non trovato con ID: " + id));
@@ -72,7 +72,7 @@ public class ResoService {
         return reso;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Reso getResoByIdAndUtente(Long id, Utente utente) {
         Reso reso = resoRepository.findByIdAndOrdineUtenteId(id, utente.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Reso con ID " + id + " non trovato per l'utente specificato."));
@@ -82,17 +82,17 @@ public class ResoService {
         return reso;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public boolean isAssociatedWithUtente(Long id, Utente utente) {
         return resoRepository.existsByIdAndOrdineUtenteId(id, utente.getId());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public boolean exists(Long id) {
         return resoRepository.existsById(id);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Set<Reso> getAllByUtente(Utente utente) {
         return resoRepository.getAllByOrdineUtenteId(utente.getId());
     }

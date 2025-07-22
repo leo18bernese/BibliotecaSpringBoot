@@ -142,6 +142,17 @@ public class Reso {
     }
 
     // Aggiunge un item al reso
+    public ResoItem getById(Long itemId) {
+        if (itemId == null) {
+            throw new IllegalArgumentException("ID dell'item non può essere null");
+        }
+
+        return items.stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElse(null);
+    }
+
     public void addItem(ResoItem item) {
         if (item == null) {
             throw new IllegalArgumentException("Item non può essere null");
@@ -158,5 +169,23 @@ public class Reso {
 
         ResoItem item = new ResoItem(ordineItem, motivo, descrizione, quantita);
         addItem(item);
+    }
+
+    public void updateItemQuantity(Long itemId, int newQuantity) {
+        ResoItem item = getById(itemId);
+
+        if (item == null) {
+            throw new IllegalArgumentException("Item non trovato con ID: " + itemId);
+        }
+
+        if ( newQuantity <= 0) {
+            throw new IllegalArgumentException("La quantità deve essere maggiore di zero");
+        }
+
+        if (!this.items.contains(item)) {
+            throw new IllegalArgumentException("L'item non appartiene a questo reso");
+        }
+
+        item.setQuantita(newQuantity);
     }
 }

@@ -24,6 +24,8 @@ public class AdminResoController {
     private final OrdineService ordineService;
     private final ChatWebSocketController chatWebSocketController;
 
+    public record UpdateStatoRequest(StatoReso stato, String messaggio) {}
+
     @GetMapping("/{id}/exists")
     public ResponseEntity<?> existsReso(@AuthenticationPrincipal Utente utente,
                                         @PathVariable Long id) {
@@ -56,21 +58,20 @@ public class AdminResoController {
     }
 
     // set new stato
-    @PatchMapping("/{id}/stato")
+    @PatchMapping ("/{id}/stato")
     public ResponseEntity<?> setStatoReso(@AuthenticationPrincipal Utente utente,
                                           @PathVariable Long id,
-                                          @RequestParam String stato,
-                                          @RequestParam String messaggio) {
+                                          @RequestBody UpdateStatoRequest request) {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
 
-        System.out.println("setStatoReso called with id: " + id + ", stato: " + stato + ", messaggio: " + messaggio);
+        System.out.println("setStatoReso called with id: " + id + ", messaggio: " + request.messaggio);
 
         try {
             Reso reso = resoService.getResoById(id);
 
-            reso.addStato(StatoReso.valueOf(stato), messaggio);
+            reso.addStato(request.stato, request.messaggio);
             resoRepository.save(reso);
 
             return ResponseEntity.ok(reso);
@@ -79,10 +80,33 @@ public class AdminResoController {
         }
     }
 
+    @PatchMapping("/{id}/quantity/{itemId}")
+    public ResponseEntity<?> updateItemQuantity(@AuthenticationPrincipal Utente utente,
+                                                @PathVariable Long id,
+                                                @PathVariable Long itemId,
+                                                @RequestParam int quantity) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        System.out.println("updateItemQuantity called with id: " + id + ", itemId: " + itemId + ", quantity: " + quantity);
+
+        try {
+            Reso reso = resoService.getResoById(id);
+            reso.updateItemQuantity(itemId, quantity);
+            resoRepository.save(reso);
+
+            return ResponseEntity.ok(reso);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante l'aggiornamento della quantità dell'item: " + e.getMessage());
+        }
+    }
+
+
     @GetMapping("/stati")
     public ResponseEntity<?> getStatiReso() {
         try {
-            return ResponseEntity.ok(StatoReso.values());
+            return ResponseEntity.ok(StatoReso.getUpdatableStates());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero degli stati dei resi: " + e.getMessage());
         }

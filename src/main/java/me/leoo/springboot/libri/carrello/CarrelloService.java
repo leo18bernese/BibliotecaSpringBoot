@@ -17,7 +17,7 @@ public class CarrelloService {
     @Autowired
     private LibroRepository libroRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Carrello getCarrelloByUtente(Utente utente) {
         return carrelloRepository.findByUtente(utente)
                 .orElseGet(() -> {
@@ -48,7 +48,7 @@ public class CarrelloService {
         return carrelloRepository.save(carrello);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public CarrelloItem getCarrelloItem(Utente utente, Long libroId) {
         Carrello carrello = getCarrelloByUtente(utente);
         Libro libro = libroRepository.findById(libroId)
