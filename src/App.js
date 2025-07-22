@@ -33,6 +33,8 @@ import ReturnsHistory from "./components/user/pages/RefundHistory";
 import Reso from "./components/reso/Reso";
 import ProtectedRoute from "./components/user/login/ProtectedRoute";
 import ResoChat from "./components/reso/ResoChat";
+import Logout from "./components/user/logout/Logout";
+import AdminReso from "./components/admin/AdminReso";
 
 const queryClient = new QueryClient();
 
@@ -78,11 +80,14 @@ function App() {
                                     </Route>
                                 </Route>
 
+                                <Route path="/admin/reso/:id" element={<AdminReso/>}/>
+
                                 <Route path="/cart" element={<Carrello/>}/>
                                 <Route path="/checkout" element={<CheckOut/>}/>
 
                                 <Route path="/login" element={<Login/>}/>
                                 <Route path="/register" element={<Register/>}/>
+                                <Route path="/logout" element={<Logout/>}/>
                             </Routes>
                         </AuthProvider>
                     </Router>

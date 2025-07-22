@@ -51,6 +51,7 @@ const AccountInfo = () => {
                             {linkItem('bell', 'Account Settings', '/account/settings')}
                             {linkItem('help-circle', 'Support', '/account/support')}
 
+                            {linkItem('arrow-out-down-right-stroke-square', 'Logout', '/logout')}
                         </div>
                     </div>
 
