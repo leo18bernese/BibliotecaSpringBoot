@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 
-const AddStateForm = ({ resoId, stati }) => {
+const AddStateForm = ({resoId, stati}) => {
     const [selectedStato, setSelectedStato] = useState('');
     const [messaggio, setMessaggio] = useState('');
     const queryClient = useQueryClient();
@@ -33,7 +33,7 @@ const AddStateForm = ({ resoId, stati }) => {
     };
 
     return (
-        <div className="mt-4 bg-gray-200 p-4">
+        <div className="mt-8 ">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div>
                     <label htmlFor="stato" className="block text-sm font-medium text-gray-700">
@@ -44,7 +44,7 @@ const AddStateForm = ({ resoId, stati }) => {
                         id="stato"
                         value={selectedStato}
                         onChange={(e) => setSelectedStato(e.target.value)}
-                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-200"
                     >
 
                         <option value="" disabled>Seleziona uno stato</option>
@@ -68,7 +68,7 @@ const AddStateForm = ({ resoId, stati }) => {
                         value={messaggio}
                         onChange={(e) => setMessaggio(e.target.value)}
                         rows="3"
-                        className="py-3 px-2 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        className="py-3 px-2 mt-1 block w-full m:text-sm  border-2 border-gray-300 rounded-md"
                     ></textarea>
                 </div>
 
@@ -76,7 +76,12 @@ const AddStateForm = ({ resoId, stati }) => {
                     type="submit"
                     className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
                 >
-                    Aggiungi Stato
+
+                    <div className="flex items-center mx-auto justify-center">
+                        <i className="bx bx-plus-circle mr-2 text-xl "></i>
+                        <span>Aggiungi Stato</span>
+                    </div>
+
                 </button>
             </form>
         </div>

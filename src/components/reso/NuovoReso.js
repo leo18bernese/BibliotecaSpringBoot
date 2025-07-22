@@ -191,6 +191,7 @@ const NuovoReso = () => {
                                                     <label htmlFor={`quantita-${item.id}`}
                                                            className="block text-sm font-medium text-gray-700">Quantità
                                                         da rendere</label>
+
                                                     <input
                                                         type="number"
                                                         id={`quantita-${item.id}`}

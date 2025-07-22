@@ -39,7 +39,7 @@ const ResoItem = ({item}) => {
 
             <div className="flex-1 flex justify-between items-start">
                 <div>
-                    <Link to={`/book/${ordineItem.id}`} className="text-xl font-semibold hover:underline">
+                    <Link to={`/book/${ordineItem.libroId}`} className="text-xl font-semibold hover:underline">
                         {ordineItem.titolo}
                     </Link>
 
