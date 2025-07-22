@@ -20,8 +20,12 @@ public class CarrelloService {
     @Transactional(readOnly = true)
     public Carrello getCarrelloByUtente(Utente utente) {
         return carrelloRepository.findByUtente(utente)
-                .orElseThrow(() -> new RuntimeException("Carrello non trovato per l'utente: " + utente.getUsername()));
-    }
+                .orElseGet(() -> {
+                    Carrello carrello = new Carrello(utente);
+                    carrelloRepository.save(carrello);
+                    return carrello;
+                });
+   }
 
     @Transactional
     public Carrello addItemToCarrello(Utente utente, Long libroId, int quantita) {
@@ -63,7 +67,7 @@ public class CarrelloService {
         }
 
         try {
-           coupon.validate(utente, carrello);
+            coupon.validate(utente, carrello);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

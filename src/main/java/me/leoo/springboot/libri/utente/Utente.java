@@ -99,7 +99,9 @@ public class Utente implements UserDetails {
     // Authorization
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return ruoli.stream()
+                .map(ruolo -> (GrantedAuthority) () -> ruolo)
+                .toList();
     }
 
 }

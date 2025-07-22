@@ -88,6 +88,11 @@ public class ResoService {
     }
 
     @Transactional(readOnly = true)
+    public boolean exists(Long id) {
+        return resoRepository.existsById(id);
+    }
+
+    @Transactional(readOnly = true)
     public Set<Reso> getAllByUtente(Utente utente) {
         return resoRepository.getAllByOrdineUtenteId(utente.getId());
     }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -21,11 +22,21 @@ public class AuthController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Utente utente) {
-        try {
-            return ResponseEntity.ok(utenteService.register(utente));
 
+    public record LoginRequest(String username, String password) {
+    }
+
+    public record RegisterRequest(String nome, String cognome, String username, String email, String password) {
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+
+            System.out.println(request);
+            Utente utente = new Utente(request.username, request.password, request.nome, request.cognome, request.email);
+
+            return ResponseEntity.ok(utenteService.register(utente));
         } catch (IllegalArgumentException e) {
             Map<String, String> errore = new HashMap<>();
             errore.put("errore", e.getMessage());
@@ -52,6 +63,4 @@ public class AuthController {
         }
     }
 
-    public record LoginRequest(String username, String password) {
-    }
 }

@@ -39,6 +39,8 @@ public class UtenteService implements UserDetailsService {
             throw new IllegalArgumentException("Email già in uso: " + utente.getEmail());
         }
 
+        System.out.println("registering user: " + utente);
+
         // Encode password
         utente.setPassword(passwordEncoder.encode(utente.getPassword()));
 

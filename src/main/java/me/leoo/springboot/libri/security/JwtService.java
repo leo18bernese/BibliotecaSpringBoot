@@ -6,14 +6,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -27,7 +30,9 @@ public class JwtService {
 
     @PostConstruct
     public void init() {
+        System.out.println("Chiave segreta letta da application.properties: " + secret);
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        System.out.println("Chiave segreta inizializzata: " + key);
     }
 
     public String extractUsername(String token) {
@@ -52,6 +57,13 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        extraClaims.put("roles", roles);
+        System.out.println("DET: " + userDetails + " " + extraClaims);
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
