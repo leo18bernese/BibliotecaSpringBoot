@@ -34,9 +34,13 @@ import Reso from "./components/reso/Reso";
 import ProtectedRoute from "./components/user/login/ProtectedRoute";
 import ResoChat from "./components/reso/ResoChat";
 import Logout from "./components/user/logout/Logout";
-import AdminReso from "./components/admin/AdminReso";
+import AdminReso from "./components/admin/reso/AdminReso";
+import AdminResoChat from "./components/admin/reso/chat/AdminResoChat";
+import AdminBar from "./components/admin/AdminBar";
+import {Outlet} from "react-router-dom";
 
 const queryClient = new QueryClient();
+
 
 function App() {
     return (
@@ -78,9 +82,17 @@ function App() {
                                         <Route path="shipping" element={<Shipping/>}/>
                                         <Route path="returns" element={<ReturnsHistory/>}/>
                                     </Route>
+
+
                                 </Route>
 
-                                <Route path="/admin/reso/:id" element={<AdminReso/>}/>
+                                <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
+                                    <Route element={<AdminBar/>}>
+                                        <Route path="/admin/reso/:id" element={<AdminReso/>}/>
+                                        <Route path="/admin/reso/:id/chat" element={<AdminResoChat/>}/>
+                                    </Route>
+                                </Route>
+
 
                                 <Route path="/cart" element={<Carrello/>}/>
                                 <Route path="/checkout" element={<CheckOut/>}/>

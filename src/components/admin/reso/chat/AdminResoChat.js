@@ -3,37 +3,32 @@ import axios from 'axios';
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import toast, {Toaster} from "react-hot-toast";
-import ResoTimeline from "./ResoTimeline";
-import ResoItem from "./ResoItem";
 import {Button} from "antd";
-
 
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-const fetchExistOrdine = async (id) => {
-    const response = await axios.get(`/api/resi/${id}/exists`);
+const fetchExistReso = async (id) => {
+    const response = await axios.get(`/api/admin/resi/${id}/exists`);
     return response.data;
 }
 
-const fetchOrdine = async (id) => {
-    const response = await axios.get(`/api/resi/${id}`);
+const fetchReso = async (id) => {
+    const response = await axios.get(`/api/admin/resi/${id}`);
     console.log(response.data);
     return response.data;
 }
 
 
-const ResoChat = () => {
+const AdminResoChat = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
 
-    const [attachments, setAttachments] = useState([]);
-
     const {data: exists, isLoading: existsLoading, error: existsError} = useQuery({
         queryKey: ['resoExists', id],
-        queryFn: () => fetchExistOrdine(id),
+        queryFn: () => fetchExistReso(id),
         onError: (err) => {
             setError(err.message);
         }
@@ -41,8 +36,8 @@ const ResoChat = () => {
 
 
     const {data: reso, isLoading, error: queryError} = useQuery({
-        queryKey: ['reso', id],
-        queryFn: () => fetchOrdine(id),
+        queryKey: ['adminReso', id],
+        queryFn: () => fetchReso(id),
         onError: (err) => {
             setError(err.message);
         },
@@ -72,7 +67,7 @@ const ResoChat = () => {
             reconnectDelay: 5000,
             onConnect: () => {
                 client.subscribe(`/topic/resi/${id}`, (message) => {
-                    queryClient.invalidateQueries(['reso', id]); // aggiorna la chat
+                    queryClient.invalidateQueries(['adminReso', id]); // aggiorna la chat
                     console.log("Nuovo messaggio ricevuto:", message.body);
                 });
             }
@@ -91,23 +86,20 @@ const ResoChat = () => {
         };
 
         try {
-            const {data} = await axios.post(`/api/resi/${id}/chat`, request);
+            const {data} = await axios.post(`/api/admin/resi/${id}/chat`, request);
 
             toast.success("Messaggio inviato con successo!");
-            await queryClient.invalidateQueries(['reso', id]); // Refresh the chat messages
+            await queryClient.invalidateQueries(['adminReso', id]); // Refresh the chat messages
 
             console.log(data);
-
 
         } catch (error) {
             console.error("Errore durante l'invio del messaggio:", error);
             toast.error("Errore durante l'invio del messaggio: " + (error.response?.data?.message || error.message));
             throw error;
         }
-    }
 
-    const addAttachmentToMessage = async (file) => {
-        setAttachments([...attachments, file]);
+
     }
 
     if (existsLoading || isLoading) return <div>Caricamento...</div>;
@@ -132,27 +124,26 @@ const ResoChat = () => {
         <div className="container mx-auto px-4 py-8 max-w-5xl">
             <Toaster/>
 
-            <div id="tracking" className="p-8 bg-white shadow-md rounded-lg flex flex-col" style={{height: '86vh'}}>
+            <div id="tracking" className="p-8 bg-white shadow-md rounded-lg flex flex-col" style={{height: '80vh'}}>
 
                 <div className="flex justify-between items-start">
                     <div>
                         <h1 className="text-2xl font-semibold">Chat del Reso #{reso.id}</h1>
-                        <p className="text-gray-500">Chat con il servizio clienti per il reso. Scrivere solo in merito a
-                            questo
-                            reso.</p>
+                        <p className="text-gray-500">Chat con l'utente per il reso.</p>
+                        <p className="text-gray-500">Si consiglia di usare i comandi predefiniti per comunicare con il cliente se possibile.</p>
                     </div>
 
                     <button
                         className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-                        onClick={() => navigate(`/reso/${id}`)}>
+                        onClick={() => navigate(`/admin/reso/${id}`)}>
                         Indietro
                     </button>
                 </div>
 
                 <div ref={messagesContainerRef} className="mt-4 overflow-y-auto flex-grow pr-4 p-4 bg-gray-100">
                     {reso.messaggi.map((msg, index) => {
-                        const mine = msg.mittente === 'UTENTE';
-                        const displaySender = mine ? 'Tu' : 'Supporto';
+                        const mine = msg.mittente === 'OPERATORE';
+                        const displaySender = mine ? 'Supporto' : "Cliente ";
 
                         const prevMsg = index > 0 ? reso.messaggi[index - 1] : null;
                         const nextMsg = index < reso.messaggi.length - 1 ? reso.messaggi[index + 1] : null;
@@ -197,7 +188,7 @@ const ResoChat = () => {
                     })}
                 </div>
 
-                <div className="mt-4 flex-shrink-0">
+                <div className="mt-4">
                     <form
                         onSubmit={async (e) => {
                             e.preventDefault();
@@ -214,46 +205,6 @@ const ResoChat = () => {
                             }
                         }}
                     >
-                        {attachments.length > 0 && (
-                            <div className="mb-2 p-2 border rounded-lg" style={{maxHeight: '150px', overflowY: 'auto'}}>
-                                <h3 className="text-sm font-semibold mb-2">Allegati:</h3>
-                                <div className="flex flex-row flex-wrap gap-2">
-                                    {attachments.map((file, index) => (
-                                        <div key={index} className="text-sm text-gray-700 p-2 bg-gray-200 rounded-lg">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <p className="font-medium truncate max-w-[150px]">{file.name}</p>
-                                                <button
-                                                    type="button"
-                                                    className="text-red-500 hover:text-red-700 ml-2 text-lg leading-none"
-                                                    onClick={() => {
-                                                        setAttachments(attachments.filter((_, i) => i !== index));
-                                                    }}
-                                                > &times;
-                                                </button>
-                                            </div>
-
-                                            {file.type.startsWith('image/') && (
-                                                <img src={URL.createObjectURL(file)} alt={file.name} className="max-h-20 mb-1 rounded"/>
-                                            )}
-                                            {file.type.startsWith('video/') && (
-                                                <video src={URL.createObjectURL(file)} controls className="max-h-20 mb-1 rounded"/>
-                                            )}
-                                            {file.type.startsWith('audio/') && (
-                                                <audio src={URL.createObjectURL(file)} controls className="w-full h-8 mb-1"/>
-                                            )}
-
-                                            <p className="text-xs text-right">
-                                                ({(file.size / 1024).toFixed(2)} KB)
-                                                <a href={URL.createObjectURL(file)} download={file.name} className="ml-2 text-blue-500 hover:text-blue-700">
-                                                    Download
-                                                </a>
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                         <div className="flex items-center">
                             <input
                                 type="text"
@@ -262,29 +213,15 @@ const ResoChat = () => {
                                 className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <label className="p-1.5 mx-2 border cursor-pointer hover:bg-gray-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
-                                </svg>
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-                                    onChange={(e) => {
-                                        const files = Array.from(e.target.files);
-                                        setAttachments(prev => [...prev, ...files]);
-                                        e.target.value = ''; // Reset file input
-                                    }}
-                                    className="hidden"
-                                />
-                            </label>
+
                             <Button
                                 htmlType="submit"
                                 type="primary"
-                                className="bg-blue-600 text-white px-4 rounded-r-lg h-10 hover:bg-blue-700 transition-colors"
+                                className="bg-blue-600 text-white px-4 py-2 ml-4 rounded-r-lg h-10 w-20 hover:bg-blue-700 transition-colors"
                             >
                                 Invia
                             </Button>
+
                         </div>
                     </form>
                 </div>
@@ -293,4 +230,4 @@ const ResoChat = () => {
     );
 }
 
-export default ResoChat;
+export default AdminResoChat;

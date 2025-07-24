@@ -4,10 +4,10 @@ import {useQuery} from "@tanstack/react-query";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {Toaster} from "react-hot-toast";
 import {Button} from "antd";
-import ResoTimeline from "../reso/ResoTimeline";
-import ResoItem from "../reso/ResoItem";
-import AddStateForm from "./AddStateForm";
-import ModifyQuantityForm from "./ModifyQuantityForm";
+import ResoTimeline from "../../reso/ResoTimeline";
+import ResoItem from "../../reso/ResoItem";
+import AddStateForm from "./form/AddStateForm";
+import ModifyQuantityForm from "./form/ModifyQuantityForm";
 import AdminResoItem from "./AdminResoItem";
 
 const fetchExistReso = async (id) => {
@@ -41,7 +41,7 @@ const AdminReso = () => {
 
 
     const {data: reso, isLoading, error: queryError} = useQuery({
-        queryKey: ['reso', id],
+        queryKey: ['adminReso', id],
         queryFn: () => fetchReso(id),
         onError: (err) => {
             setError(err.message);

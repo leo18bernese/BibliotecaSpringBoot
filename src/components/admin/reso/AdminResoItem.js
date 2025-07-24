@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import ModifyQuantityForm from "./ModifyQuantityForm";
+import ModifyQuantityForm from "./form/ModifyQuantityForm";
 
 const fetchBookImage = async (id) => {
     try {
