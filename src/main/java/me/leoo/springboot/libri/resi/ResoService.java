@@ -7,6 +7,7 @@ import me.leoo.springboot.libri.ordini.OrdineItem;
 import me.leoo.springboot.libri.ordini.OrdineItemRepository;
 import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
+import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.utente.Utente;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -42,13 +43,13 @@ public class ResoService {
     }
 
     @Transactional
-    public Messaggio aggiungiMessaggio(Long resoId, ResoController.CreaMessaggioRequest request) {
+    public Messaggio aggiungiMessaggio(Long resoId, TipoMittente mittente, ResoController.CreaMessaggioRequest request) {
         Reso reso = resoRepository.findById(resoId)
                 .orElseThrow(() -> new EntityNotFoundException("Reso non trovato con ID: " + resoId));
 
         Messaggio messaggio = new Messaggio();
         messaggio.setTesto(request.testo());
-        messaggio.setMittente(request.mittente());
+        messaggio.setMittente(mittente);
         if (request.allegati() != null) {
             messaggio.setAllegati(request.allegati());
         }

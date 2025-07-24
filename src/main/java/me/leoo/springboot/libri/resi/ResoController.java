@@ -39,7 +39,6 @@ public class ResoController {
 
     public record CreaMessaggioRequest(
             String testo,
-            TipoMittente mittente,
             Set<String> allegati
     ) {
     }
@@ -125,7 +124,8 @@ public class ResoController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
             }
 
-            Messaggio nuovoMessaggio = resoService.aggiungiMessaggio(id, request);
+            Messaggio nuovoMessaggio = resoService.aggiungiMessaggio(id,TipoMittente.UTENTE, request);
+
             chatWebSocketController.notifyNewMessage(id.toString(), nuovoMessaggio);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuovoMessaggio);
         } catch (Exception e) {
