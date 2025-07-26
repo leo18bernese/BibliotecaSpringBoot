@@ -6,9 +6,10 @@ import toast, {Toaster} from "react-hot-toast";
 import ResoTimeline from "./ResoTimeline";
 import ResoItem from "./ResoItem";
 import {Button} from "antd";
+import MessageAttachments from "./MessageAttachments";
 
 
-import { Client } from '@stomp/stompjs';
+import {Client} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
 const fetchExistOrdine = async (id) => {
@@ -21,7 +22,6 @@ const fetchOrdine = async (id) => {
     console.log(response.data);
     return response.data;
 }
-
 
 const ResoChat = () => {
     const {id} = useParams();
@@ -94,15 +94,56 @@ const ResoChat = () => {
             const {data} = await axios.post(`/api/resi/${id}/chat`, request);
 
             toast.success("Messaggio inviato con successo!");
-            await queryClient.invalidateQueries(['reso', id]); // Refresh the chat messages
 
             console.log(data);
 
+            const messageId = data.id;
+
+            // Upload degli allegati (se presenti)
+            if (attachments.length > 0) {
+                await handleAttachmentsUpload(messageId);
+            }
+
+            // Refresh dei messaggi chat solo dopo aver completato tutto
+            await queryClient.invalidateQueries(['reso', id]);
 
         } catch (error) {
             console.error("Errore durante l'invio del messaggio:", error);
             toast.error("Errore durante l'invio del messaggio: " + (error.response?.data?.message || error.message));
             throw error;
+        }
+    }
+
+    const handleAttachmentsUpload = async (messageId) => {
+        if (attachments.length === 0) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+
+            // Aggiungi tutti i file al FormData
+            attachments.forEach(attachment => {
+                formData.append('files', attachment);
+            });
+
+            console.log(`Caricando ${attachments.length} allegati per il messaggio ${messageId}`);
+
+            const response = await axios.post(`/api/resi/${id}/chat/${messageId}/attachments`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            console.log('Tutti i file caricati con successo:', response.data);
+            toast.success(`${attachments.length} allegati caricati con successo!`);
+
+        } catch (error) {
+            console.error('Errore durante il caricamento degli allegati:', error);
+            toast.error("Errore durante il caricamento degli allegati: " + (error.response?.data || error.message));
+            throw error; // Rilancia l'errore per gestirlo nel chiamante se necessario
+        } finally {
+            setAttachments([]); // Pulisci gli allegati dopo il tentativo di upload
         }
     }
 
@@ -127,6 +168,7 @@ const ResoChat = () => {
         Se il problema persiste, contatti il supporto clienti.
     </div>;
     if (queryError || error) return <div>Error: {error || queryError.message}</div>;
+
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -180,8 +222,11 @@ const ResoChat = () => {
                                     }
 
                                     <div className={`mx-auto ${mine ? 'justify-end' : 'justify-start'} flex`}>
-                                        <div className={`inline-block ${mine ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} p-3 rounded-lg`}>
+                                        <div
+                                            className={`inline-block ${mine ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} p-3 rounded-lg`}>
                                             {msg.testo}
+
+                                            <MessageAttachments resoId={reso.id} messageId={msg.id} />
                                         </div>
                                     </div>
 
@@ -215,7 +260,7 @@ const ResoChat = () => {
                         }}
                     >
                         {attachments.length > 0 && (
-                            <div className="mb-2 p-2 border rounded-lg" style={{maxHeight: '150px', overflowY: 'auto'}}>
+                            <div className="mb-2 p-2 border rounded-lg" style={{maxHeight: '200px', overflowY: 'auto'}}>
                                 <h3 className="text-sm font-semibold mb-2">Allegati:</h3>
                                 <div className="flex flex-row flex-wrap gap-2">
                                     {attachments.map((file, index) => (
@@ -233,18 +278,22 @@ const ResoChat = () => {
                                             </div>
 
                                             {file.type.startsWith('image/') && (
-                                                <img src={URL.createObjectURL(file)} alt={file.name} className="max-h-20 mb-1 rounded"/>
+                                                <img src={URL.createObjectURL(file)} alt={file.name}
+                                                     className="max-h-20 mb-1 rounded"/>
                                             )}
                                             {file.type.startsWith('video/') && (
-                                                <video src={URL.createObjectURL(file)} controls className="max-h-20 mb-1 rounded"/>
+                                                <video src={URL.createObjectURL(file)} controls
+                                                       className="max-h-20 mb-1 rounded"/>
                                             )}
                                             {file.type.startsWith('audio/') && (
-                                                <audio src={URL.createObjectURL(file)} controls className="w-full h-8 mb-1"/>
+                                                <audio src={URL.createObjectURL(file)} controls
+                                                       className="w-full h-8 mb-1"/>
                                             )}
 
                                             <p className="text-xs text-right">
                                                 ({(file.size / 1024).toFixed(2)} KB)
-                                                <a href={URL.createObjectURL(file)} download={file.name} className="ml-2 text-blue-500 hover:text-blue-700">
+                                                <a href={URL.createObjectURL(file)} download={file.name}
+                                                   className="ml-2 text-blue-500 hover:text-blue-700">
                                                     Download
                                                 </a>
                                             </p>
@@ -263,8 +312,10 @@ const ResoChat = () => {
                                 required
                             />
                             <label className="p-1.5 mx-2 border cursor-pointer hover:bg-gray-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                                 </svg>
                                 <input
                                     type="file"
@@ -294,3 +345,4 @@ const ResoChat = () => {
 }
 
 export default ResoChat;
+
