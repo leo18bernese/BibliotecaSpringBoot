@@ -33,8 +33,6 @@ public class ImageController {
     @PostMapping("/{productId}")
     public ResponseEntity<String> uploadImage(@PathVariable Long productId,
                                               @RequestParam("file") MultipartFile file) {
-        System.out.println("ImageController: uploadImage called " + productId + " " + file.getOriginalFilename());
-
         try {
             String finalPath = UPLOAD_DIR + "/" + productId;
 

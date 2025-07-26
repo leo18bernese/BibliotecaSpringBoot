@@ -7,8 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.resi.Reso;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -47,10 +51,43 @@ public class Messaggio {
         timestamp = LocalDateTime.now();
     }
 
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/images/ordini";
+
+
     public Messaggio(Reso reso, String testo, TipoMittente mittente) {
         this.reso = reso;
         this.testo = testo;
         this.mittente = mittente;
         this.timestamp = LocalDateTime.now();
+    }
+
+    /**
+     * Structure: order dir -> attachment_messageId_index.extension <br/>
+     * <p>
+     * attachment_4_1.jpg for for the first attachment of the fourth message
+     */
+    public List<Path> getAllImages() {
+        try {
+            String finalPath = UPLOAD_DIR + "/" + reso.getId();
+            Path dirPath = Paths.get(finalPath);
+
+            System.out.println("Looking for images in directory: " + finalPath + " for message ID: " + id);
+
+            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
+                return List.of();
+            }
+
+            System.out.println("Directory exists and is valid: " + finalPath);
+
+            return Files.list(dirPath)
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().startsWith("attachment_" + id + "_"))
+                    .toList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while getting all images for book with ID: " + id, e);
+        }
     }
 }

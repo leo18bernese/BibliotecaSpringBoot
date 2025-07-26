@@ -11,7 +11,12 @@ import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.resi.stato.StatoReso;
 import me.leoo.springboot.libri.resi.stato.StatoResoStorico;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Builder
@@ -43,6 +48,9 @@ public class Reso {
     private final Date dataCreazione = new Date();
 
     private MetodoRimborso metodoRimborso;
+
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/images/ordini";
 
     public Reso(Ordine ordine, MetodoRimborso metodoRimborso) {
         this.ordine = ordine;
@@ -178,7 +186,7 @@ public class Reso {
             throw new IllegalArgumentException("Item non trovato con ID: " + itemId);
         }
 
-        if ( newQuantity <= 0) {
+        if (newQuantity <= 0) {
             throw new IllegalArgumentException("La quantità deve essere maggiore di zero");
         }
 

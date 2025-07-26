@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String jwt = authHeader.substring(7);
-            log.info("Token received: {}", jwt);
+            //log.info("Token received: {}", jwt);
 
             if (!jwt.contains(".")) {
                 log.warn("Malformed JWT token received");
@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    System.out.println("authenticated user: " + username);
+                    //System.out.println("authenticated user: " + username);
                 }
             }
 

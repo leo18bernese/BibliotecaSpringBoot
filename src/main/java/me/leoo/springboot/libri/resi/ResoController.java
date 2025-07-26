@@ -10,7 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -124,7 +128,7 @@ public class ResoController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
             }
 
-            Messaggio nuovoMessaggio = resoService.aggiungiMessaggio(id,TipoMittente.UTENTE, request);
+            Messaggio nuovoMessaggio = resoService.aggiungiMessaggio(id, TipoMittente.UTENTE, request);
 
             chatWebSocketController.notifyNewMessage(id.toString(), nuovoMessaggio);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuovoMessaggio);
@@ -132,6 +136,86 @@ public class ResoController {
             return ResponseEntity.badRequest().body("Errore durante l'aggiunta del messaggio al reso " + id + ": " + e.getMessage());
         }
     }
+
+    @PostMapping("/{id}/chat/{messageId}/attachments")
+    public ResponseEntity<?> aggiungiAllegatiMessaggio(@AuthenticationPrincipal Utente utente,
+                                                       @PathVariable Long id,
+                                                       @PathVariable Long messageId,
+                                                       @RequestParam("files") List<MultipartFile> allegati) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        try {
+            if (!resoService.isAssociatedWithUtente(id, utente)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
+            }
+
+            if (allegati == null || allegati.isEmpty()) {
+                return ResponseEntity.badRequest().body("Nessun allegato fornito");
+            }
+
+            System.out.println("Allegati ricevuti (" + allegati.size() + ") per il messaggio con ID " + messageId);
+            for (MultipartFile file : allegati) {
+                if (!file.isEmpty()) {
+                    System.out.println("- " + file.getOriginalFilename());
+                }
+            }
+
+            resoService.addAllegatiMessaggio(id, messageId, allegati);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Aggiunti " + allegati.size() + " allegati al messaggio con ID " + messageId + " del reso " + id);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore durante l'aggiunta degli allegati al messaggio del reso " + id + ": " + e.getMessage());
+        }
+    }
+
+    // Mantieni anche l'endpoint originale per compatibilità con il frontend esistente
+    @PostMapping("/{id}/chat/{messageId}/attachment")
+    public ResponseEntity<?> aggiungiAllegatoMessaggio(@AuthenticationPrincipal Utente utente,
+                                                       @PathVariable Long id,
+                                                       @PathVariable Long messageId,
+                                                       @RequestParam("file") MultipartFile allegato) {
+        return aggiungiAllegatiMessaggio(utente, id, messageId, Arrays.asList(allegato));
+    }
+
+    @GetMapping("/{id}/chat/{messageId}/attachments/all")
+    public ResponseEntity<?> getAllegatiMessaggio(@AuthenticationPrincipal Utente utente,
+                                                  @PathVariable Long id,
+                                                  @PathVariable Long messageId) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        try {
+            if (!resoService.isAssociatedWithUtente(id, utente)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
+            }
+
+            System.out.println("Recupero allegati per il messaggio con ID " + messageId + " del reso " + id);
+
+            Messaggio messaggio = resoService.getMessaggioById(messageId);
+            if (messaggio == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
+            }
+
+            List<Path> allegati = messaggio.getAllImages();
+
+            if (allegati.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun allegato trovato per il messaggio con ID " + messageId);
+            }
+
+            System.out.println("Allegati trovati per il messaggio con ID " + messageId + ": " + allegati.size());
+
+            return ResponseEntity.ok(allegati);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body("Errore durante il recupero degli allegati del messaggio: " + e.getMessage());
+        }
+    }
+
 
     @GetMapping("/reasons")
     public ResponseEntity<MotivoReso[]> getMotiviReso() {
