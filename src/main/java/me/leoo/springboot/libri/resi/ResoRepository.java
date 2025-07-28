@@ -4,6 +4,7 @@ import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
@@ -20,6 +21,7 @@ public interface ResoRepository extends JpaRepository<Reso, Long> {
 
     List<Messaggio> findAllByOrdineUtenteId(Long utenteId);
 
+    @Query("SELECT m FROM Reso r JOIN r.messaggi m WHERE m.id = :id")
     Optional<Messaggio> findMessaggioById(Long id);
 
     boolean existsByIdAndOrdineUtenteId(Long id, Long utenteId);

@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.resi;
 
 import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
@@ -12,8 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -46,6 +49,12 @@ public class ResoController {
             Set<String> allegati
     ) {
     }
+
+    public record AllegatoResponse(
+            String nome,
+            String contentType,
+            String base64Content
+    ) {}
 
     @PostMapping
     public ResponseEntity<?> creaReso(@AuthenticationPrincipal Utente utente,
@@ -180,7 +189,7 @@ public class ResoController {
         return aggiungiAllegatiMessaggio(utente, id, messageId, Arrays.asList(allegato));
     }
 
-    @GetMapping("/{id}/chat/{messageId}/attachments/all")
+    @GetMapping("/{id}/chat/{messageId}/attachments/paths")
     public ResponseEntity<?> getAllegatiMessaggio(@AuthenticationPrincipal Utente utente,
                                                   @PathVariable Long id,
                                                   @PathVariable Long messageId) {
@@ -193,8 +202,6 @@ public class ResoController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
             }
 
-            System.out.println("Recupero allegati per il messaggio con ID " + messageId + " del reso " + id);
-
             Messaggio messaggio = resoService.getMessaggioById(messageId);
             if (messaggio == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
@@ -206,13 +213,72 @@ public class ResoController {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun allegato trovato per il messaggio con ID " + messageId);
             }
 
-            System.out.println("Allegati trovati per il messaggio con ID " + messageId + ": " + allegati.size());
-
             return ResponseEntity.ok(allegati);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.badRequest().body("Errore durante il recupero degli allegati del messaggio: " + e.getMessage());
+        }
+    }
+    @GetMapping("/{id}/chat/{messageId}/attachments/content")
+    public ResponseEntity<?> getAllegatiMessaggioContent(@AuthenticationPrincipal Utente utente,
+                                                         @PathVariable Long id,
+                                                         @PathVariable Long messageId) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        try {
+            // Se l'utente non è admin, controlla l'associazione con il reso
+            if (!utente.isAdmin() && !resoService.isAssociatedWithUtente(id, utente)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
+            }
+
+            Messaggio messaggio = resoService.getMessaggioById(messageId);
+            if (messaggio == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
+            }
+
+            List<Path> allegati = messaggio.getAllImages();
+
+            if (allegati.isEmpty()) {
+                return ResponseEntity.ok(List.of()); // Restituisci lista vuota
+            }
+
+            List<ImageUtils.FileResponse> allegatiResponse = allegati.stream()
+                    .map(path -> {
+                        try {
+                            return ImageUtils.getFileAsBase64Response(path);
+                        } catch (Exception e) {
+                            throw new RuntimeException("Errore durante il recupero dell'allegato: " + e.getMessage(), e);
+                        }
+                    })
+                    .toList();
+
+            return ResponseEntity.ok(allegatiResponse);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body("Errore durante il recupero degli allegati del messaggio: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/chat/attachment/{path}")
+    public ResponseEntity<?> getAllegatoMessaggio(@AuthenticationPrincipal Utente utente,
+                                                  @PathVariable Long id,
+                                                  @PathVariable String path){
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        try {
+            if (!resoService.isAssociatedWithUtente(id, utente)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
+            }
+
+            return ImageUtils.getFileResponse(Path.of(path));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore durante il recupero dell'allegato del messaggio: " + e.getMessage());
         }
     }
 

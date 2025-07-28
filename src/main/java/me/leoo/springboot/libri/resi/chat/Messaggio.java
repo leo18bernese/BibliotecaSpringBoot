@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.resi.Reso;
+import org.springframework.http.ResponseEntity;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,6 +90,22 @@ public class Messaggio {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error while getting all images for book with ID: " + id, e);
+        }
+    }
+
+    public ResponseEntity<byte[]> getPictureResponse(int index) {
+        List<Path> paths = getAllImages();
+
+        if(index < 0 || index >= paths.size()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Path path = paths.get(index);
+
+        try {
+            return ImageUtils.getImageResponse(path);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

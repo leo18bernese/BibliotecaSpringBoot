@@ -72,6 +72,10 @@ public class Utente implements UserDetails {
         ruoli.remove(ruolo);
     }
 
+    public boolean isAdmin() {
+        return ruoli.contains("ROLE_ADMIN");
+    }
+
     // Wishlist
     public void addToWishlist(Libro libro) {
         if (libro != null) {
