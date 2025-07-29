@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -66,6 +67,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
+        } catch (ExpiredJwtException e) {
+            log.debug("JWT token expired: {}", e.getMessage());
+            // Non logghiamo come errore perché è un comportamento normale
         } catch (MalformedJwtException e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
         } catch (Exception e) {
