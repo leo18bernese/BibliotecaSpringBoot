@@ -1,12 +1,18 @@
 package me.leoo.springboot.libri.libri;
 
 import lombok.extern.slf4j.Slf4j;
+import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
+import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -15,6 +21,9 @@ public class LibroController {
 
     @Autowired
     private LibroRepository libroRepository;
+
+    @Autowired
+    private SearchService searchService;
 
     // DTO per le risposte
     public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzo,
@@ -134,5 +143,66 @@ public class LibroController {
                                           @RequestParam(required = false) String genere,
                                           @RequestParam(required = false) String autore) {
         return libroRepository.advanceSearch(titolo, genere, autore);
+    }
+
+    @GetMapping("/ricerca")
+    public ResponseEntity<RicercaLibriResponse> cercaLibri(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Double prezzoMin,
+            @RequestParam(required = false) Double prezzoMax,
+            @RequestParam(defaultValue = "popolaritaDesc") String ordinamento,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int elementiPerPagina,
+            @RequestParam Map<String, String> allParams) {
+
+        // Estrai e gestisci filtri multipli dal formato filtro_categoria=valore1,valore2,valore3
+        Map<String, List<String>> filtriMultipli = estraiFiltriMultipli(allParams);
+
+        Pageable pageable = PageRequest.of(pagina, elementiPerPagina, getSort(ordinamento));
+        RicercaLibriResponse risultati = searchService.cercaLibri(
+                q, prezzoMin, prezzoMax, filtriMultipli, pageable);
+
+        return ResponseEntity.ok(risultati);
+    }
+
+    private Map<String, List<String>> estraiFiltriMultipli(Map<String, String> allParams) {
+        Map<String, List<String>> filtriMultipli = new HashMap<>();
+
+        // Parametri standard da escludere
+        Set<String> parametriStandard = Set.of("q",  "prezzoMin", "prezzoMax",
+                "ordinamento", "pagine", "elementiPerPagina");
+
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            // Salta i parametri standard
+            if (parametriStandard.contains(key)) {
+                continue;
+            }
+
+            // Gestisce i filtri con formato: categoria=valore1,valore2,valore3
+            List<String> valori = Arrays.stream(value.split(","))
+                    .map(String::trim)
+                    .filter(v -> !v.isEmpty())
+                    .collect(Collectors.toList());
+
+            if (!valori.isEmpty()) {
+                // Aggiungi il filtro solo se ha valori
+                filtriMultipli.put(key, valori);
+            }
+        }
+
+        return filtriMultipli;
+    }
+
+    private Sort getSort(String ordinamento) {
+        if ("prezzo-cresc".equals(ordinamento)) {
+            return Sort.by(Sort.Direction.ASC, "prezzo");
+        } else if ("prezzo-desc".equals(ordinamento)) {
+            return Sort.by(Sort.Direction.DESC, "prezzo");
+        }
+        return Sort.by(Sort.Direction.DESC, "id");
     }
 }

@@ -163,13 +163,6 @@ public class ResoController {
                 return ResponseEntity.badRequest().body("Nessun allegato fornito");
             }
 
-            System.out.println("Allegati ricevuti (" + allegati.size() + ") per il messaggio con ID " + messageId);
-            for (MultipartFile file : allegati) {
-                if (!file.isEmpty()) {
-                    System.out.println("- " + file.getOriginalFilename());
-                }
-            }
-
             resoService.addAllegatiMessaggio(id, messageId, allegati);
 
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -186,38 +179,6 @@ public class ResoController {
                                                        @PathVariable Long messageId,
                                                        @RequestParam("file") MultipartFile allegato) {
         return aggiungiAllegatiMessaggio(utente, id, messageId, Arrays.asList(allegato));
-    }
-
-    @GetMapping("/{id}/chat/{messageId}/attachments/paths")
-    public ResponseEntity<?> getAllegatiMessaggio(@AuthenticationPrincipal Utente utente,
-                                                  @PathVariable Long id,
-                                                  @PathVariable Long messageId) {
-        if (utente == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
-        }
-
-        try {
-            if (!resoService.isAssociatedWithUtente(id, utente)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
-            }
-
-            Messaggio messaggio = resoService.getMessaggioById(messageId);
-            if (messaggio == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
-            }
-
-            List<Path> allegati = messaggio.getAllImages();
-
-            if (allegati.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun allegato trovato per il messaggio con ID " + messageId);
-            }
-
-            return ResponseEntity.ok(allegati);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body("Errore durante il recupero degli allegati del messaggio: " + e.getMessage());
-        }
     }
 
     @GetMapping("/{id}/chat/{messageId}/attachments/content")
@@ -272,7 +233,7 @@ public class ResoController {
         }
 
         try {
-            if (!resoService.isAssociatedWithUtente(id, utente)) {
+            if (!utente.isAdmin() && !resoService.isAssociatedWithUtente(id, utente)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
             }
 
@@ -291,12 +252,10 @@ public class ResoController {
         }
 
         try {
-            System.out.println("Controllo se il messaggio con ID " + messageId + " del reso " + id + " ha allegati");
             Messaggio messaggio = resoService.getMessaggioById(messageId);
             if (messaggio == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
             }
-            System.out.println("Messaggio trovato: " + messaggio.getId() + ", ha " + messaggio.getAllegati().size() + " allegati");
 
             boolean hasAttachments = !messaggio.getAllegati().isEmpty();
             return ResponseEntity.ok(hasAttachments);

@@ -16,6 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/resi")
@@ -120,6 +123,29 @@ public class AdminResoController {
             return ResponseEntity.status(HttpStatus.CREATED).body(nuovoMessaggio);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore durante l'aggiunta del messaggio al reso " + id + ": " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/chat/{messageId}/attachments")
+    public ResponseEntity<?> aggiungiAllegatiMessaggio(@AuthenticationPrincipal Utente utente,
+                                                       @PathVariable Long id,
+                                                       @PathVariable Long messageId,
+                                                       @RequestParam("files") List<MultipartFile> allegati) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        try {
+          if (allegati == null || allegati.isEmpty()) {
+                return ResponseEntity.badRequest().body("Nessun allegato fornito");
+            }
+
+            resoService.addAllegatiMessaggio(id, messageId, allegati);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Aggiunti " + allegati.size() + " allegati al messaggio con ID " + messageId + " del reso " + id);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore durante l'aggiunta degli allegati al messaggio del reso " + id + ": " + e.getMessage());
         }
     }
 
