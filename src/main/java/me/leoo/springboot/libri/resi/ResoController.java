@@ -13,10 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +52,8 @@ public class ResoController {
             String nome,
             String contentType,
             String base64Content
-    ) {}
+    ) {
+    }
 
     @PostMapping
     public ResponseEntity<?> creaReso(@AuthenticationPrincipal Utente utente,
@@ -220,6 +219,7 @@ public class ResoController {
             return ResponseEntity.badRequest().body("Errore durante il recupero degli allegati del messaggio: " + e.getMessage());
         }
     }
+
     @GetMapping("/{id}/chat/{messageId}/attachments/content")
     public ResponseEntity<?> getAllegatiMessaggioContent(@AuthenticationPrincipal Utente utente,
                                                          @PathVariable Long id,
@@ -266,7 +266,7 @@ public class ResoController {
     @GetMapping("/{id}/chat/attachment/{path}")
     public ResponseEntity<?> getAllegatoMessaggio(@AuthenticationPrincipal Utente utente,
                                                   @PathVariable Long id,
-                                                  @PathVariable String path){
+                                                  @PathVariable String path) {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
@@ -279,6 +279,29 @@ public class ResoController {
             return ImageUtils.getFileResponse(Path.of(path));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore durante il recupero dell'allegato del messaggio: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/chat/{messageId}/attachments/has")
+    public ResponseEntity<?> hasAllegatiMessaggio(@AuthenticationPrincipal Utente utente,
+                                                  @PathVariable Long id,
+                                                  @PathVariable Long messageId) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        try {
+            System.out.println("Controllo se il messaggio con ID " + messageId + " del reso " + id + " ha allegati");
+            Messaggio messaggio = resoService.getMessaggioById(messageId);
+            if (messaggio == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
+            }
+            System.out.println("Messaggio trovato: " + messaggio.getId() + ", ha " + messaggio.getAllegati().size() + " allegati");
+
+            boolean hasAttachments = !messaggio.getAllegati().isEmpty();
+            return ResponseEntity.ok(hasAttachments);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore durante il controllo degli allegati del messaggio: " + e.getMessage());
         }
     }
 
