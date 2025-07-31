@@ -65,14 +65,7 @@ public class LibroController {
             Libro libro = libroRepository.findById(id)
                     .orElseThrow();
 
-            LiteBookResponse response = new LiteBookResponse(
-                    libro.getId(),
-                    libro.getTitolo(),
-                    libro.getAutore(),
-                    libro.getAnnoPubblicazione(),
-                    libro.getRifornimento().getPrezzoTotale(),
-                    libro.getRifornimento().getSconto()
-            );
+            LiteBookResponse response = libro.toLiteBookResponse();
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -148,7 +141,6 @@ public class LibroController {
     @GetMapping("/ricerca")
     public ResponseEntity<RicercaLibriResponse> cercaLibri(
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) String categoria,
             @RequestParam(required = false) Double prezzoMin,
             @RequestParam(required = false) Double prezzoMax,
             @RequestParam(defaultValue = "popolaritaDesc") String ordinamento,

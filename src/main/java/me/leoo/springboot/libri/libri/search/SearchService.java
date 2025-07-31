@@ -5,8 +5,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.LibroController;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
+import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +34,12 @@ public class SearchService {
 
         Page<Libro> risultatiLibri = libroRepository.findAll(spec, pageable);
 
+        Page<LibroController.LiteBookResponse> libriResponse = risultatiLibri
+                .map(Libro::toLiteBookResponse);
+
         Map<String, List<FiltroOpzione>> filtriDisponibili = calcolaFiltriDinamici(filtriMultipli);
 
-        return new RicercaLibriResponse(risultatiLibri, filtriDisponibili, filtriMultipli);
+        return new RicercaLibriResponse(libriResponse, filtriDisponibili, filtriMultipli);
     }
 
     private Specification<Libro> buildLibroSpecificationMultiple(String q, Double prezzoMin, Double prezzoMax,

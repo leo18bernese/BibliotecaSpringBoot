@@ -90,6 +90,17 @@ public class Libro {
         return this;
     }
 
+    public LibroController.LiteBookResponse toLiteBookResponse() {
+        return new LibroController.LiteBookResponse(
+                this.id,
+                this.titolo,
+                this.autore,
+                this.annoPubblicazione,
+                this.rifornimento.getPrezzoTotale(),
+                this.rifornimento.getSconto()
+        );
+    }
+
     @JsonIgnore
     public boolean isInStock() {
         return rifornimento != null && rifornimento.getDisponibili() > 0;
