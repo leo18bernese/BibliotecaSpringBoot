@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.leo18bernese.Utils:bukkit:2.0.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.github.leo18bernese.Utils" artifactId="bukkit" version="2.0.0" baseVersion="2.0.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.leo18bernese.Utils/bukkit/2.0.0/24cea7ea7b264826c2ced5b72e58f8bbf4db5a52/bukkit-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
