@@ -26,10 +26,10 @@ public class SpedizioneController {
         return Spedizione.getById(id);
     }
 
-    @GetMapping("/methods/type/{id}")
-    public ResponseEntity<?> getTipoSpedizioneById(@PathVariable String id) {
+    @GetMapping("/methods/type/{type}")
+    public ResponseEntity<?> getTipoSpedizioneById(@PathVariable String type) {
         try {
-            SpedizioneLuogo luogo = SpedizioneLuogo.valueOf(id.toUpperCase());
+            SpedizioneLuogo luogo = SpedizioneLuogo.valueOf(type.toUpperCase());
 
             return ResponseEntity.ok(Spedizione.getByType(luogo).toArray(new Spedizioniere[0]));
         } catch (Exception e) {

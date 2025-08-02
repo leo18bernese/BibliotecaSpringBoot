@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
+import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import org.springframework.http.ResponseEntity;
 
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Getter
@@ -39,6 +41,12 @@ public class Libro {
     private String editore;
     private String lingua;
     private String isbn;
+
+    // dimensioni
+    private double lenght = new Random().nextInt(10, 20);
+    private double width = lenght + new Random().nextInt(5, 10);
+    private double height = new Random().nextInt(1, 5);
+    private double weight = 0.5; // in kg
 
     private Date dataAggiunta = new Date();
 
@@ -109,6 +117,14 @@ public class Libro {
     @JsonIgnore
     public boolean isInOfferta() {
         return rifornimento != null && rifornimento.getSconto() != null;
+    }
+
+    public DeliveryPackage getDeliveryPackage() {
+        return DeliveryPackage.getMostSuitable(lenght, width, height, weight);
+    }
+
+    public double getVolume() {
+        return lenght * width * height;
     }
 
     public ResponseEntity<byte[]> getPictureResponse(int index) {

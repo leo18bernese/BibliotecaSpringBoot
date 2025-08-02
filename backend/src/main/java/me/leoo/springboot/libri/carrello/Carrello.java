@@ -5,6 +5,7 @@ import jakarta.transaction.NotSupportedException;
 import lombok.*;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utils.LibriUtils;
@@ -45,7 +46,7 @@ public class Carrello {
     @JoinTable(name = "carrello_buono",
             joinColumns = @JoinColumn(name = "carrello_id"),
             inverseJoinColumns = @JoinColumn(name = "buono_id"))
-    private Set<Buono> couponCodes ;
+    private Set<Buono> couponCodes;
 
     public Carrello(Utente utente) {
         this.utente = utente;
@@ -195,6 +196,50 @@ public class Carrello {
         }
 
         return item.getLibro().getRifornimento().getSconto();
+    }
+
+    public DeliveryPackage getSmallestPackage() {
+        if (items.isEmpty()) {
+            return null;
+        }
+
+        double totalVolume = items.stream()
+                .mapToDouble(i -> i.getLibro().getVolume() * i.getQuantita())
+                .sum();
+
+        double totalWeight = items.stream()
+                .mapToDouble(i -> i.getLibro().getWeight() * i.getQuantita())
+                .sum();
+
+        double sideLength = Math.cbrt(totalVolume);
+
+        double totalLength = sideLength * 1.2 + 2; // Adding some margin
+        double totalWidth = sideLength * 1.2 + 2; // Adding some
+        double totalHeight = sideLength * 1.2 + 2;
+        double finalWeight = totalWeight * 1.1; // Adding some margin
+
+        double maxLength = items.stream()
+                .mapToDouble(i -> i.getLibro().getLenght())
+                .max()
+                .orElse(0);
+
+        double maxWidth = items.stream()
+                .mapToDouble(i -> i.getLibro().getWidth())
+                .max()
+                .orElse(0);
+
+        double maxHeight = items.stream()
+                .mapToDouble(i -> i.getLibro().getHeight())
+                .max()
+                .orElse(0);
+
+        double finalLength = Math.max(totalLength, maxLength);
+        double finalWidth = Math.max(totalWidth, maxWidth);
+        double finalHeight = Math.max(totalHeight, maxHeight);
+
+        DeliveryPackage suitable = DeliveryPackage.getMostSuitable(finalLength, finalWidth, finalHeight, finalWeight);
+
+        return suitable != null ? suitable : DeliveryPackage.EXTRA_LARGE; // Default to SMALL if no suitable package found
     }
 
     public boolean canCheckout() {
