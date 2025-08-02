@@ -53,10 +53,11 @@ const Login = () => {
     }
 
     return (
-        <div className="p-4 w-1/2 mt-4 mb-6 mx-auto">
+        <div className="p-4 lg:w-1/2 w-3/4 mt-4 mb-6 mx-auto">
             <Toaster />
             <h2 className="text-2xl font-bold mb-4">Login</h2>
             <p className="text-gray-600">Please log in to access your account.</p>
+
             <p className="text-gray-600">
                 If you don't have an account, please{" "}
                 <Link to="/register" className="text-gray-700 underline">

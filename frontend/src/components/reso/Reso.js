@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import axios from 'axios';
 import {useQuery} from "@tanstack/react-query";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {Toaster} from "react-hot-toast";
 import ResoTimeline from "./ResoTimeline";
 import ResoItem from "./ResoItem";
@@ -13,6 +13,7 @@ const fetchExistOrdine = async (id) => {
 
 const fetchOrdine = async (id) => {
     const response = await axios.get(`/api/resi/${id}`);
+    console.log(response.data);
     return response.data;
 }
 
@@ -65,31 +66,78 @@ const Reso = () => {
     </div>;
     if (queryError || error) return <div>Error: {error || queryError.message}</div>;
 
+    const colors = {
+        "wait": "bg-yellow-100 text-yellow-800",
+        "error": "bg-red-100 text-red-800",
+        "ok": "bg-green-100 text-green-800",
+    }
+
     console.log(reso);
 
     const warn = reso.statoWarning;
+    const attesa = reso.stato === "IN_ATTESA";
+    const colorClass = warn ? colors.error : (attesa ? colors.wait : colors.ok);
 
     return (
         <div className="container mx-auto px-4 py-8">
             <Toaster/>
 
             <div id="tracking" className="p-4 bg-white shadow-md rounded-lg">
-                <h1 className="text-2xl font-semibold">Dettagli Reso #{reso.id}</h1>
-                <p className="text-gray-500">Traccia lo stato del tuo reso.</p>
+
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-2xl font-semibold">Dettagli Reso #{reso.id}</h1>
+                        <p className="text-gray-500">Traccia lo stato del tuo reso.</p>
+                    </div>
+
+                    <button
+                        className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+                        onClick={() => navigate(`/reso/${id}/chat`)}>
+                        Vai alla Chat
+                    </button>
+                </div>
+
+
 
                 <div className="mt-4 mb-10">
-                <span className="p-2 rounded-2xl font-semibold uppercase text-sm mb "
-                      style={warn ? {backgroundColor: '#fee2e2', color: '#991b1b'} : {backgroundColor: '#d1fae5', color: '#065f46'}}>
-                                <span className="">{reso.statoName}</span>
-                            </span>
+                <span className={`p-2 rounded-2xl font-semibold uppercase text-sm mb ${colorClass}`}>
+                    <span className="">{reso.statoName}</span>
+                </span>
                 </div>
 
                 {!reso.statoWarning && (
                     <ResoTimeline current={reso.stato} stati={reso.stati}/>
                 )}
 
-                <p className="text-center mt-8">{reso.statoDescrizione}</p>
-                <p className="text-center">{reso.statoNext}</p>
+                <p className="text-center mt-8 text-gray-800">{reso.statoDescrizione}</p>
+
+                {(reso.statoMessaggio && reso.stato === "IN_ATTESA") && (
+                    <div className="text-center mt-8 bg-blue-50 border border-blue-500  rounded-lg ">
+                        <div className="w-1/2 mx-auto py-6 text-gray-600">
+
+                            <p><b>Motivo fornito dal servizio clienti: </b>
+                                {reso.statoMessaggio}.</p>
+
+                            <p>Puoi scrivere nella chat relativa a questo reso per ottenere maggiori informazioni, per fare
+                                domande e per
+                                fornire ulteriori dettagli per sbloccare la richiesta.</p>
+
+                            <button
+                                className=" bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+                                onClick={() => navigate(`/reso/${id}/chat`)}>
+                                Clicca qui per accedere alla chat.
+                            </button>
+
+                            <p className="text-gray-500 mt-4 text-sm">Se nessun dettaglio verrà fornito entro 7
+                                giorni,
+                                il reso verrà automaticamente sospeso e dopo ulteriori 7 giorni verrà
+                                archiviato senza possibilità di recupero da parte del cliente.</p>
+
+                        </div>
+
+                    </div>
+                )}
+
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4  mt-8" style={{alignItems: 'start'}}>
@@ -118,6 +166,11 @@ const Reso = () => {
                             <div className="flex justify-between border-b py-2 text-md ">
                                 <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
                                 <h3 className="font-semibold text-right text-gray-800">{new Date(reso.dataCreazione).toLocaleString()}</h3>
+                            </div>
+
+                            <div className="flex justify-between border-b py-2 text-md ">
+                                <h3 className="font-semibold text-gray-500">Totale reso stimato:</h3>
+                                <h3 className="font-semibold text-right text-gray-800">{reso.totaleReso} €</h3>
                             </div>
                         </div>
                     </div>

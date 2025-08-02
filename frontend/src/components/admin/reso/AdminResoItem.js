@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
+import ModifyQuantityForm from "./form/ModifyQuantityForm";
 
 const fetchBookImage = async (id) => {
     try {
@@ -17,7 +18,10 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const OrdineItem = ({book, bookId}) => {
+const AdminResoItem = ({item, resoId}) => {
+
+    const ordineItem = item.ordineItem;
+    const bookId = ordineItem?.id;
 
     const {data: bookImage, isLoading: isImageLoading, error: imageError} = useQuery({
         queryKey: ['bookFirst', bookId],
@@ -25,29 +29,33 @@ const OrdineItem = ({book, bookId}) => {
         enabled: !!bookId, // Only fetch if bookId is available
     });
 
+
     return (
-        <div key={book.id} className="bg-white border border-gray-300 rounded-xl p-4 flex items-center my-3">
+        <div key={item.id} className="bg-white border border-gray-300 rounded-xl p-4 flex items-center my-3">
 
             <img
                 src={`/api/images/${bookId}/first`}
-                alt={book.titolo}
+                alt={item.titolo}
                 className="w-24 h-32 object-cover rounded-md mr-4"/>
 
             <div className="flex-1 flex justify-between items-start">
                 <div>
-                    <Link to={`/book/${book.libroId}`} className="text-xl font-semibold hover:underline">
-                        {book.titolo}
+                    <Link to={`/book/${ordineItem.libroId}`} className="text-lg font-semibold hover:underline">
+                        {ordineItem.titolo}
                     </Link>
 
-                    <p className="text-gray-700">Quantità: {book.quantita}</p>
+                    <p className="text-gray-700">Quantità di reso: {item.quantita} di {ordineItem.quantita}</p>
+
+                    <div className="font-semibold text-lg  text-gray-500">
+                     € {ordineItem.prezzo} {item.quantita > 1 && "cad."}
+                    </div>
                 </div>
 
-                <div className="text-right font-semibold text-lg ml-4">
-                    <p className="text-gray-500">€ {book.prezzo} {book.quantita > 1 && "cad."}</p>
-                </div>
+                <ModifyQuantityForm resoId={resoId} itemId={item.id} resoItem={item}
+                                    key={`modify-${item.id}`}/>
             </div>
         </div>
     );
 }
 
-export default OrdineItem;
+export default AdminResoItem;

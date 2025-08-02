@@ -1,7 +1,5 @@
 import React, {useContext} from 'react';
-import axios from 'axios';
 import {UserContext} from "../user/UserContext";
-import {useQuery} from "@tanstack/react-query";
 import CarrelloItem from "./CarrelloItem";
 import {Toaster} from "react-hot-toast";
 import {useNavigate} from "react-router-dom";

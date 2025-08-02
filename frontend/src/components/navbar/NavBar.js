@@ -4,7 +4,6 @@ import {Link} from 'react-router-dom';
 import {UserContext} from "../user/UserContext";
 import {FaShoppingCart} from 'react-icons/fa';
 import axios from "axios";
-import {useCarrello} from "../hook/useCarrello";
 import {useQuery} from "@tanstack/react-query";
 
 const fetchCartItemsCount = async () => {

@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import PropTypes from 'prop-types';
 import {UserContext} from "../UserContext";
 import axios from "axios";
 import {useQuery} from "@tanstack/react-query";

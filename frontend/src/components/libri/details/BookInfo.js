@@ -7,7 +7,6 @@ import {CartContext} from "../../carrello/CartContext";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import toast, {Toaster} from "react-hot-toast";
 import BookInfoTabs from "./BookInfoTabs";
-import NuovaRecensione from "../../recensioni/NuovaRecensione";
 import {UserContext} from "../../user/UserContext";
 import {useAuth} from "../../user/AuthContext";
 

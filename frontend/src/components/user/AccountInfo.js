@@ -1,10 +1,7 @@
 import React, {useContext} from 'react';
-import axios from 'axios';
 import {Link, NavLink, Outlet, useParams} from "react-router-dom";
-import {useQuery} from "@tanstack/react-query";
 import {UserContext} from "./UserContext";
 import {Toaster} from "react-hot-toast";
-import ProtectedRoute from "./login/ProtectedRoute";
 
 const linkItem = (emoji, text, to) => (
     <NavLink to={to}
@@ -51,6 +48,7 @@ const AccountInfo = () => {
                             {linkItem('bell', 'Account Settings', '/account/settings')}
                             {linkItem('help-circle', 'Support', '/account/support')}
 
+                            {linkItem('arrow-out-down-right-stroke-square', 'Logout', '/logout')}
                         </div>
                     </div>
 

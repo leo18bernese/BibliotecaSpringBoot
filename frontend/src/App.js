@@ -32,8 +32,16 @@ import NuovoReso from "./components/reso/NuovoReso";
 import ReturnsHistory from "./components/user/pages/RefundHistory";
 import Reso from "./components/reso/Reso";
 import ProtectedRoute from "./components/user/login/ProtectedRoute";
+import ResoChat from "./components/reso/ResoChat";
+import Logout from "./components/user/logout/Logout";
+import AdminReso from "./components/admin/reso/AdminReso";
+import AdminBar from "./components/admin/AdminBar";
+import AdminChat from "./components/admin/reso/chat/AdminChat";
+import SearchPage from "./components/libri/search/SearchPage";
+import BookDisplay from "./components/libri/BookDisplay";
 
 const queryClient = new QueryClient();
+
 
 function App() {
     return (
@@ -49,6 +57,7 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<Home/>}/>
                                 <Route path="/search" element={<SearchBooks/>}/>
+                                <Route path="/ricerca" element={<SearchPage/>}/>
 
                                 <Route path="/book/:id" element={<BookInfo/>}/>
                                 <Route path="/libri/:id" element={<RedirectToBook/>}/>
@@ -63,6 +72,8 @@ function App() {
                                     <Route path="/ordine/:id" element={<Ordine/>}/>
                                     <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
                                     <Route path="/reso/:id" element={<Reso/>}/>
+                                    <Route path="/reso/:id/chat" element={<ResoChat/>}/>
+
 
                                     <Route path="/account/*" element={<AccountInfo/>}>
                                         <Route index element={<Navigate to="personal-details" replace/>}/>
@@ -73,13 +84,24 @@ function App() {
                                         <Route path="shipping" element={<Shipping/>}/>
                                         <Route path="returns" element={<ReturnsHistory/>}/>
                                     </Route>
+
+
                                 </Route>
+
+                                <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN"/>}>
+                                    <Route element={<AdminBar/>}>
+                                        <Route path="/admin/reso/:id" element={<AdminReso/>}/>
+                                        <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
+                                    </Route>
+                                </Route>
+
 
                                 <Route path="/cart" element={<Carrello/>}/>
                                 <Route path="/checkout" element={<CheckOut/>}/>
 
                                 <Route path="/login" element={<Login/>}/>
                                 <Route path="/register" element={<Register/>}/>
+                                <Route path="/logout" element={<Logout/>}/>
                             </Routes>
                         </AuthProvider>
                     </Router>
@@ -102,14 +124,14 @@ const fetchHomepageItems = async () => {
 function Home() {
     const {user} = useContext(UserContext);
 
-    const {data: homepageItems, isLoading, error} = useQuery({
+    const {data: homepageIds, isLoading, error} = useQuery({
         queryKey: ['homepageItems'],
         queryFn: fetchHomepageItems,
         staleTime: Infinity, // Impedisce il refetch automatico
     });
 
     return (
-        <div className="App container mx-auto">
+        <div className=" container mx-auto">
 
             <Toaster/>
 
@@ -126,17 +148,8 @@ function Home() {
                 )}
             </header>
 
-            <div className="homepage-items grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 p-10">
-                {isLoading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p>Error loading items: {error.message}</p>
-                ) : (
-                    homepageItems.map(item => (
-                        <LiteBook bookId={item} key={item}/>
-                    ))
-                )}
-            </div>
+            <BookDisplay idList={homepageIds} isLoading={isLoading} error={error}/>
+
         </div>
     );
 }

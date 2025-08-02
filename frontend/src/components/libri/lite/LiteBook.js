@@ -22,18 +22,23 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const LiteBook = ({bookId}) => {
+const LiteBook = ({bookID, book: providedBook}) => {
 
-    const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
+    const bookId = bookID || providedBook?.libroId;
+
+    const {data: parsedBook, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['liteBook', bookId],
         queryFn: () => fetchBookById(bookId),
+        enabled: !providedBook && !!bookId,
     });
 
     const {data: bookImage, isLoading: isImageLoading, error: imageError} = useQuery({
         queryKey: ['bookFirst', bookId],
         queryFn: () => fetchBookImage(bookId),
-        enabled: !!bookId, // Only fetch if bookId is available
+        enabled: !!bookId,
     });
+
+    const book = providedBook || parsedBook;
 
     if (isBookLoading) {
         return <div>Loading...</div>;
@@ -49,19 +54,25 @@ const LiteBook = ({bookId}) => {
                 <div className="book-card">
 
                     <Link to={`/book/${bookId}`}>
-                        {bookImage ? (
-                            <img
-                                src={`/api/images/${bookId}/first`}
-                                alt={`Cover of ${book.titolo}`}
-                                className="w-full h-64 object-cover rounded-md mb-5"
-                                style={{height: '250px'}}
-                            />
-                        ) : (
-                            <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-md mb-5"
-                                 style={{height: '250px'}}>
+                        <div
+                            className={`w-full rounded-md mb-5 h-64 ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : bookImage ? '' : 'bg-gray-200 flex items-center justify-center'}`}
+                            style={{ height: '250px' }}
+                        >
+                            {isImageLoading ? (
+                                <span className="text-gray-500">Loading image...</span>
+                            ) : imageError ? (
+                                <span className="text-red-500">Error loading image</span>
+                            ) : bookImage ? (
+                                <img
+                                    src={`/api/images/${bookId}/first`}
+                                    alt={`Cover of ${book.titolo}`}
+                                    className="w-full h-full object-cover rounded-md"
+                                />
+                            ) : (
                                 <span className="text-gray-500">No image available</span>
-                            </div>
-                        )}
+                            )}
+                        </div>
+
                     </Link>
 
 

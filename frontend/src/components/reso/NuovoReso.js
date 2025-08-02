@@ -20,6 +20,13 @@ const fetchMotivi = async () => {
     return response.data;
 }
 
+const fetchMetodoRimborso = async () => {
+    const response = await axios.get('/api/resi/refund-methods');
+    console.log("Metodo di rimborso:", response.data);
+    return response.data;
+}
+
+
 // Componente NuovoReso
 const NuovoReso = () => {
     const {id} = useParams();
@@ -51,6 +58,11 @@ const NuovoReso = () => {
     const {data: motivi, isLoading: isMotiviLoading} = useQuery({
         queryKey: ['motiviReso'],
         queryFn: fetchMotivi
+    });
+
+    const {data: metodoRimborso, isLoading: isMetodoRimborsoLoading} = useQuery({
+        queryKey: ['metodoRimborso'],
+        queryFn: fetchMetodoRimborso
     });
 
     // Inizializza lo stato degli item quando l'ordine viene caricato
@@ -113,6 +125,12 @@ const NuovoReso = () => {
             return;
         }
 
+        if (!resoRequest.metodoRimborso) {
+            toast.error("Seleziona un metodo di rimborso.");
+            setIsLoading(false);
+            return;
+        }
+
         const finalRequest = {
             ordineId: resoRequest.ordineId,
             items: itemsToSubmit
@@ -134,7 +152,7 @@ const NuovoReso = () => {
         }
     };
 
-    if (existsLoading || isOrdineLoading || isMotiviLoading) return <div>Caricamento...</div>;
+    if (existsLoading || isOrdineLoading || isMotiviLoading || isMetodoRimborsoLoading) return <div>Caricamento...</div>;
     if (error) return <div>Errore: {error}</div>;
     if (!ordine) return <div>Ordine non trovato.</div>;
 
@@ -173,6 +191,7 @@ const NuovoReso = () => {
                                                     <label htmlFor={`quantita-${item.id}`}
                                                            className="block text-sm font-medium text-gray-700">Quantità
                                                         da rendere</label>
+
                                                     <input
                                                         type="number"
                                                         id={`quantita-${item.id}`}
@@ -183,6 +202,7 @@ const NuovoReso = () => {
                                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2"
                                                     />
                                                 </div>
+
                                                 <div>
                                                     <label htmlFor={`motivo-${item.id}`}
                                                            className="block text-sm font-medium text-gray-700">Motivo
@@ -222,8 +242,27 @@ const NuovoReso = () => {
                                         )}
                                     </div>
                                 </div>
+
+
                             </div>
                         ))}
+                    </div>
+
+                    <div     className="border rounded-lg border-gray-400 p-4 bg-gray-200 transition-colors mt-8">
+
+                        <label htmlFor={`metodo-rimborso`} className="block text-sm font-medium text-gray-700 ">Metodo di
+                            Rimborso</label>
+                        <select
+                            id={`metodo-rimborso`}
+                            value={resoRequest.metodoRimborso || ''}
+                            onChange={(e) => setResoRequest(prev => ({...prev, metodoRimborso: e.target.value}))}
+                            className="mt-1 block w-full border-gray-300 bg-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2"
+                        >
+                            <option value="" disabled>Seleziona un metodo di rimborso</option>
+                            {metodoRimborso.map((metodo) => (
+                                <option key={metodo.name} value={metodo.name}>{metodo.displayName}</option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="mt-6">
