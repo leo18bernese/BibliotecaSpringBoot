@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jsoup:jsoup:1.15.4" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jsoup" artifactId="jsoup" version="1.15.4" baseVersion="1.15.4" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jsoup/jsoup/1.15.4/cd56eb47dcd4590ef6451f87e5ec33bddd1a9a51/jsoup-1.15.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
