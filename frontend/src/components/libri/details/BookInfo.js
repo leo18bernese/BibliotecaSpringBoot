@@ -91,7 +91,6 @@ const BookInfo = () => {
         queryFn: () => fetchBookById(bookId),
     });
 
-
     const {data: previousBookExists} = useQuery({
         queryKey: ['bookExists', previousId],
         queryFn: () => fetchBookExists(previousId),

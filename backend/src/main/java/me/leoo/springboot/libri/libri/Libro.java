@@ -60,7 +60,7 @@ public class Libro {
     private LibroInfo descrizione;
 
 
-    public static final String IMAGE_DIR = "src/main/resources/static/images";
+    public static final String IMAGE_DIR = "backend/src/main/resources/static/images";
 
     public Libro(String titolo, String autore, String genere, int annoPubblicazione, int numeroPagine, String editore, String lingua, String isbn, int quantita, double prezzo) {
         this.titolo = titolo;
@@ -148,6 +148,8 @@ public class Libro {
         try {
             String finalPath = IMAGE_DIR + "/" + id;
             Path dirPath = Paths.get(finalPath);
+
+            System.out.println("does " + dirPath + " exist? " + Files.exists(dirPath));
 
             if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
                 return List.of();

@@ -27,7 +27,7 @@ public class ImageController {
     private LibroRepository libroRepository;
 
     @Deprecated
-    private static final String UPLOAD_DIR = "src/main/resources/static/images";
+    private static final String UPLOAD_DIR = "backend/src/main/resources/static/images";
 
     @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
     @PostMapping("/{productId}")

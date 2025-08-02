@@ -50,7 +50,7 @@ public class Reso {
     private MetodoRimborso metodoRimborso;
 
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/images/ordini";
+    private static final String UPLOAD_DIR = "backend/src/main/resources/static/images/ordini";
 
     public Reso(Ordine ordine, MetodoRimborso metodoRimborso) {
         this.ordine = ordine;

@@ -32,7 +32,7 @@ public class ResoService {
     private final OrdineRepository ordineRepository; // Da creare se non esiste
     private final OrdineItemRepository ordineItemRepository; // Da creare se non esiste
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/images/ordini";
+    private static final String UPLOAD_DIR = "backend/src/main/resources/static/images/ordini";
 
 
     @Transactional

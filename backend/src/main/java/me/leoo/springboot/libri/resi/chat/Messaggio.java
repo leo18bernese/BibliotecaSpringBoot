@@ -54,7 +54,7 @@ public class Messaggio {
     }
 
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/images/ordini";
+    private static final String UPLOAD_DIR = "backend/src/main/resources/static/images/ordini";
 
 
     public Messaggio(Reso reso, String testo, TipoMittente mittente) {
