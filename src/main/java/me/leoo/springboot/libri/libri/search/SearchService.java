@@ -7,6 +7,8 @@ import jakarta.persistence.criteria.*;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroController;
 import me.leoo.springboot.libri.libri.LibroRepository;
+import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzione;
+import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzioneRepository;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +26,9 @@ public class SearchService {
 
     @Autowired
     private LibroRepository libroRepository;
+
+    @Autowired
+    private CaratteristicaOpzioneRepository caratteristicheRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -33,9 +39,7 @@ public class SearchService {
         Specification<Libro> spec = buildLibroSpecificationMultiple(q, prezzoMin, prezzoMax, filtriMultipli);
 
         Page<Libro> risultatiLibri = libroRepository.findAll(spec, pageable);
-
-        Page<LibroController.LiteBookResponse> libriResponse = risultatiLibri
-                .map(Libro::toLiteBookResponse);
+        Page<LibroController.LiteBookResponse> libriResponse = risultatiLibri.map(Libro::toLiteBookResponse);
 
         Map<String, List<FiltroOpzione>> filtriDisponibili = calcolaFiltriDinamici(filtriMultipli);
 
@@ -99,6 +103,12 @@ public class SearchService {
     private Map<String, List<FiltroOpzione>> calcolaFiltriDinamici(Map<String, List<String>> filtriAttivi) {
         Map<String, List<FiltroOpzione>> filtri = new HashMap<>();
 
+        Map<String, CaratteristicaOpzione> metadatiMap = caratteristicheRepository.findAll().stream()
+                .collect(Collectors.toMap(
+                        op -> op.getNomeCaratteristica() + "::" + op.getValoreOpzione(),
+                        Function.identity()
+                ));
+
         // Prima ottieni tutte le caratteristiche disponibili dinamicamente
         Set<String> caratteristicheDisponibili = ottieniCaratteristicheDisponibili();
 
@@ -139,7 +149,13 @@ public class SearchService {
                         String valore = tuple.get(0, String.class);
                         Long conteggio = tuple.get(1, Long.class);
                         boolean selezionato = valoriSelezionati.contains(valore);
-                        return new FiltroOpzione(valore, conteggio, selezionato);
+
+                        String metadataKey = caratteristicaNome + "::" + valore;
+                        CaratteristicaOpzione opzioneMetadata = metadatiMap.get(metadataKey);
+                        Map<String, Object> metadata = (opzioneMetadata != null) ? opzioneMetadata.getMetadata() : Collections.emptyMap();
+
+
+                        return new FiltroOpzione(valore, conteggio, selezionato, metadata);
                     })
                     .sorted((a, b) -> {
                         // Prima i selezionati, poi per conteggio decrescente

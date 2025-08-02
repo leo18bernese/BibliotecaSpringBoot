@@ -148,6 +148,8 @@ public class LibroController {
             @RequestParam(defaultValue = "10") int elementiPerPagina,
             @RequestParam Map<String, String> allParams) {
 
+        System.out.println("pagina: " + pagina + ", elementiPerPagina: " + elementiPerPagina);
+
         // Estrai e gestisci filtri multipli dal formato filtro_categoria=valore1,valore2,valore3
         Map<String, List<String>> filtriMultipli = estraiFiltriMultipli(allParams);
 
@@ -163,7 +165,7 @@ public class LibroController {
 
         // Parametri standard da escludere
         Set<String> parametriStandard = Set.of("q",  "prezzoMin", "prezzoMax",
-                "ordinamento", "pagine", "elementiPerPagina");
+                "ordinamento", "pagina", "elementiPerPagina");
 
         for (Map.Entry<String, String> entry : allParams.entrySet()) {
             String key = entry.getKey();
