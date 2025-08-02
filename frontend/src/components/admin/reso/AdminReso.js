@@ -1,7 +1,7 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import {useQuery} from "@tanstack/react-query";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Toaster} from "react-hot-toast";
 import AddStateForm from "./form/AddStateForm";
 import AdminResoItem from "./AdminResoItem";

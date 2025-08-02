@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {Link, NavLink, Outlet, useParams} from "react-router-dom";
+import {NavLink, Outlet, useParams} from "react-router-dom";
 import {UserContext} from "./UserContext";
 import {Toaster} from "react-hot-toast";
 

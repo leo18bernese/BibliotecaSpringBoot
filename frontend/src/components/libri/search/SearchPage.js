@@ -1,8 +1,7 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import MetadataDisplay from "./MetadataDisplay";
-import LiteBook from "../lite/LiteBook";
 import BookDisplay from "../BookDisplay";
 
 function SearchPage() {

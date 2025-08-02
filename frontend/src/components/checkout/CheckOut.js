@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {UserContext} from "../user/UserContext";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
 import {useQuery, useQueryClient} from "@tanstack/react-query";

@@ -1,9 +1,7 @@
-import React, {useContext, useState, useRef, useEffect} from 'react';
+import React from 'react';
 import axios from 'axios';
-import {useQuery, useQueryClient, useMutation} from "@tanstack/react-query";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import toast, {Toaster} from "react-hot-toast";
-import {Button} from "antd";
+import {useQueryClient} from "@tanstack/react-query";
+import {useNavigate, useParams} from "react-router-dom";
 import ChatTemplate from "../admin/reso/chat/ChatTemplate";
 
 const ResoChat = () => {

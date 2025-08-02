@@ -15,7 +15,6 @@ import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query'
 import ScrollToTop from "./components/utils/ScrollToTop";
 import CheckOut from "./components/checkout/CheckOut";
 import axios from "axios";
-import LiteBook from "./components/libri/lite/LiteBook";
 import AccountInfo from "./components/user/AccountInfo";
 import OrderHistory from "./components/user/pages/OrderHistory";
 import Ordine from "./components/ordine/Ordine";

@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import {UserContext} from "../UserContext";
-import toast, {Toaster} from "react-hot-toast";
+import {Toaster} from "react-hot-toast";
 import {Link, useLocation, Outlet} from "react-router-dom";
 
 const getDeniedContainer = (emoji, title, message, buttonText, buttonLink) => (
