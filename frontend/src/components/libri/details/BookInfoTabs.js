@@ -25,11 +25,21 @@ const BookInfoTabs = ({book}) => {
     };
 
     const tabs = [
-        { label: 'Info Produttore' },
-        { label: 'Info Prodotto' },
-        { label: 'Specifiche Tecniche' },
-        { label: 'Prodotti Correlati' }
+        {label: 'Info Produttore'},
+        {label: 'Specifiche Tecniche'},
+        {label: 'Prodotti Correlati'}
     ];
+
+    const tableContent = (index, key, value) => {
+        const id = index || key.replace(/\s+/g, '-').toLowerCase();
+
+        return (
+            <tr key={id} className="text-gray-700">
+                <td className="border-y border-gray-300 px-4 py-1 font-semibold w-1/2">{key}</td>
+                <td className="border-y border-gray-300 px-4 py-1 w-1/2">{value}</td>
+            </tr>
+        );
+    }
 
     return (
         <div>
@@ -59,26 +69,38 @@ const BookInfoTabs = ({book}) => {
 
             <TabPanel value={activeTab} index={1}>
                 <div>
-                    <h3 className="text-lg font-semibold mb-2">Informazioni sul Prodotto</h3>
-                    <p className="text-gray-700 mb-4">Informazioni dettagliate sul prodotto.</p>
-                </div>
-            </TabPanel>
-
-            <TabPanel value={activeTab} index={2}>
-                <div>
                     <h3 className="text-lg font-semibold mb-2">Specifiche Tecniche</h3>
-                    <p className="text-gray-700 mb-4">Specifiche tecniche del prodotto.</p>
 
-                    <table className="w-2/5">
-                        <tbody >
-                        {Object.entries(book.descrizione.caratteristiche).map(([key, value], index) => (
-                            <tr key={index} className="text-gray-700">
-                                <td className="border-y border-gray-300 px-4 py-1 font-semibold w-1/2" >{key}</td>
-                                <td className="border-y border-gray-300 px-4 py-1 w-1/2">{value}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                    <div className="flex justify-between ">
+
+                        <div className="w-2/5">
+                            <p className="text-gray-700 mb-4">Specifiche tecniche del prodotto.</p>
+
+                            <table >
+                                <tbody>
+
+                                {Object.entries(book.descrizione.caratteristiche).map(([key, value], index) => (
+                                    tableContent(index, key, value)
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="w-2/5">
+                            <p className="text-gray-700 mb-4">Peso e dimensioni del prodotto.</p>
+
+                            <table >
+                                <tbody>
+
+                                {tableContent(null, 'Lunghezza', book.dimensioni.length + ' cm' || 'N/A')}
+                                {tableContent(null, 'Larghezza', book.dimensioni.width + ' cm' || 'N/A')}
+                                {tableContent(null, 'Altezza', book.dimensioni.height + ' cm' || 'N/A')}
+                                {tableContent(null, 'Peso', book.dimensioni.weight + ' kg' || 'N/A')}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </TabPanel>
 

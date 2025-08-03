@@ -208,7 +208,7 @@ public class Carrello {
                 .sum();
 
         double totalWeight = items.stream()
-                .mapToDouble(i -> i.getLibro().getWeight() * i.getQuantita())
+                .mapToDouble(i -> i.getLibro().getDimensioni().weight() * i.getQuantita())
                 .sum();
 
         double sideLength = Math.cbrt(totalVolume);
@@ -219,17 +219,17 @@ public class Carrello {
         double finalWeight = totalWeight * 1.1; // Adding some margin
 
         double maxLength = items.stream()
-                .mapToDouble(i -> i.getLibro().getLenght())
+                .mapToDouble(i -> i.getLibro().getDimensioni().length())
                 .max()
                 .orElse(0);
 
         double maxWidth = items.stream()
-                .mapToDouble(i -> i.getLibro().getWidth())
+                .mapToDouble(i -> i.getLibro().getDimensioni().width())
                 .max()
                 .orElse(0);
 
         double maxHeight = items.stream()
-                .mapToDouble(i -> i.getLibro().getHeight())
+                .mapToDouble(i -> i.getLibro().getDimensioni().height())
                 .max()
                 .orElse(0);
 

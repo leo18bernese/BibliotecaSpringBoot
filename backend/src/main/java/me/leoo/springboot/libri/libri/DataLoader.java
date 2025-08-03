@@ -48,16 +48,16 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
-        libroRepository.save(new Libro("Il Signore degli Anelli", "J.R.R. Tolkien", "Fantasy", 1954, 1200, "George Allen & Unwin", "Italiano", "978-8845292613", 50, 25.00));
-        libroRepository.save(new Libro("Dune", "Frank Herbert", "Fantascienza", 1965, 800, "Chilton Books", "Italiano", "978-8834710186", 30, 20.50));
-        libroRepository.save(new Libro("Il Codice Da Vinci", "Dan Brown", "Thriller", 2003, 592, "Doubleday", "Italiano", "978-8804519962", 75, 15.75));
-        libroRepository.save(new Libro("Harry Potter e la Pietra Filosofale", "J.K. Rowling", "Fantasy per ragazzi", 1997, 320, "Bloomsbury Publishing", "Italiano", "978-8869186641", 100, 12.99));
-        libroRepository.save(new Libro("Sapiens: Da animali a dèi", "Yuval Noah Harari", "Saggistica storica", 2011, 544, "Bompiani", "Italiano", "978-8845296833", 40, 18.90));
-        libroRepository.save(new Libro("Va' dove ti porta il cuore", "Susanna Tamaro", "Romanzo", 1994, 192, "Baldini & Castoldi", "Italiano", "978-8884901962", 60, 10.00));
-        libroRepository.save(new Libro("I Promessi Sposi", "Alessandro Manzoni", "Romanzo storico", 1840, 700, "Ferrara", "Italiano", "978-8809766940", 25, 14.50));
-        libroRepository.save(new Libro("Introduzione alla Programmazione in Java", "Herbert Schildt", "Informatica", 2019, 1000, "McGraw-Hill Education", "Italiano", "978-0078022171", 15, 45.00));
-        Libro l = libroRepository.save(new Libro("La Cucina Italiana: Il Ricettario Completo", "AA.VV.", "Cucina", 2010, 600, "Editoriale Domus", "Italiano", "978-8872126285", 20, 30.00));
-        libroRepository.save(new Libro("L'Alienista", "Caleb Carr", "Thriller psicologico", 1994, 480, "Rizzoli", "Italiano", "978-8817024469", 35, 16.25));
+        libroRepository.save(new Libro("Il Signore degli Anelli", "J.R.R. Tolkien", "Fantasy", 1954, 1200, "George Allen & Unwin", "Italiano", "9788845292613", 50, 25.00));
+        libroRepository.save(new Libro("Dune", "Frank Herbert", "Fantascienza", 1965, 800, "Chilton Books", "Italiano", "9788834710186", 30, 20.50));
+        libroRepository.save(new Libro("Il Codice Da Vinci", "Dan Brown", "Thriller", 2003, 592, "Doubleday", "Italiano", "9788804519962", 75, 15.75));
+        libroRepository.save(new Libro("Harry Potter e la Pietra Filosofale", "J.K. Rowling", "Fantasy per ragazzi", 1997, 320, "Bloomsbury Publishing", "Italiano", "9788869186641", 100, 12.99));
+        libroRepository.save(new Libro("Sapiens: Da animali a dèi", "Yuval Noah Harari", "Saggistica storica", 2011, 544, "Bompiani", "Italiano", "9788845296833", 40, 18.90));
+        libroRepository.save(new Libro("Va' dove ti porta il cuore", "Susanna Tamaro", "Romanzo", 1994, 192, "Baldini & Castoldi", "Italiano", "9788884901962", 60, 10.00));
+        libroRepository.save(new Libro("I Promessi Sposi", "Alessandro Manzoni", "Romanzo storico", 1840, 700, "Ferrara", "Italiano", "9788809766940", 25, 14.50));
+        libroRepository.save(new Libro("Introduzione alla Programmazione in Java", "Herbert Schildt", "Informatica", 2019, 1000, "McGraw-Hill Education", "Italiano", "9780078022171", 15, 45.00));
+        Libro l = libroRepository.save(new Libro("La Cucina Italiana: Il Ricettario Completo", "AA.VV.", "Cucina", 2010, 600, "Editoriale Domus", "Italiano", "9788872126285", 20, 30.00));
+        libroRepository.save(new Libro("L'Alienista", "Caleb Carr", "Thriller psicologico", 1994, 480, "Rizzoli", "Italiano", "9788817024469", 35, 16.25));
 
         List<Libro> libri = libroRepository.findAll();
         System.out.println("Libri caricati nel database: " + libri.size());

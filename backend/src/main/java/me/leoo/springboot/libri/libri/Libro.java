@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
@@ -43,10 +44,7 @@ public class Libro {
     private String isbn;
 
     // dimensioni
-    private double lenght = new Random().nextInt(10, 20);
-    private double width = lenght + new Random().nextInt(5, 10);
-    private double height = new Random().nextInt(1, 5);
-    private double weight = 0.5; // in kg
+    private LibroDimension dimensioni = new LibroDimension();
 
     private Date dataAggiunta = new Date();
 
@@ -71,6 +69,11 @@ public class Libro {
         this.editore = editore;
         this.lingua = lingua;
         this.isbn = isbn;
+
+        double length = new Random().nextInt(10, 20);
+        double width = length + new Random().nextInt(5, 10);
+        double height = new Random().nextInt(1, 5);
+        this.dimensioni = new LibroDimension(length, width, height, 0.5);
 
         this.descrizione = new LibroInfo(this, """
                 Un libro scritto per raccontare una storia, condividere conoscenza o semplicemente per intrattenere.
@@ -120,11 +123,16 @@ public class Libro {
     }
 
     public DeliveryPackage getDeliveryPackage() {
-        return DeliveryPackage.getMostSuitable(lenght, width, height, weight);
+        return DeliveryPackage.getMostSuitable(
+                dimensioni.length(),
+                dimensioni.width(),
+                dimensioni.height(),
+                dimensioni.weight()
+        );
     }
 
     public double getVolume() {
-        return lenght * width * height;
+        return dimensioni.length() * dimensioni.width() * dimensioni.height();
     }
 
     public ResponseEntity<byte[]> getPictureResponse(int index) {

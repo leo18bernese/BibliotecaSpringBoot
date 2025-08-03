@@ -1,8 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 const EditableField = ({id, label, icon, value, placeholder, minChars, maxChars, type, onChange}) => {
     const [editing, setEditing] = useState(false);
-    const [inputValue, setInputValue] = useState(value || '');
+    const [inputValue, setInputValue] = useState('');
+
+
+    console.log("EditableField rendered with value:", value);
 
     const handleBlur = () => {
         setEditing(false);
@@ -25,6 +28,12 @@ const EditableField = ({id, label, icon, value, placeholder, minChars, maxChars,
             setInputValue(newValue);
         }
     };
+
+    useEffect(() => {
+        if (value !== undefined) {
+            setInputValue(value || '');
+        }
+    })
 
     const chars = inputValue.length;
     const borderColor = chars >= maxChars ? 'border-red-300' : editing ? 'border-gray-500' : 'border-gray-300';
@@ -52,7 +61,7 @@ const EditableField = ({id, label, icon, value, placeholder, minChars, maxChars,
                     className="flex-1 bg-transparent outline-none text-lg"
                 />
 
-                {type !== "number" && (
+                {(type !== "number" && !!maxChars) && (
                 <span className="text-sm text-gray-500">{maxChars - chars}</span>
                 )}
             </div>

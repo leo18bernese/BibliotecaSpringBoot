@@ -2,7 +2,9 @@ import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "./EditableField";
-import React, {useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import DescriptionEditor from "../../libri/details/DescriptionEditor";
+import RemovableField from "./RemovableField";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -35,10 +37,6 @@ const AdminBook = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [title, setTitle] = useState("ciao sono il titolo");
-    const [author, setAuthor] = useState("ciao sono l'autore");
-    const [annoPubblicazione, setAnnoPubblicazione] = useState("2025");
-    const [produttore, setProduttore] = useState("ciao sono il produttore");
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['book', id],
@@ -50,10 +48,60 @@ const AdminBook = () => {
         queryFn: () => fetchBookExists(id),
     });
 
+    const descriptionEditorRef = useRef(null);
+
+    const [title, setTitle] = useState('');
+    const [author, setAuthor] = useState('');
+    const [genere, setGenere] = useState('');
+    const [annoPubblicazione, setAnnoPubblicazione] = useState('');
+    const [numeroPagine, setNumeroPagine] = useState('');
+    const [editore, setEditore] = useState('');
+    const [lingua, setLingua] = useState('');
+    const [isbn, setIsbn] = useState('');
+    const [dimensioni, setDimensioni] = useState({});
+    const [description, setDescription] = useState("");
+    const [characteristics, setCharacteristics] = useState({});
+
+    // Inizializza gli stati quando book è disponibile
+    useEffect(() => {
+        console.log("using effect", book);
+
+        if (book) {
+            console.log("Setting initial book data:");
+            console.log("Title:", book.titolo);
+            setTitle(book.titolo || '');
+            console.log("Title2:", book.titolo);
+            setAuthor(book.autore || '');
+            setGenere(book.genere || '');
+            setAnnoPubblicazione(book.annoPubblicazione || '');
+            setNumeroPagine(book.numeroPagine || '');
+            setEditore(book.editore || '');
+            setLingua(book.lingua || '');
+            setIsbn(book.isbn || '');
+            setDimensioni(book.dimensioni || {});
+            setDescription(book.descrizione?.descrizioneHtml || '');
+            setCharacteristics(book.descrizione?.caratteristiche || {});
+        }
+    }, [book]);
+
+
     const {data: images, isLoading: areImagesLoading} = useQuery({
         queryKey: ['images', id],
         queryFn: () => fetchImageIds(id),
     });
+
+    const getEditorContent = () => {
+        if (descriptionEditorRef.current) {
+            const content = descriptionEditorRef.current.getContent();
+            setDescription(content);
+            return content;
+        }
+        return '';
+    };
+
+    const initialContent = useMemo(() => {
+        return book?.descrizione?.descrizioneHtml || '';
+    }, [book?.descrizione?.descrizioneHtml]);
 
     if (isBookLoading || isBookExistsLoading || areImagesLoading) {
         return <div>Loading...</div>;
@@ -74,10 +122,12 @@ const AdminBook = () => {
             <div className="mt-4">
                 <h2 className="text-md font-semibold">Book Details</h2>
 
-                <EditableField id="title" label="Title" icon="book"
+                <EditableField key={`title-${book?.id || 'new'}`}
+                               id="title"
+                               label="Title" icon="book"
                                value={title}
                                placeholder="Enter book title"
-                               minChars={2} maxChars={30}
+                               minChars={2} maxChars={128}
                                onChange={(newTitle) => {
                                    setTitle(newTitle);
                                }}
@@ -88,28 +138,120 @@ const AdminBook = () => {
                                placeholder="Enter author name"
                                minChars={2} maxChars={30}
                                onChange={(newAuthor) => {
-                                      setAuthor(newAuthor);
-                                 }}
+                                   setAuthor(newAuthor);
+                               }}
+                />
+
+                <EditableField id="genere" label="Genre" icon="reading"
+                               value={genere}
+                               placeholder="Enter book genre"
+                               minChars={2} maxChars={30}
+                               onChange={(newGenere) => {
+                                   setGenere(newGenere);
+                               }}
                 />
 
                 <EditableField id="annoPubblicazione" label="Publication Year" icon="calendar"
                                value={annoPubblicazione}
                                placeholder="Enter publication year"
                                minChars={1700} maxChars={2025}
-                                 type="number"
+                               type="number"
                                onChange={(newAnno) => {
                                    setAnnoPubblicazione(newAnno);
                                }}
                 />
 
-                <EditableField id="produttore" label="Publisher" icon="building"
-                               value={produttore}
-                               placeholder="Enter publisher name"
-                               minChars={2} maxChars={30}
-                               onChange={(newProduttore) => {
-                                   setProduttore(newProduttore);
+                <EditableField id="numeroPagine" label="Number of Pages" icon="file"
+                               value={numeroPagine}
+                               placeholder="Enter number of pages"
+                               minChars={1} maxChars={10000}
+                               type="number"
+                               onChange={(newNumero) => {
+                                   setNumeroPagine(newNumero);
                                }}
                 />
+
+                <EditableField id="editore" label="Editor" icon="edit"
+                               value={editore}
+                               placeholder="Enter editor name"
+                               minChars={2} maxChars={48}
+                               onChange={(newEditore) => {
+                                   setEditore(newEditore);
+                               }}
+                />
+
+                <EditableField id="lingua" label="Language" icon="translate"
+                               value={lingua}
+                               placeholder="Enter language"
+                               minChars={2} maxChars={24}
+                               onChange={(newLingua) => {
+                                   setLingua(newLingua);
+                               }}
+                />
+
+                <EditableField id="isbn" label="ISBN" icon="barcode"
+                               value={isbn}
+                               placeholder="Enter ISBN"
+                               minChars={10}
+                               onChange={(newIsbn) => {
+                                   setIsbn(newIsbn);
+                               }}
+                />
+
+
+                {/*<DescriptionEditor
+                    ref={descriptionEditorRef}
+                    initialContent={initialContent}
+                />
+
+                <button onClick={getEditorContent}>Get Description Content</button>*/}
+
+                {(
+                    <div className="mt-8">
+                        <h2 className="text-md font-semibold">Characteristics</h2>
+                        <div className=" pl-5">
+
+                            {Object.entries(characteristics).map(([key, value]) => (
+                                <RemovableField key={key} id={key} label={key}
+                                                value={value}
+                                                placeholder={`Enter ${key} value`}
+                                                minChars={2} maxChars={30}
+                                                onChange={(newValue) => {
+                                                    setCharacteristics(prev => ({
+                                                        ...prev,
+                                                        [key]: newValue
+                                                    }));
+                                                }}
+                                                onRemove={() => {
+                                                    setCharacteristics(prev => {
+                                                        const newCharacteristics = {...prev};
+                                                        delete newCharacteristics[key];
+                                                        return newCharacteristics;
+                                                    });
+                                                }}
+                                />
+                            ))}
+
+                            {/* add new characteristic */}
+                            <RemovableField id="newCharacteristic" label="New Characteristic"
+                                            value=""
+                                            placeholder="Enter new characteristic"
+                                            minChars={2} maxChars={30}
+                                            onChange={(newValue) => {
+                                                if (newValue) {
+                                                    setCharacteristics(prev => ({
+                                                        ...prev,
+                                                        [newValue]: ''
+                                                    }));
+                                                }
+
+                                            }}
+                                            removable={false}
+                            />
+                        </div>
+                    </div>
+                )}
+
             </div>
         </div>
     );
