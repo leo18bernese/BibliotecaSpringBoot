@@ -5,6 +5,7 @@ import EditableField from "./EditableField";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import DescriptionEditor from "../../libri/details/DescriptionEditor";
 import RemovableField from "./RemovableField";
+import toast from "react-hot-toast";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -111,6 +112,8 @@ const AdminBook = () => {
         return <div>Error loading book data.</div>;
     }
 
+    console.log("dimensioni", dimensioni);
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-lg font-semibold">Book Editor</h1>
@@ -119,7 +122,7 @@ const AdminBook = () => {
                 You can't change the storage information, such as the number of copies or the location.
             </p>
 
-            <div className="mt-4">
+            <div className="mt-8 p-4">
                 <h2 className="text-md font-semibold">Book Details</h2>
 
                 <EditableField key={`title-${book?.id || 'new'}`}
@@ -197,61 +200,112 @@ const AdminBook = () => {
                                    setIsbn(newIsbn);
                                }}
                 />
+            </div>
 
-
-                {/*<DescriptionEditor
+            {/*<DescriptionEditor
                     ref={descriptionEditorRef}
                     initialContent={initialContent}
                 />
 
                 <button onClick={getEditorContent}>Get Description Content</button>*/}
 
-                {(
-                    <div className="mt-8">
-                        <h2 className="text-md font-semibold">Characteristics</h2>
-                        <div className=" pl-5">
+            <div className="mt-8 border-t-2  border-gray-600 p-4">
+                <h2 className="text-md font-semibold">Characteristics</h2>
+                <div className=" pl-5">
 
-                            {Object.entries(characteristics).map(([key, value]) => (
-                                <RemovableField key={key} id={key} label={key}
-                                                value={value}
-                                                placeholder={`Enter ${key} value`}
-                                                minChars={2} maxChars={30}
-                                                onChange={(newValue) => {
-                                                    setCharacteristics(prev => ({
-                                                        ...prev,
-                                                        [key]: newValue
-                                                    }));
-                                                }}
-                                                onRemove={() => {
-                                                    setCharacteristics(prev => {
-                                                        const newCharacteristics = {...prev};
-                                                        delete newCharacteristics[key];
-                                                        return newCharacteristics;
-                                                    });
-                                                }}
-                                />
-                            ))}
+                    {Object.entries(characteristics).map(([key, value]) => (
+                        <RemovableField key={key} id={key} label={key}
+                                        value={value}
+                                        placeholder={`Enter ${key} value`}
+                                        minChars={2} maxChars={30}
+                                        onChange={(newValue) => {
+                                            setCharacteristics(prev => ({
+                                                ...prev,
+                                                [key]: newValue
+                                            }));
+                                        }}
+                                        onRem ove={() => {
+                            setCharacteristics(prev => {
+                                const newCharacteristics = {...prev};
+                                delete newCharacteristics[key];
+                                return newCharacteristics;
+                            });
+                        }}
+                        />
+                    ))}
 
-                            {/* add new characteristic */}
-                            <RemovableField id="newCharacteristic" label="New Characteristic"
-                                            value=""
-                                            placeholder="Enter new characteristic"
-                                            minChars={2} maxChars={30}
-                                            onChange={(newValue) => {
-                                                if (newValue) {
-                                                    setCharacteristics(prev => ({
-                                                        ...prev,
-                                                        [newValue]: ''
-                                                    }));
-                                                }
+                    {/* add new characteristic */}
+                    <RemovableField id="newCharacteristic" label=" New Characteristic"
+                                    icon="plus text-green-600 font-bold"
+                                    value=""
+                                    placeholder="Enter new characteristic"
+                                    minChars={2} maxChars={30}
+                                    onChange={(newValue) => {
+                                        if (newValue) {
 
-                                            }}
-                                            removable={false}
-                            />
-                        </div>
-                    </div>
-                )}
+                                            if (characteristics[newValue]) {
+                                                toast.error(`Characteristic "${newValue}" already exists.`);
+                                                return;
+                                            }
 
+                                            setCharacteristics(prev => ({
+                                                ...prev,
+                                                [newValue]: ''
+                                            }));
+                                        }
+
+                                    }}
+                                    removable={false}
+                    />
+                </div>
+            </div>
+
+            <div className="mt-8 border-t-2  border-gray-600 p-4">
+                <h2 className="text-md font-semibold">Book dimensions</h2>
+
+                <EditableField key='length'
+                               id="length" label="Length (cm)" icon="ruler"
+                               value={dimensioni.length || ''}
+                               placeholder="Enter length in cm"
+                               minChars={1}
+                               type="number"
+                               onChange={(newLength) => {
+                                   setDimensioni(prev => ({...prev,  length: newLength}));
+                               }}
+                />
+
+                <EditableField key='width'
+                               id="width" label="Width (cm)" icon="ruler"
+                               value={dimensioni.width || ''}
+                               placeholder="Enter width in cm"
+                               minChars={1}
+                               type="number"
+                               onChange={(newWidth) => {
+                                   setDimensioni(prev => ({...prev, width: newWidth}));
+                               }}
+                />
+
+                <EditableField key='height'
+                               id="height" label="Height (cm)" icon="ruler"
+                               value={dimensioni.height || ''}
+                               placeholder="Enter height in cm"
+                               minChars={1}
+                               type="number"
+                               onChange={(newHeight) => {
+                                   setDimensioni(prev => ({...prev, height: newHeight}));
+                               }}
+                />
+
+                <EditableField key='weight'
+                               id="weight" label="Weight (kg)" icon="dumbbell"
+                               value={dimensioni.weight || ''}
+                               placeholder="Enter weight in kg"
+                               minChars={1}
+                               type="number"
+                               onChange={(newWeight) => {
+                                   setDimensioni(prev => ({...prev, weight: newWeight}));
+                               }}
+                />
             </div>
         </div>
     );

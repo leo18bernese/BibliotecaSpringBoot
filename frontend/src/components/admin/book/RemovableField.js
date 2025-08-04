@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 
 const EditableField = ({
-                           id, label, value, placeholder, minChars, maxChars, type, onChange, onRemove,
+                           id, label, icon, value, placeholder, minChars, maxChars, type, onChange, onRemove,
                            removable = true
                        }) => {
     const [editing, setEditing] = useState(false);
@@ -35,8 +35,11 @@ const EditableField = ({
     return (
         <div className="mt-1">
 
-            <div className={"flex items-center transition-all"}>
-                <label className="w-1/6" htmlFor={id}>{label}:</label>
+            <div className={"flex items-center transition-all "}>
+
+
+
+                <label className="w-1/6 " htmlFor={id}>{label}:</label>
 
                 <span className={"border-b-4 " + borderColor}>
 
@@ -66,6 +69,17 @@ const EditableField = ({
                         <i className={`bxr bx-trash text-xl text-red-500`}></i>
                     </button>
                 )}
+
+                    {icon && (
+                        <button className="text-sm text-gray-500"
+                                onClick={() => {
+                                    setInputValue('');
+                                    onChange();
+                                }}
+                        >
+                            <i className={`bx bx-${icon} text-2xl mr-2`}></i>
+                        </button>
+                    )}
 
                 </span>
 
