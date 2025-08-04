@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 
 const EditableField = ({id, label, icon, value, placeholder, minChars, maxChars = 10000, type, onChange}) => {
     const [editing, setEditing] = useState(false);
-    const [firstRender, setFirstRender] = useState(true);
     const [inputValue, setInputValue] = useState('');
 
     const handleBlur = () => {
@@ -37,12 +36,16 @@ const EditableField = ({id, label, icon, value, placeholder, minChars, maxChars 
         }
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (value !== undefined && firstRender) {
             setInputValue(value || '');
             setFirstRender(false);
         }
-    })
+    })*/
+
+    useEffect(() => {
+        setInputValue(value || '');
+    }, [value]);
 
     const chars = inputValue.length;
     const borderColor = chars >= maxChars ? 'border-red-300' : editing ? 'border-gray-500' : 'border-gray-300';

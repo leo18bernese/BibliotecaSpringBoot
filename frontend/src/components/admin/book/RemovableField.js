@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 const EditableField = ({
                            id, label, icon, value, placeholder, minChars, maxChars, type, onChange, onRemove,
@@ -28,6 +28,10 @@ const EditableField = ({
             setInputValue(newValue);
         }
     };
+
+    useEffect(() => {
+        setInputValue(value || '');
+    }, [value]);
 
     const chars = inputValue.length;
     const borderColor = chars >= maxChars ? 'border-red-300' : editing ? 'border-gray-500' : 'border-gray-300';

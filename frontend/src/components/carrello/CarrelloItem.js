@@ -72,7 +72,7 @@ const CarrelloItem = ({item}) => {
                         {item.titolo}
                     </Link>
 
-                    <p className="text-gray-700">di {item.autore}</p>
+                    <p className="text-gray-700">di {item.autore.nome}</p>
                     <p className="text-gray-700 mb-4">Scritto nel: {item.annoPubblicazione}</p>
 
                     <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">

@@ -36,7 +36,7 @@ const SearchBooks = () => {
                 {books.map(book => (
                     <Link to={`/book/${book.id}`} key={book.id}>
                         <li>
-                            {book.titolo} - {book.autore} - {book.genere}
+                            {book.titolo} - {book.autore.nome} - {book.genere}
                         </li>
                     </Link>
 

@@ -252,7 +252,7 @@ const BookInfo = () => {
                             <h1 className="text-2xl font-bold mb-4">{book.titolo}</h1>
 
                             <div className="text-gray-700 mb-6">
-                                <p className="mb-2"><strong>Autore:</strong> {book.autore}</p>
+                                <p className="mb-2"><strong>Autore:</strong> {book.autore.nome}</p>
                                 <p className="mb-2"><strong>Genere:</strong> {book.genere}</p>
                                 <p className="mb-4"><strong>Anno di pubblicazione:</strong> {book.annoPubblicazione}</p>
                             </div>

@@ -72,7 +72,7 @@ const AdminBook = () => {
             console.log("Title:", book.titolo);
             setTitle(book.titolo || '');
             console.log("Title2:", book.titolo);
-            setAuthor(book.autore || '');
+            setAuthor(book.autore.nome || '');
             setGenere(book.genere || '');
             setAnnoPubblicazione(book.annoPubblicazione || '');
             setNumeroPagine(book.numeroPagine || '');
@@ -82,6 +82,7 @@ const AdminBook = () => {
             setDimensioni(book.dimensioni || {});
             setDescription(book.descrizione?.descrizioneHtml || '');
             setCharacteristics(book.descrizione?.caratteristiche || {});
+            console.log("finished");
         }
     }, [book]);
 

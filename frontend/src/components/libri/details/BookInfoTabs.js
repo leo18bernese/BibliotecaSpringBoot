@@ -55,7 +55,7 @@ const BookInfoTabs = ({book}) => {
 
             <TabPanel value={activeTab} index={0}>
                 <div>
-                    <h3 className="text-lg font-semibold mb-2">Informazioni sull'Autore: {book.autore}</h3>
+                    <h3 className="text-lg font-semibold mb-2">Informazioni sull'Autore: {book.autore.nome}</h3>
 
                     <div
                         dangerouslySetInnerHTML={{__html: book.descrizione.autoreHtml}}

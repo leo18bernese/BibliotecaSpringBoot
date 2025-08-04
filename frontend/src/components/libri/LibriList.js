@@ -21,7 +21,7 @@ const LibriList = () => {
             <ol>
                 {libri.map(libro => (
                     <li key={libro.id}>
-                        {libro.titolo} - {libro.autore} - {libro.genere}
+                        {libro.titolo} - {libro.autore.nome} - {libro.genere}
                     </li>
                 ))}
             </ol>
