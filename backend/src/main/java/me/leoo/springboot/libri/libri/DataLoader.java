@@ -14,6 +14,7 @@ import me.leoo.springboot.libri.utente.UtenteService;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
+@Order(2) // Esegue dopo LibroDataLoader
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
@@ -43,37 +45,34 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (libroRepository.existsById(1L)) {
-            System.out.println("Libri già caricati nel database, salto il caricamento");
+        if (utenteRepository.findByUsername("Daniel18").isPresent()) {
+            System.out.println("Dati utenti e buoni già caricati nel database, salto il caricamento");
             return;
         }
 
-        libroRepository.save(new Libro("Il Signore degli Anelli", "J.R.R. Tolkien", "Fantasy", 1954, 1200, "George Allen & Unwin", "Italiano", "9788845292613", 50, 25.00));
-        libroRepository.save(new Libro("Dune", "Frank Herbert", "Fantascienza", 1965, 800, "Chilton Books", "Italiano", "9788834710186", 30, 20.50));
-        libroRepository.save(new Libro("Il Codice Da Vinci", "Dan Brown", "Thriller", 2003, 592, "Doubleday", "Italiano", "9788804519962", 75, 15.75));
-        libroRepository.save(new Libro("Harry Potter e la Pietra Filosofale", "J.K. Rowling", "Fantasy per ragazzi", 1997, 320, "Bloomsbury Publishing", "Italiano", "9788869186641", 100, 12.99));
-        libroRepository.save(new Libro("Sapiens: Da animali a dèi", "Yuval Noah Harari", "Saggistica storica", 2011, 544, "Bompiani", "Italiano", "9788845296833", 40, 18.90));
-        libroRepository.save(new Libro("Va' dove ti porta il cuore", "Susanna Tamaro", "Romanzo", 1994, 192, "Baldini & Castoldi", "Italiano", "9788884901962", 60, 10.00));
-        libroRepository.save(new Libro("I Promessi Sposi", "Alessandro Manzoni", "Romanzo storico", 1840, 700, "Ferrara", "Italiano", "9788809766940", 25, 14.50));
-        libroRepository.save(new Libro("Introduzione alla Programmazione in Java", "Herbert Schildt", "Informatica", 2019, 1000, "McGraw-Hill Education", "Italiano", "9780078022171", 15, 45.00));
-        Libro l = libroRepository.save(new Libro("La Cucina Italiana: Il Ricettario Completo", "AA.VV.", "Cucina", 2010, 600, "Editoriale Domus", "Italiano", "9788872126285", 20, 30.00));
-        libroRepository.save(new Libro("L'Alienista", "Caleb Carr", "Thriller psicologico", 1994, 480, "Rizzoli", "Italiano", "9788817024469", 35, 16.25));
+        System.out.println("Caricamento utenti, carrelli, recensioni e buoni nel database...");
 
-        List<Libro> libri = libroRepository.findAll();
-        System.out.println("Libri caricati nel database: " + libri.size());
-
+        // Crea utente di test
         SpedizioneIndirizzo ind1 = new SpedizioneIndirizzo("Mario Rossi", "Via Roma 1", "Milano", "MI", "20100", "1234567890");
         SpedizioneIndirizzo ind2 = new SpedizioneIndirizzo("Luigi Bianchi", "Via Milano 2", "Roma", "RM", "00100", "0987654321");
 
         Utente u = new Utente("Daniel18", "ciao1234", "Daniel", "Bello", "daniel@gmail.com");
-        u.addToWishlist(l);
+
+        // Aggiungi un libro alla wishlist se esistono libri
+        List<Libro> libri = libroRepository.findAll();
+        if (!libri.isEmpty()) {
+            u.addToWishlist(libri.get(0)); // Aggiungi il primo libro alla wishlist
+        }
+
         u.addIndirizzo(ind1);
         u.addIndirizzo(ind2);
         Utente uu = utenteService.register(u);
 
+        // Crea carrello per l'utente
         Carrello carrello = new Carrello(uu);
         carrelloRepository.save(carrello);
 
+        // Crea recensioni per i libri esistenti
         for (Libro libro : libri) {
             for (int i = 0; i < 3; i++) {
                 Recensione recensione = new Recensione(libro.getId(), uu.getId(), "Molto bello", "Ottimo libro, lo consiglio", 4, true, true);
@@ -81,11 +80,10 @@ public class DataLoader implements CommandLineRunner {
 
                 libro.getRecensioni().add(r.getId());
             }
-
             libroRepository.save(libro);
         }
 
-
+        // Crea buoni sconto
         // Buono sconto del 20% senza data di scadenza
         Buono buono1 = new Buono(
                 "SCONTO20",
@@ -101,7 +99,7 @@ public class DataLoader implements CommandLineRunner {
         );
         buonoRepository.save(buono1);
 
-// Buono sconto fisso di 15€ con scadenza tra 30 giorni
+        // Buono sconto fisso di 15€ con scadenza tra 30 giorni
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, 30);
         Date scadenza = calendar.getTime();
@@ -119,7 +117,7 @@ public class DataLoader implements CommandLineRunner {
         );
         buonoRepository.save(buono2);
 
-// Buono sconto del 50% per un utente specifico
+        // Buono sconto del 50% per un utente specifico
         Buono buono3 = new Buono(
                 "VIP50",
                 new Sconto(50, 0),
@@ -134,7 +132,7 @@ public class DataLoader implements CommandLineRunner {
         );
         buonoRepository.save(buono3);
 
-// Buono sconto di 5€ cumulabile con altri buoni
+        // Buono sconto di 5€ cumulabile con altri buoni
         Buono buono4 = new Buono(
                 "EXTRA5",
                 new Sconto(0, 5),
@@ -149,7 +147,7 @@ public class DataLoader implements CommandLineRunner {
         );
         buonoRepository.save(buono4);
 
-// Buono sconto 30% non ancora attivo (futuro)
+        // Buono sconto 30% non ancora attivo (futuro)
         Calendar futureStart = Calendar.getInstance();
         futureStart.add(Calendar.MONTH, 1);
         Calendar futureEnd = Calendar.getInstance();
@@ -168,8 +166,6 @@ public class DataLoader implements CommandLineRunner {
         );
         buonoRepository.save(buono5);
 
-
-        System.out.println("Libri caricati nel database");
-
+        System.out.println("Dati utenti e buoni caricati nel database");
     }
 }

@@ -2,6 +2,7 @@ package me.leoo.springboot.libri.utente.wishlist;
 
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
+import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class WishlistController {
     @Autowired
     private UtenteRepository utenteRepository;
 
-    public record WishlistResponse(Long id, String titolo, String autore, String genere,
+    public record WishlistResponse(Long id, String titolo, Autore autore, String genere,
                                    int annoPubblicazione, int numeroPagine, String editore,
                                    String lingua, String isbn) {
     }

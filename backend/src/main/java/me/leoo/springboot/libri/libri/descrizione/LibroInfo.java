@@ -33,21 +33,15 @@ public class LibroInfo {
     @JsonIgnore
     private String descrizione;
 
-    @Lob
-    @Column(columnDefinition = "LONGTEXT")
-    @JsonIgnore
-    private String produttore;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "libro_caratteristiche", joinColumns = @JoinColumn(name = "libro_info_id"))
     @MapKeyColumn(name = "caratteristica")
     @Column(name = "valore")
     private Map<String, String> caratteristiche;
 
-    public LibroInfo(Libro prodotto, String descrizione, String produttore) {
+    public LibroInfo(Libro prodotto, String descrizione) {
         this.libro = prodotto;
         this.descrizione = descrizione;
-        this.produttore = produttore;
         this.caratteristiche = new HashMap<>();
 
         int random = new Random().nextInt(3);
@@ -92,9 +86,5 @@ public class LibroInfo {
 
     public String getDescrizioneHtml() {
         return new MarkdownService().convertToHtml(this.descrizione);
-    }
-
-    public String getAutoreHtml() {
-        return new MarkdownService().convertToHtml(this.produttore);
     }
 }

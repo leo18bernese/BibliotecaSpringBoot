@@ -4,6 +4,7 @@ import jakarta.transaction.NotSupportedException;
 import me.leoo.springboot.libri.buono.BuonoService;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
+import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.ordini.OrdineService;
@@ -47,7 +48,7 @@ public class CarrelloController {
     private OrdineService ordineService;
 
     // DTO per le risposte
-    public record CarrelloItemResponse(Long libroId, String titolo, String autore, int annoPubblicazione, int quantita,
+    public record CarrelloItemResponse(Long libroId, String titolo, Autore autore, int annoPubblicazione, int quantita,
                                        Date dataAggiunta, double prezzo, Rifornimento rifornimento) {
     }
 

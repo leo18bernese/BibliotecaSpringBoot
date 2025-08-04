@@ -72,3 +72,5 @@
 # Common rules for the entire repository                            #
 # ================================================================= #
 .DS_Store
+.idea
+

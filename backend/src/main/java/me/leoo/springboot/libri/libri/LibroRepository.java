@@ -15,16 +15,16 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
 
     List<Libro> findByTitoloIsContainingIgnoreCase(String keyword);
 
-    List<Libro> findByAutore(String autore);
+    List<Libro> findByAutoreNome(String autore);
 
-    List<Libro> findByAutoreContaining(String autore);
+    List<Libro> findByAutoreNomeContaining(String autore);
 
     List<Libro> findByGenere(String genere);
 
     @Query("SELECT l FROM Libro l WHERE " +
             "(:titolo IS NULL OR l.titolo = :titolo) AND " +
             "(:genere IS NULL OR l.genere = :genere) AND " +
-            "(:autore IS NULL OR l.autore = :autore)")
+            "(:autore IS NULL OR l.autore.nome = :autore)")
     public Iterable<Libro> advanceSearch(@Param("titolo") String titolo,
                                          @Param("genere") String genere,
                                          @Param("autore") String autore);

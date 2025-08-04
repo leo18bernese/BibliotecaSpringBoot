@@ -1,6 +1,9 @@
 package me.leoo.springboot.libri.libri;
 
 import lombok.extern.slf4j.Slf4j;
+import me.leoo.springboot.libri.libri.autore.Autore;
+import me.leoo.springboot.libri.libri.autore.AutoreRepository;
+import me.leoo.springboot.libri.libri.autore.AutoreService;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
 import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.utils.Sconto;
@@ -24,6 +27,12 @@ public class LibroController {
 
     @Autowired
     private SearchService searchService;
+
+    @Autowired
+    private AutoreRepository autoreRepository;
+
+    @Autowired
+    private AutoreService autoreService;
 
     // DTO per le risposte
     public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzo,
@@ -81,6 +90,10 @@ public class LibroController {
     // Crea libro
     @PostMapping
     public Libro createLibro(@RequestBody Libro libro) {
+        // Usa AutoreService per gestire l'autore con getOrCreate
+        if (libro.getAutore() != null) {
+            libro.setAutore(autoreService.getOrCreate(libro.getAutore()));
+        }
         return libroRepository.save(libro);
     }
 
@@ -89,6 +102,11 @@ public class LibroController {
     public Libro updateLibro(@PathVariable Long id, @RequestBody Libro libro) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        // Usa AutoreService per gestire l'autore con getOrCreate
+        if (libro.getAutore() != null) {
+            libro.setAutore(autoreService.getOrCreate(libro.getAutore()));
+        }
 
         libroToUpdate = libroToUpdate.updateFrom(libro);
 
@@ -118,9 +136,9 @@ public class LibroController {
     public Iterable<Libro> searchByAutore(@PathVariable String autore,
                                           @RequestParam(required = false) boolean exact) {
         if (exact) {
-            return libroRepository.findByAutore(autore);
+            return libroRepository.findByAutoreNome(autore);
         } else {
-            return libroRepository.findByAutoreContaining(autore);
+            return libroRepository.findByAutoreNomeContaining(autore);
         }
     }
 

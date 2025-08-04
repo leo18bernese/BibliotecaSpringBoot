@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
@@ -14,7 +15,6 @@ import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import org.springframework.http.ResponseEntity;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +35,10 @@ public class Libro {
     private Long id;
 
     private String titolo;
-    private String autore;
+
+    @ManyToOne(optional = false)
+    private Autore autore;
+
     private String genere;
     private int annoPubblicazione;
     private int numeroPagine;
@@ -60,7 +63,7 @@ public class Libro {
 
     public static final String IMAGE_DIR = "backend/src/main/resources/static/images";
 
-    public Libro(String titolo, String autore, String genere, int annoPubblicazione, int numeroPagine, String editore, String lingua, String isbn, int quantita, double prezzo) {
+    public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine, String editore, String lingua, String isbn, int quantita, double prezzo) {
         this.titolo = titolo;
         this.autore = autore;
         this.genere = genere;
@@ -75,6 +78,7 @@ public class Libro {
         double height = new Random().nextInt(1, 5);
         this.dimensioni = new LibroDimension(length, width, height, 0.5);
 
+
         this.descrizione = new LibroInfo(this, """
                 Un libro scritto per raccontare una storia, condividere conoscenza o semplicemente per intrattenere.
                 <br><br>
@@ -82,7 +86,7 @@ public class Libro {
                 Lo scopo di un libro è quello di trasmettere idee, emozioni e informazioni attraverso le parole scritte.
                 Quindi, un libro può essere un romanzo, un saggio, una biografia o qualsiasi altra forma di narrazione scritta.
                 
-                """, "Autore molto conosciuto nel ambito della letteratura");
+                """);
 
         this.rifornimento = new Rifornimento(quantita, prezzo);
     }
@@ -105,7 +109,7 @@ public class Libro {
         return new LibroController.LiteBookResponse(
                 this.id,
                 this.titolo,
-                this.autore,
+                this.autore != null ? this.autore.getNome() : null,
                 this.annoPubblicazione,
                 this.rifornimento.getPrezzoTotale(),
                 this.rifornimento.getSconto()
@@ -138,7 +142,7 @@ public class Libro {
     public ResponseEntity<byte[]> getPictureResponse(int index) {
         List<Path> paths = getAllImages();
 
-        if(index < 0 || index >= paths.size()) {
+        if (index < 0 || index >= paths.size()) {
             return ResponseEntity.notFound().build();
         }
 
@@ -166,7 +170,7 @@ public class Libro {
             return Files.list(dirPath)
                     .filter(Files::isRegularFile)
                     .toList();
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new RuntimeException("Error while getting all images for book with ID: " + id, e);
         }
     }
