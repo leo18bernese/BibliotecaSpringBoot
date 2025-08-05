@@ -1,11 +1,13 @@
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "./EditableField";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import DescriptionEditor from "../../libri/details/DescriptionEditor";
 import RemovableField from "./RemovableField";
 import toast from "react-hot-toast";
+import MaskedSuggestionInput from "./MaskedSuggetionInput";
+import CheckableField from "./CheckableField";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -33,6 +35,17 @@ const fetchImageIds = async (id) => {
     }
 }
 
+const fetchAutoriList = async () => {
+    const {data} = await axios.get('/api/autori');
+    return data;
+}
+
+const updateBook = async ({id, bookData}) => {
+    const {data} = await axios.put(`/api/libri/${id}`, bookData);
+    return data;
+}
+
+
 const AdminBook = () => {
     const {id} = useParams();
     const navigate = useNavigate();
@@ -47,6 +60,13 @@ const AdminBook = () => {
     const {data: bookExists, isLoading: isBookExistsLoading, error: bookExistsError} = useQuery({
         queryKey: ['bookExists', id],
         queryFn: () => fetchBookExists(id),
+
+    });
+
+    const {data: autoriList, isLoading: isAutoriListLoading} = useQuery({
+        queryKey: ['autoriList'],
+        queryFn: fetchAutoriList,
+        enabled: !!book,
     });
 
     const descriptionEditorRef = useRef(null);
@@ -92,6 +112,37 @@ const AdminBook = () => {
         queryFn: () => fetchImageIds(id),
     });
 
+    const mutation = useMutation({
+        mutationFn: updateBook,
+        onSuccess: () => {
+            toast.success('Libro aggiornato con successo!');
+            queryClient.invalidateQueries({queryKey: ['book', id]});
+        },
+        onError: (error) => {
+            toast.error(`Errore nell'aggiornamento del libro: ${error.response?.data?.message || error.message}`);
+        },
+    });
+
+    const handleSave = () => {
+        // const currentDescription = getEditorContent(); // Se si usa l'editor, altrimenti lo stato 'description'
+        const bookData = {
+            titolo: title,
+            autore: author,
+            genere,
+            annoPubblicazione: parseInt(annoPubblicazione, 10),
+            numeroPagine: parseInt(numeroPagine, 10),
+            editore,
+            lingua,
+            isbn,
+            dimensioni,
+            descrizione: description,
+            caratteristiche: characteristics,
+        };
+
+        mutation.mutate({id, bookData});
+    };
+
+
     const getEditorContent = () => {
         if (descriptionEditorRef.current) {
             const content = descriptionEditorRef.current.getContent();
@@ -99,6 +150,15 @@ const AdminBook = () => {
             return content;
         }
         return '';
+    };
+
+    const getAuthorSuggestions = (query) => {
+        if (!autoriList || query.length < 2) {
+            return [];
+        }
+        return autoriList.filter(autore =>
+            autore.nome.toLowerCase().includes(query.toLowerCase())
+        ).map(autore => autore.nome);
     };
 
     const initialContent = useMemo(() => {
@@ -137,14 +197,17 @@ const AdminBook = () => {
                                }}
                 />
 
-                <EditableField id="author" label="Author" icon="user"
-                               value={author}
-                               placeholder="Enter author name"
-                               minChars={2} maxChars={30}
-                               onChange={(newAuthor) => {
-                                   setAuthor(newAuthor);
-                               }}
+                <MaskedSuggestionInput
+                    id="author" label="Author" icon="user"
+                    value={author}
+                    placeholder="Search or enter author name"
+                    minChars={1} maxChars={30}
+                    fetchSuggestions={getAuthorSuggestions}
+                    onChange={(newAuthor) => {
+                        setAuthor(newAuthor);
+                    }}
                 />
+
 
                 <EditableField id="genere" label="Genre" icon="reading"
                                value={genere}
@@ -187,6 +250,7 @@ const AdminBook = () => {
                 <EditableField id="lingua" label="Language" icon="translate"
                                value={lingua}
                                placeholder="Enter language"
+                               description={`The language of the book, e.g., "English", "Italian", etc.`}
                                minChars={2} maxChars={24}
                                onChange={(newLingua) => {
                                    setLingua(newLingua);
@@ -225,7 +289,7 @@ const AdminBook = () => {
                                                 [key]: newValue
                                             }));
                                         }}
-                                        onRem ove={() => {
+                                        onRemove={() => {
                             setCharacteristics(prev => {
                                 const newCharacteristics = {...prev};
                                 delete newCharacteristics[key];
@@ -271,7 +335,7 @@ const AdminBook = () => {
                                minChars={1}
                                type="number"
                                onChange={(newLength) => {
-                                   setDimensioni(prev => ({...prev,  length: newLength}));
+                                   setDimensioni(prev => ({...prev, length: newLength}));
                                }}
                 />
 
@@ -307,6 +371,36 @@ const AdminBook = () => {
                                    setDimensioni(prev => ({...prev, weight: newWeight}));
                                }}
                 />
+            </div>
+
+            <div className="mt-8 border-t-2  border-gray-600 p-4">
+                <h2 className="text-md font-semibold">Visibility and Status</h2>
+
+                <CheckableField key="hidden"
+                                id="hidden" label="Hidden" icon="badge-info"
+                                value={book?.hidden ? 'Yes' : 'No'}
+                                placeholder="Is this book hidden?"
+                                minChars={1} maxChars={3}
+                                type="checkbox"
+                                description="Check this box to hide the book from public listings."
+                                confirm={true}
+                                confirmText="Are you sure you want to hide this book?"
+                                onChange={(newHidden) => {
+                                    // This is a read-only field, so we don't change it
+                                    // but you can implement logic to toggle visibility
+                                    console.log("Hidden field is read-only");
+                                }}
+                />
+            </div>
+
+            <div className="mt-8 pt-5 flex justify-end">
+                <button
+                    onClick={handleSave}
+                    disabled={mutation.isPending}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400"
+                >
+                    {mutation.isPending ? 'Saving...' : 'Save Changes'}
+                </button>
             </div>
         </div>
     );

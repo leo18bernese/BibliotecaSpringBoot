@@ -8,6 +8,7 @@ public class AutoreService {
     @Autowired
     private AutoreRepository autoreRepository;
 
+
     public Autore getOrCreate(Autore autore) {
         if (autore == null || autore.getNome() == null) return null;
 

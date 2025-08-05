@@ -105,6 +105,20 @@ function SearchPage() {
         updateSearchParams(newParams);
     };
 
+    const handleEnterKey = (e, key) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+
+            const value = e.target.value.trim();
+
+            if (value) {
+                handleFilterChange(key, value);
+            } else {
+                handleFilterChange(key, null);
+            }
+        }
+    };
+
     const handleCharacteristicChange = (caratteristicaNome, valore) => {
         const newParams = new URLSearchParams(searchParams);
         const currentValues = newParams.get(caratteristicaNome)?.split(',') || [];
@@ -240,6 +254,7 @@ function SearchPage() {
                     placeholder="Cerca per titolo o descrizione..."
                     defaultValue={searchParams.get('q') || ''}
                     onBlur={(e) => handleFilterChange('q', e.target.value)}
+                    onKeyDown={(e) => handleEnterKey(e, 'q')}
                     style={{width: '100%', padding: '10px', marginBottom: '20px'}}
                 />
 

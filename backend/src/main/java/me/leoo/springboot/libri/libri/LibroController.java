@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.autore.AutoreRepository;
 import me.leoo.springboot.libri.libri.autore.AutoreService;
+import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
 import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.utils.Sconto;
@@ -37,6 +38,14 @@ public class LibroController {
     // DTO per le risposte
     public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzo,
                                    Sconto sconto) {
+    }
+
+    // DTO per update
+    public record UpdateLibroRequest(String titolo, String autore, String genere, int annoPubblicazione,
+                                     int numeroPagine, String editore, String lingua, String isbn,
+                                     LibroDimension dimensioni,
+                                     String descrizione,
+                                     Map<String, String> caratteristiche) {
     }
 
     // Tutti i libri
@@ -99,18 +108,47 @@ public class LibroController {
 
     // Modifica libro
     @PutMapping("/{id}")
-    public Libro updateLibro(@PathVariable Long id, @RequestBody Libro libro) {
+    public Libro updateLibro(@PathVariable Long id, @RequestBody UpdateLibroRequest request) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
+        System.out.println("Updating libro with ID: " + id);
+
         // Usa AutoreService per gestire l'autore con getOrCreate
-        if (libro.getAutore() != null) {
-            libro.setAutore(autoreService.getOrCreate(libro.getAutore()));
+        if (!libroToUpdate.getAutore().getNome().equalsIgnoreCase(request.autore())) {
+            Autore autore = autoreService.getOrCreate(request.autore(), "");
+            libroToUpdate.setAutore(autore);
         }
 
-        libroToUpdate = libroToUpdate.updateFrom(libro);
+        libroToUpdate = libroToUpdate.updateFrom(request);
+
+        System.out.println("Updated libro: " + libroToUpdate);
 
         return libroRepository.save(libroToUpdate);
+    }
+
+    // hide book
+    @PutMapping("/{id}/hide")
+    public ResponseEntity<Libro> hideLibro(@PathVariable Long id) {
+        Libro libro = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        libro.setHidden(false);
+        libroRepository.save(libro);
+
+        return ResponseEntity.ok(libro);
+    }
+
+    // show book
+    @PutMapping("/{id}/show")
+    public ResponseEntity<Libro> showLibro(@PathVariable Long id) {
+        Libro libro = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        libro.setHidden(true);
+        libroRepository.save(libro);
+
+        return ResponseEntity.ok(libro);
     }
 
     // Cancella libro
@@ -182,7 +220,7 @@ public class LibroController {
         Map<String, List<String>> filtriMultipli = new HashMap<>();
 
         // Parametri standard da escludere
-        Set<String> parametriStandard = Set.of("q",  "prezzoMin", "prezzoMax",
+        Set<String> parametriStandard = Set.of("q", "prezzoMin", "prezzoMax",
                 "ordinamento", "pagina", "elementiPerPagina");
 
         for (Map.Entry<String, String> entry : allParams.entrySet()) {

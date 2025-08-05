@@ -84,6 +84,10 @@ public class LibroInfo {
         this.caratteristiche.remove(chiave);
     }
 
+    public void clearCaratteristiche() {
+        this.caratteristiche.clear();
+    }
+
     public String getDescrizioneHtml() {
         return new MarkdownService().convertToHtml(this.descrizione);
     }

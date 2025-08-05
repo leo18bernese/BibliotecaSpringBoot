@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 
 const EditableField = ({
-                           id, label, icon, value, placeholder, minChars, maxChars, type, onChange, onRemove,
+                           id, label, icon, value, placeholder, minChars, maxChars, type,
+                           onChange, onRemove,
                            removable = true
                        }) => {
     const [editing, setEditing] = useState(false);

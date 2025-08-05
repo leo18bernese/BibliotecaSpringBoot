@@ -254,7 +254,13 @@ const BookInfo = () => {
                             <div className="text-gray-700 mb-6">
                                 <p className="mb-2"><strong>Autore:</strong> {book.autore.nome}</p>
                                 <p className="mb-2"><strong>Genere:</strong> {book.genere}</p>
-                                <p className="mb-4"><strong>Anno di pubblicazione:</strong> {book.annoPubblicazione}</p>
+                                <p className="mb-6"><strong>Editore:</strong> {book.editore}</p>
+
+                                <p className="mb-2"><strong>Anno di pubblicazione:</strong> {book.annoPubblicazione}</p>
+                                <p className="mb-2"><strong>Numero di pagine:</strong> {book.numeroPagine}</p>
+                                <p className="mb-2"><strong>Lingua:</strong> {book.lingua}</p>
+                                <p className="mb-2"><strong>ISBN:</strong> {book.isbn}</p>
+
                             </div>
 
                         </div>

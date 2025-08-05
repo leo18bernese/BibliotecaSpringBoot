@@ -60,6 +60,7 @@ public class Libro {
     @OneToOne(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     private LibroInfo descrizione;
 
+    private boolean hidden = false;
 
     public static final String IMAGE_DIR = "backend/src/main/resources/static/images";
 
@@ -92,15 +93,29 @@ public class Libro {
     }
 
 
-    public Libro updateFrom(Libro libro) {
-        this.titolo = libro.getTitolo();
-        this.autore = libro.getAutore();
-        this.genere = libro.getGenere();
-        this.annoPubblicazione = libro.getAnnoPubblicazione();
-        this.numeroPagine = libro.getNumeroPagine();
-        this.editore = libro.getEditore();
-        this.lingua = libro.getLingua();
-        this.isbn = libro.getIsbn();
+    public Libro updateFrom(LibroController.UpdateLibroRequest request) {
+        this.titolo = request.titolo();
+        this.genere = request.genere();
+        this.annoPubblicazione = request.annoPubblicazione();
+        this.numeroPagine = request.numeroPagine();
+        this.editore = request.editore();
+        this.lingua = request.lingua();
+        this.isbn = request.isbn();
+        this.dimensioni = request.dimensioni();
+
+        if (this.descrizione == null) {
+            this.descrizione = new LibroInfo(this, request.descrizione());
+        } else {
+            this.descrizione.setDescrizione(request.descrizione());
+        }
+
+        this.descrizione.clearCaratteristiche();
+
+        if (request.caratteristiche() != null) {
+            for (var entry : request.caratteristiche().entrySet()) {
+                this.descrizione.addCaratteristica(entry.getKey(), entry.getValue());
+            }
+        }
 
         return this;
     }

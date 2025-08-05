@@ -1,6 +1,6 @@
 // src/components/navbar/NavBar.js
-import React, {useContext} from 'react';
-import {Link} from 'react-router-dom';
+import React, {useContext, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import {UserContext} from "../user/UserContext";
 import {FaShoppingCart} from 'react-icons/fa';
 import axios from "axios";
@@ -13,6 +13,9 @@ const fetchCartItemsCount = async () => {
 
 const NavBar = () => {
     const {user} = useContext(UserContext);
+    const navigate = useNavigate();
+
+    const [searchQuery, setSearchQuery] = useState('');
 
     const {data: count, isLoadingCart, errorCart, isErrorCart} = useQuery({
         queryKey: ['cartItemsCount'],
@@ -22,6 +25,17 @@ const NavBar = () => {
     });
 
     const carrello = count || 0; // Default to 0 if count is undefined
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (searchQuery.trim()) {
+                navigate(`/ricerca?q=${encodeURIComponent(searchQuery.trim())}`);
+                setSearchQuery(''); // Opzionale: pulisce l'input dopo la ricerca
+
+            }
+        }
+    };
 
     return (
         <nav className="bg-gray-800 text-white shadow-md">
@@ -40,6 +54,19 @@ const NavBar = () => {
                     </li>
                 </ul>
 
+                {/* search bar */}
+                <div className="">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={handleSearchKeyDown}
+                        className="w-full px-4 py-2 rounded bg-gray-700 text-white
+                        focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
                 {/* Right side - User and Cart icons */}
                 <div className="flex items-center space-x-4">
 
@@ -47,7 +74,7 @@ const NavBar = () => {
                         <Link to="/account" className="text-white hover:text-gray-300">
                             {user.username}
                         </Link>
-                    ):(
+                    ) : (
                         <Link to="/login" className="text-white hover:text-gray-300">
                             Login
                         </Link>
