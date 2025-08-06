@@ -43,7 +43,6 @@ const EditableField = ({
             <div className={"flex items-center transition-all "}>
 
 
-
                 <label className="w-1/6 " htmlFor={id}>{label}:</label>
 
                 <span className={"border-b-4 " + borderColor}>
@@ -64,30 +63,31 @@ const EditableField = ({
                     className="flex-1 bg-transparent outline-none text-lg"
                 />
 
-                {removable && (
-                    <button className="text-sm text-gray-500"
-                            onClick={() => {
-                                setInputValue('');
-                                onRemove();
-                            }}
-                    >
-                        <i className={`bxr bx-trash text-xl text-red-500`}></i>
-                    </button>
-                )}
-
-                    {icon && (
+                    {removable && (
                         <button className="text-sm text-gray-500"
                                 onClick={() => {
                                     setInputValue('');
-                                    onChange();
+                                    onRemove();
                                 }}
                         >
-                            <i className={`bx bx-${icon} text-2xl mr-2`}></i>
+                            <i className={`bxr bx-trash text-xl text-red-500`}></i>
                         </button>
                     )}
 
+
+
                 </span>
 
+                {icon && (
+                    <button className="text-sm text-gray-500"
+                            onClick={() => {
+                                setInputValue('');
+                                onChange();
+                            }}
+                    >
+                        <i className={`bx bx-${icon} text-2xl mr-2`}></i>
+                    </button>
+                )}
             </div>
         </div>
     );

@@ -39,6 +39,8 @@ import AdminChat from "./components/admin/reso/chat/AdminChat";
 import SearchPage from "./components/libri/search/SearchPage";
 import BookDisplay from "./components/libri/BookDisplay";
 import AdminBook from "./components/admin/book/AdminBook";
+import AdminBookOverview from "./components/admin/book/AdminBookOverview";
+import AdminBookImages from "./components/admin/book/AdminBookImages";
 
 const queryClient = new QueryClient();
 
@@ -93,7 +95,9 @@ function App() {
                                         <Route path="/admin/reso/:id" element={<AdminReso/>}/>
                                         <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
 
-                                        <Route path="/admin/book/:id" element={<AdminBook/>}/>
+                                        <Route path="/admin/book/:id" element={<AdminBookOverview/>}/>
+                                        <Route path="/admin/book/:id/edit" element={<AdminBook/>}/>
+                                        <Route path="/admin/book/:id/images" element={<AdminBookImages/>}/>
 
                                     </Route>
                                 </Route>

@@ -85,13 +85,8 @@ const AdminBook = () => {
 
     // Inizializza gli stati quando book è disponibile
     useEffect(() => {
-        console.log("using effect", book);
-
         if (book) {
-            console.log("Setting initial book data:");
-            console.log("Title:", book.titolo);
             setTitle(book.titolo || '');
-            console.log("Title2:", book.titolo);
             setAuthor(book.autore.nome || '');
             setGenere(book.genere || '');
             setAnnoPubblicazione(book.annoPubblicazione || '');
@@ -102,7 +97,6 @@ const AdminBook = () => {
             setDimensioni(book.dimensioni || {});
             setDescription(book.descrizione?.descrizioneHtml || '');
             setCharacteristics(book.descrizione?.caratteristiche || {});
-            console.log("finished");
         }
     }, [book]);
 
@@ -394,8 +388,29 @@ const AdminBook = () => {
             </div>
 
             <div className="mt-8 pt-5 flex justify-end">
+
                 <button
-                    onClick={handleSave}
+                    onClick={() => {
+                        if(window.confirm("Are you sure you want to discard changes?")) {
+                            navigate('/admin/libri');
+                        }
+                    }}
+                    className="bg-red-300 hover:bg-red-400 text-red-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                >
+                    Discard Changes
+                </button>
+
+                <button
+                    onClick={() => {
+                        if (!title || !author || !genere || !annoPubblicazione || !numeroPagine || !editore || !lingua || !isbn) {
+                            toast.error('Please fill in all required fields.');
+                            return;
+                        }
+
+                        if(window.confirm("Are you sure you want to save changes?")) {
+                            handleSave();
+                        }
+                    }}
                     disabled={mutation.isPending}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400"
                 >
