@@ -110,6 +110,9 @@ const AdminBook = () => {
         mutationFn: updateBook,
         onSuccess: () => {
             toast.success('Libro aggiornato con successo!');
+
+            navigate("/admin/book/" + id);
+
             queryClient.invalidateQueries({queryKey: ['book', id]});
         },
         onError: (error) => {
@@ -165,6 +168,10 @@ const AdminBook = () => {
 
     if (bookError || bookExistsError) {
         return <div>Error loading book data.</div>;
+    }
+
+    if (!book || !bookExists) {
+        return <div className="p-4">Book not found or does not exist.</div>;
     }
 
     console.log("dimensioni", dimensioni);
@@ -392,7 +399,7 @@ const AdminBook = () => {
                 <button
                     onClick={() => {
                         if(window.confirm("Are you sure you want to discard changes?")) {
-                            navigate('/admin/libri');
+                            navigate("/admin/book/" + id);
                         }
                     }}
                     className="bg-red-300 hover:bg-red-400 text-red-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"

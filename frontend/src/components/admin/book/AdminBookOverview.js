@@ -66,6 +66,10 @@ const AdminBookOverview = () => {
         return <div>Error loading book data.</div>;
     }
 
+    if (!book || !bookExists) {
+        return <div className="p-4">Book not found or does not exist.</div>;
+    }
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-lg font-semibold">Manage Book #{id}</h1>
