@@ -31,8 +31,12 @@ public class ImageController {
 
     @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
     @PostMapping("/{productId}")
-    public ResponseEntity<String> uploadImage(@PathVariable Long productId,
-                                              @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadImages(@PathVariable Long productId,
+                                               @RequestParam("files") MultipartFile[] files) {
+        if (files == null || files.length == 0) {
+            return ResponseEntity.badRequest().body("No files provided");
+        }
+
         try {
             String finalPath = UPLOAD_DIR + "/" + productId;
 
@@ -41,13 +45,20 @@ public class ImageController {
                 Files.createDirectories(dirPath);
             }
 
-            Path path = Paths.get(finalPath, file.getOriginalFilename());
-            Files.write(path, file.getBytes());
+            int uploadedCount = 0;
 
-            return ResponseEntity.ok("Image uploaded successfully");
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    Path path = Paths.get(finalPath, file.getOriginalFilename());
+                    Files.write(path, file.getBytes());
+                    uploadedCount++;
+                }
+            }
+
+            return ResponseEntity.ok("Successfully uploaded " + uploadedCount + " images");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Cannot upload image");
+            return ResponseEntity.badRequest().body("Cannot upload images");
         }
     }
 
@@ -92,17 +103,23 @@ public class ImageController {
         }
     }
 
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<String> deleteImage(@PathVariable Long productId) {
+    @DeleteMapping("/{productId}/index/{index}")
+    public ResponseEntity<String> deleteImage(@PathVariable Long productId, @PathVariable int index) {
+        Libro libro = libroRepository.findById(productId).orElseThrow();
+        List<Path> paths = libro.getAllImages();
+
+        if (index < 0 || index >= paths.size()) {
+            return ResponseEntity.badRequest().body("Invalid image index");
+        }
+
+        Path path = paths.get(index);
+
         try {
-            String finalPath = UPLOAD_DIR + "/" + productId;
-
-            Path path = Paths.get(finalPath);
-            Files.delete(path);
-
+            Files.deleteIfExists(path);
             return ResponseEntity.ok("Image deleted successfully");
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting image");
         }
     }
 

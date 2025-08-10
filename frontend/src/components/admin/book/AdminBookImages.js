@@ -31,7 +31,7 @@ const fetchImageIds = async (id) => {
 const uploadImages = async (bookId, files) => {
     const formData = new FormData();
     files.forEach(file => {
-        formData.append('images', file);
+        formData.append('files', file);
     });
 
     const { data } = await axios.post(`/api/images/${bookId}`, formData, {
@@ -62,7 +62,7 @@ const AdminBookImages = () => {
     });
 
     const deleteImage = async (bookId, imageIndex) => {
-        const { data } = await axios.delete(`${API_URL}/${bookId}/index/${imageIndex}`);
+        const { data } = await axios.delete(`/api/images/${bookId}/index/${imageIndex}`);
         return data;
     };
 
@@ -70,6 +70,7 @@ const AdminBookImages = () => {
         mutationFn: ({ bookId, imageIndex }) => deleteImage(bookId, imageIndex),
         onSuccess: () => {
             queryClient.invalidateQueries(['images', id]);
+
             toast.success('Immagine eliminata con successo');
         },
         onError: () => {
