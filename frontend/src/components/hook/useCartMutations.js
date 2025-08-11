@@ -1,0 +1,39 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useContext } from 'react';
+import {CartContext} from "../carrello/CartContext";
+
+export const useCartMutations = () => {
+    const queryClient = useQueryClient();
+    const { addItem, removeItem } = useContext(CartContext);
+
+    const addToCartMutation = useMutation({
+        mutationFn: async ({ bookId, quantity }) => {
+            return await addItem(bookId, quantity);
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['cartItem', variables.bookId]);
+            queryClient.invalidateQueries(['cart']);
+        },
+        onError: (error) => {
+            console.error('Add to cart mutation error:', error);
+        }
+    });
+
+    const removeFromCartMutation = useMutation({
+        mutationFn: async ({ bookId, quantity }) => {
+            return await removeItem(bookId, quantity);
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['cartItem', variables.bookId]);
+            queryClient.invalidateQueries(['cart']);
+        },
+        onError: (error) => {
+            console.error('Remove from cart mutation error:', error);
+        }
+    });
+
+    return {
+        addToCartMutation,
+        removeFromCartMutation
+    };
+};

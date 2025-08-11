@@ -19,6 +19,7 @@ const Login = () => {
     }
 
     const handleLogin = async (e) => {
+        console.log("current location:", location);
         e.preventDefault();
 
         const username = e.target.username.value;
@@ -40,6 +41,7 @@ const Login = () => {
             console.log("going to ", from);
             toast.success("Login successful!");
             console.log("User has logged in, sending to ", from);
+
             navigate(from, { replace: true }); // Redirect to the previous page or home
         } catch (error) {
             console.error("Errore durante il login:", error.response?.data.errore || error.message);

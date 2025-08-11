@@ -41,6 +41,7 @@ import BookDisplay from "./components/libri/BookDisplay";
 import AdminBook from "./components/admin/book/AdminBook";
 import AdminBookOverview from "./components/admin/book/AdminBookOverview";
 import AdminBookImages from "./components/admin/book/AdminBookImages";
+import AdminBookInventory from "./components/admin/book/AdminBookInventory";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,8 @@ function App() {
                                         <Route path="/admin/book/:id" element={<AdminBookOverview/>}/>
                                         <Route path="/admin/book/:id/edit" element={<AdminBook/>}/>
                                         <Route path="/admin/book/:id/images" element={<AdminBookImages/>}/>
+                                        <Route path="/admin/book/:id/inventory" element={<AdminBookInventory/>}/>
+
 
                                     </Route>
                                 </Route>

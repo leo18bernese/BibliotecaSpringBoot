@@ -91,7 +91,7 @@ public class Carrello {
 
         System.out.println("Adding " + quantita + " of " + libro.getTitolo() + " to the cart");
 
-        rifornimento.addPrenotati(quantita);
+        rifornimento.addPrenotati(quantita, utente.getId());
         System.out.println(libro + "    " + item + "    " + rifornimento + "    " + rifornimento.getPrenotati());
 
         System.out.println("Updated rifornimento: " + rifornimento.getPrenotati() + " prenotati");
@@ -108,14 +108,18 @@ public class Carrello {
         }
 
         if (item.getQuantita() <= quantita) {
+            // remuovi tutti se quantità carrello <= quantità da rimuovere
+
             items.remove(item);
 
-            rifornimento.removePrenotati(item.getQuantita());
+            rifornimento.removePrenotati(utente.getId());
         } else {
+            // altrimenti rimuovi solo la quantità specificata
+
             item.setQuantita(item.getQuantita() - quantita);
             item.setUltimaModifica(new Date());
 
-            rifornimento.removePrenotati(quantita);
+            rifornimento.removePrenotati(utente.getId(), quantita);
         }
 
         ultimaModifica = new Date();

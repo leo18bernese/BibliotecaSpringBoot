@@ -13,6 +13,8 @@ import me.leoo.utils.common.time.TimeUtil;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Entity
@@ -25,7 +27,12 @@ public class Rifornimento {
     private Long id;
 
     private int quantita;
-    private int prenotati;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "rifornimento_prenotati", joinColumns = @JoinColumn(name = "rifornimento_id"))
+    @MapKeyColumn(name = "user_id")
+    @Column(name = "quantita_prenotata")
+    private Map<Long, Integer> prenotatiMap = new HashMap<>();
 
     private double prezzo;
 
@@ -39,12 +46,11 @@ public class Rifornimento {
     private Date prossimoRifornimento;
 
     public Rifornimento(int quantita, double prezzo) {
-        this(quantita, 0, prezzo, Sconto.from(prezzo, 15), 3, TimeUtil.fromNow(3, Calendar.DAY_OF_MONTH).getTime());
+        this(quantita, prezzo, Sconto.from(prezzo, 15), 3, TimeUtil.fromNow(3, Calendar.DAY_OF_MONTH).getTime());
     }
 
-    public Rifornimento(int quantita, int prenotati, double prezzo, Sconto sconto, int giorniConsegna, @Nullable Date prossimoRifornimento) {
+    public Rifornimento(int quantita, double prezzo, Sconto sconto, int giorniConsegna, @Nullable Date prossimoRifornimento) {
         this.quantita = quantita;
-        this.prenotati = prenotati;
         this.prezzo = prezzo;
         this.sconto = sconto;
         this.giorniConsegna = giorniConsegna;
@@ -66,34 +72,57 @@ public class Rifornimento {
     }
 
     // Reservation
+    public int getPrenotati() {
+        return prenotatiMap.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
     public int getDisponibili() {
-        return quantita - prenotati;
+        return quantita - getPrenotati();
     }
 
     public boolean isDisponibile(int quantita) {
         return getDisponibili() >= quantita;
     }
 
-    public String addPrenotati(int prenotati) {
-        if (this.prenotati + prenotati > quantita) {
-            this.prenotati = quantita;
-            return "Prenotazione riuscita.";
+    public String addPrenotati(int prenotati, Long userId) {
+
+        //se prenotati attuali + da aggiunge > disponibili, non si può prenotare
+        //quindi aggiungo prenotati tanti quanti sono i disponibili
+        if (getPrenotati() + prenotati > quantita) {
+            int disponibili = getDisponibili();
+            prenotatiMap.put(userId, disponibili);
+
+            return "Prenotazione non riuscita. Troppi prenotati. Prenotati solo " + disponibili + " pezzi.";
         }
 
-        this.prenotati += prenotati;
+        // Aggiungo prenotati per l'utente
+        prenotatiMap.put(userId, prenotatiMap.getOrDefault(userId, 0) + prenotati);
 
-        return "Prenotazione riuscita.";
+        return "Prenotazione riuscita. Prenotati " + prenotati + " pezzi.";
     }
 
-    public void removePrenotati(int prenotati) {
-        if (this.prenotati - prenotati < 0) {
-            this.prenotati = 0;
+    /**
+     * remove all prenotati for userId
+     */
+    public void removePrenotati(Long userId) {
+        prenotatiMap.remove(userId);
+    }
+
+    /**
+     * remove amount of prenotati for userId
+     */
+    public void removePrenotati(Long userId, int toRemove) {
+        if (!prenotatiMap.containsKey(userId)) return;
+
+        int prenotati = prenotatiMap.get(userId);
+
+        if (prenotati - toRemove <= 0) {
+            prenotatiMap.remove(userId);
             return;
         }
 
-        this.prenotati -= prenotati;
+        prenotatiMap.put(userId, prenotati - toRemove);
     }
-
     // Price
 
     /**
@@ -173,7 +202,7 @@ public class Rifornimento {
     // Update
     public Rifornimento updateFrom(Rifornimento rifornimento) {
         this.quantita = rifornimento.getQuantita();
-        this.prenotati = rifornimento.getPrenotati();
+        this.prenotatiMap = rifornimento.getPrenotatiMap();
         this.prezzo = rifornimento.getPrezzo();
         this.sconto = rifornimento.getSconto();
         this.giorniConsegna = rifornimento.getGiorniConsegna();

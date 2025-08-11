@@ -3,12 +3,12 @@ import React, {useContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ImageGallery from "../images/ImageGallery";
-import {CartContext} from "../../carrello/CartContext";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import toast, {Toaster} from "react-hot-toast";
 import BookInfoTabs from "./BookInfoTabs";
 import {UserContext} from "../../user/UserContext";
 import {useAuth} from "../../user/AuthContext";
+import {useCartMutations} from "../../hook/useCartMutations";
 
 const API_URL = '/api/images';
 
@@ -73,7 +73,7 @@ const BookInfo = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const {addItem} = useContext(CartContext);
+    const { addToCartMutation } = useCartMutations();
 
     const bookId = Number.parseInt(id);
     const previousId = bookId - 1;
@@ -188,6 +188,18 @@ const BookInfo = () => {
             throw error;
         }
     }
+
+    const handleAddToCart = () => {
+        if (!user) {
+            showLoginPrompt();
+            return;
+        }
+
+        addToCartMutation.mutate({
+            bookId: book.id,
+            quantity: 1
+        });
+    };
 
     const isLoading = isBookLoading || areImagesLoading || areReviewsLoading;
 
@@ -310,10 +322,10 @@ const BookInfo = () => {
 
                             <div className="flex flex-col gap-2">
                                 <button
-                                    className={` ${!isDisponibile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded-xl transition`}
-                                    onClick={() => user ? addItem(book.id, 1) : showLoginPrompt()}
-                                    disabled={!isDisponibile}>
-                                    Aggiungi al carrello
+                                    className={`${!isDisponibile || addToCartMutation.isPending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded-xl transition`}
+                                    onClick={handleAddToCart}
+                                    disabled={!isDisponibile || addToCartMutation.isPending}>
+                                    {addToCartMutation.isPending ? 'Aggiungendo...' : 'Aggiungi al carrello'}
                                 </button>
 
                                 {isDisponibile &&
