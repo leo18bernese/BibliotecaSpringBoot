@@ -1,6 +1,6 @@
 // src/components/navbar/NavBar.js
 import React, {useContext, useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {UserContext} from "../user/UserContext";
 import {FaShoppingCart} from 'react-icons/fa';
 import axios from "axios";
@@ -14,6 +14,7 @@ const fetchCartItemsCount = async () => {
 const NavBar = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -75,7 +76,7 @@ const NavBar = () => {
                             {user.username}
                         </Link>
                     ) : (
-                        <Link to="/login" className="text-white hover:text-gray-300">
+                        <Link to="/login" state={{ from: location }} className="text-white hover:text-gray-300">
                             Login
                         </Link>
                     )}

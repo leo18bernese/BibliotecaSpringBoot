@@ -10,7 +10,7 @@ const ViewableField = ({
         <div className={"mt-6 ml-4"}>
 
             <div className="flex flex-col flex-1">
-                <label htmlFor={id} className="flex-1 text-lg cursor-pointer select-none text-gray-600">
+                <label htmlFor={id} className="flex-1 text-lg select-none text-gray-600">
                     {label}
                 </label>
 
