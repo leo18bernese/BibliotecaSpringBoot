@@ -26,7 +26,7 @@ const CheckableField = ({id, label, description, icon, value, onChange, confirm,
                 <i className={`bx bx-${icon} text-2xl`}></i>
 
                 <div className="flex flex-col flex-1">
-                    <label htmlFor={id} className="flex-1 text-lg select-none">
+                    <label htmlFor={id} className="flex-1 text-lg font-semibold select-none">
                         {label}
                     </label>
 

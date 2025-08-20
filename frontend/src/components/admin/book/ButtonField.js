@@ -10,7 +10,7 @@ const ButtonField = ({
             {label && (
                 <div className="flex flex-col flex-1">
 
-                    <label htmlFor={id} className="flex-1 text-lg select-none text-gray-600">
+                    <label htmlFor={id} className="flex-1 text-lg select-none font-semibold text-gray-600">
                         {label}
                     </label>
 
