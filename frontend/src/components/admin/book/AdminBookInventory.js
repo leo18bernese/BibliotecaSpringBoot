@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useBlocker, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "./EditableField";
 import React, {useEffect, useMemo, useRef, useState} from "react";
@@ -23,27 +23,8 @@ const fetchBookExists = async (id) => {
     return data;
 }
 
-const fetchImageIds = async (id) => {
-    try {
-        const {data} = await axios.get(`/api/images/${id}`);
-        return data;
-    } catch (error) {
-        if (error.response && error.response.status === 404) {
-            console.warn("No images found for this book:", error);
-            return -1;
-        }
-
-        throw error; // Rethrow other errors
-    }
-}
-
-const fetchAutoriList = async () => {
-    const {data} = await axios.get('/api/autori');
-    return data;
-}
-
-const updateBook = async ({id, bookData}) => {
-    const {data} = await axios.put(`/api/libri/${id}`, bookData);
+const updateRifornimento = async ({id, bookData}) => {
+    const {data} = await axios.put(`/api/libri/${id}/rifornimento`, bookData);
     return data;
 }
 
@@ -74,6 +55,7 @@ const AdminBookInventory = () => {
 
     const [prezzo, setPrezzo] = useState(0);
     const [sconto, setSconto] = useState({});
+    const [scontoType, setScontoType] = useState('percentage'); // 'percentage' or 'fixed'
 
     const [giorniConsegna, setGiorniConsegna] = useState(0);
 
@@ -92,6 +74,14 @@ const AdminBookInventory = () => {
             setPrezzo(rifornimento.prezzo || 0);
             setSconto(rifornimento.sconto || {});
 
+            // Determina il tipo di sconto basandosi sui dati esistenti
+            const scontoData = rifornimento.sconto || {};
+            if (scontoData.percentuale > 0 ){
+                setScontoType('percentage');
+            } else if (scontoData.valore > 0) {
+                setScontoType('fixed');
+            }
+
             setGiorniConsegna(rifornimento.giorniConsegna || 0);
 
             const prenotatiMap = rifornimento.prenotatiMap || {};
@@ -103,14 +93,23 @@ const AdminBookInventory = () => {
         }
     }, [book]);
 
+    // Calcola il prezzo scontato basandosi sul tipo di sconto
+    const calcolaPrezzoScontato = () => {
+        if (scontoType === 'percentage') {
+            const percentuale = sconto.percentuale || 0;
+            return (prezzo - (prezzo * percentuale / 100)).toFixed(2);
+        } else {
+            const importoFisso = sconto.importoFisso || 0;
+            return Math.max(0, prezzo - importoFisso).toFixed(2);
+        }
+    };
 
-    const mutation = useMutation({
-        mutationFn: updateBook,
+    const priceMutation = useMutation({
+        mutationFn: updateRifornimento,
         onSuccess: () => {
             toast.success('Libro aggiornato con successo!');
             // 3. Resetta lo stato dopo un salvataggio riuscito
-            setHasUnsavedChanges(false);
-            navigate("/admin/book/" + id);
+
             queryClient.invalidateQueries({queryKey: ['book', id]});
         },
         onError: (error) => {
@@ -119,20 +118,23 @@ const AdminBookInventory = () => {
     });
 
     const handleSave = () => {
-        // const currentDescription = getEditorContent(); // Se si usa l'editor, altrimenti lo stato 'description'
+        // Costruisci l'oggetto sconto nel formato richiesto
+        const scontoFormatted = scontoType === 'percentage'
+            ? {percentuale: sconto.percentuale || 0, valore: 0}
+            : {percentuale: 0, valore: sconto.importoFisso || 0};
+
         const bookData = {
-            // Aggiungi qui i dati da salvare
-            rifornimento: {
-                quantita: quantity,
-                prenotati: prenotati,
-                disponibili: disponibili,
-                prezzo: prezzo,
-                sconto: sconto,
-                giorniConsegna: giorniConsegna,
-                prenotatiMap: prenotatiList.reduce((acc, curr) => ({ ...acc, [curr.userId]: curr.quantity }), {})
-            }
+            prezzo: prezzo,
+            sconto: scontoFormatted,
+            prenotatiMap: prenotatiList.reduce((acc, curr) => ({...acc, [curr.userId]: curr.quantity}), {})
         };
-        mutation.mutate({id, bookData});
+
+        priceMutation.mutate({id, bookData});
+
+        // to check
+        setHasUnsavedChanges(false);
+
+        navigate("/admin/book/" + id);
     };
 
     // 4. Funzione helper per gestire le modifiche e impostare lo stato
@@ -141,24 +143,40 @@ const AdminBookInventory = () => {
         setHasUnsavedChanges(true);
     };
 
-    const blocker = useBlocker(
-        ({ currentLocation, nextLocation }) =>
-            hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname
-    );
+    // Gestisce il cambio di tipo di sconto
+    const handleScontoTypeChange = (newType) => {
+        setScontoType(newType);
+        // Reset dei valori di sconto quando si cambia tipo
+        if (newType === 'percentage') {
+            setSconto({percentuale: 0});
+        } else {
+            setSconto({importoFisso: 0});
+        }
+        setHasUnsavedChanges(true);
+    };
 
-    // Gestisci il blocco della navigazione
+    // Gestisce navigazione browser (tasti avanti/indietro)
     useEffect(() => {
-        if (blocker.state === "blocked") {
+        if (!hasUnsavedChanges) return;
+
+        const handlePopState = (event) => {
             const confirmLeave = window.confirm(
                 'Hai modifiche non salvate. Sei sicuro di voler lasciare questa pagina?'
             );
-            if (confirmLeave) {
-                blocker.proceed();
+            if (!confirmLeave) {
+                window.history.pushState(null, '', window.location.pathname);
             } else {
-                blocker.reset();
+                setHasUnsavedChanges(false);
             }
-        }
-    }, [blocker]);
+        };
+
+        window.history.pushState(null, '', window.location.pathname);
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [hasUnsavedChanges]);
 
     // Mantieni l'useEffect per beforeunload (per reload/chiusura tab)
     useEffect(() => {
@@ -198,87 +216,11 @@ const AdminBookInventory = () => {
                 You can also edit the price, create discounts, and manage other inventory-related details.
             </p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
-                <div className="mt-8 p-4 bg-gray-50 rounded-md">
-                    <h2 className="text-md font-semibold rounded-md">Stock information</h2>
+            <div className="flex-col mt-4">
 
-                    <ViewableField key="quantity"
-                                   id="quantity"
-                                   label="Available Quantity"
-                                   icon="book"
-                                   value={quantity}
-                                   description="The number of copies available in stock."
-                    />
-
-                    <ViewableField key="prenotati"
-                                   id="prenotati"
-                                   label="Reserved Copies"
-                                   icon="bookmark"
-                                   value={prenotati}
-                                   description="The number of copies that are reserved by users.
-                                 You can see the list of reservations in the 'Reservations' section."
-                    />
-
-                    <ViewableField key="disponibili"
-                                   id="disponibili"
-                                   label="Available for Sale"
-                                   icon="check-circle"
-                                   value={disponibili}
-                                   description="The number of copies available for sale after reservations."
-                    />
-                </div>
-
-                <div className="mt-8 p-4 bg-gray-50 rounded-md">
-                    <h3 className="font-semibold">Prices and Discounts</h3>
-
-                    <EditableField key="prezzo"
-                                   id="prezzo"
-                                   label="Price"
-                                   icon="dollar"
-                                   value={prezzo}
-                                   onChange={(newValue) => {
-                                       const newPrezzo = parseFloat(newValue);
-                                       if (!isNaN(newPrezzo) && newPrezzo >= 0) {
-                                           handleFieldChange(setPrezzo)(newPrezzo);
-                                       } else {
-                                           toast.error("Invalid price value.");
-                                       }
-                                   }}
-                                   description="The base price of the book. You can apply discounts to this price."
-                    />
-
-                    <EditableField key="sconto"
-                                   id="sconto"
-                                   label="Discount Percentage"
-                                   icon="tag"
-                                   value={sconto.percentuale || 0}
-                                   onChange={(newValue) => {
-                                       const newSconto = parseFloat(newValue);
-                                       if (!isNaN(newSconto) && newSconto >= 0 && newSconto <= 100) {
-                                           handleFieldChange(setSconto)({ percentuale: newSconto });
-                                       } else {
-                                           toast.error("Invalid discount percentage.");
-                                       }
-                                   }}
-                                   description="The discount percentage applied to the base price."
-                    />
-
-                    <ViewableField key="prezzoScontato"
-                                   id="prezzoScontato"
-                                   label="Discounted Price"
-                                   icon="sale"
-                                   value={(prezzo - (prezzo * (sconto.percentuale || 0) / 100)).toFixed(2)}
-                                   description="The price after applying the discount."
-                    />
-
-                </div>
-
-            </div>
-
-            <div className="flex flex-col items-start gap-4 mt-4">
-                <div className="flex flex-row items-start gap-4 mt-4">
-                    <div className="mt-8 pl-4">
-                        <h2 className="text-md font-semibold">Stock information</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
+                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                        <h2 className="text-md font-semibold rounded-md">Stock information</h2>
 
                         <ViewableField key="quantity"
                                        id="quantity"
@@ -306,7 +248,7 @@ const AdminBookInventory = () => {
                         />
                     </div>
 
-                    <div className="mt-12 pl-4">
+                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h3 className="font-semibold">Prices and Discounts</h3>
 
                         <EditableField key="prezzo"
@@ -325,27 +267,75 @@ const AdminBookInventory = () => {
                                        description="The base price of the book. You can apply discounts to this price."
                         />
 
-                        <EditableField key="sconto"
-                                       id="sconto"
-                                       label="Discount Percentage"
-                                       icon="tag"
-                                       value={sconto.percentuale || 0}
-                                       onChange={(newValue) => {
-                                           const newSconto = parseFloat(newValue);
-                                           if (!isNaN(newSconto) && newSconto >= 0 && newSconto <= 100) {
-                                               handleFieldChange(setSconto)({ percentuale: newSconto });
-                                           } else {
-                                               toast.error("Invalid discount percentage.");
-                                           }
-                                       }}
-                                       description="The discount percentage applied to the base price."
-                        />
+                        {/* Discount Type Selector */}
+                        <div className="mt-4 mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Discount Type
+                            </label>
+                            <div className="flex space-x-4">
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        value="percentage"
+                                        checked={scontoType === 'percentage'}
+                                        onChange={(e) => handleScontoTypeChange(e.target.value)}
+                                        className="mr-2"
+                                    />
+                                    Percentage
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        value="fixed"
+                                        checked={scontoType === 'fixed'}
+                                        onChange={(e) => handleScontoTypeChange(e.target.value)}
+                                        className="mr-2"
+                                    />
+                                    Fixed Amount
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Discount Value Field */}
+                        {scontoType === 'percentage' ? (
+                            <EditableField key="scontoPercentuale"
+                                           id="scontoPercentuale"
+                                           label="Discount Percentage"
+                                           icon="tag"
+                                           value={sconto.percentuale || 0}
+                                           onChange={(newValue) => {
+                                               const newSconto = parseFloat(newValue);
+                                               if (!isNaN(newSconto) && newSconto >= 0 && newSconto <= 100) {
+                                                   handleFieldChange(setSconto)({percentuale: newSconto});
+                                               } else {
+                                                   toast.error("Invalid discount percentage (0-100).");
+                                               }
+                                           }}
+                                           description="The discount percentage applied to the base price (0-100%)."
+                            />
+                        ) : (
+                            <EditableField key="scontoFisso"
+                                           id="scontoFisso"
+                                           label="Fixed Discount Amount"
+                                           icon="tag"
+                                           value={sconto.importoFisso || 0}
+                                           onChange={(newValue) => {
+                                               const newSconto = parseFloat(newValue);
+                                               if (!isNaN(newSconto) && newSconto >= 0 && newSconto <= prezzo) {
+                                                   handleFieldChange(setSconto)({importoFisso: newSconto});
+                                               } else {
+                                                   toast.error("Invalid fixed discount amount (cannot exceed price).");
+                                               }
+                                           }}
+                                           description="The fixed amount to subtract from the base price."
+                            />
+                        )}
 
                         <ViewableField key="prezzoScontato"
                                        id="prezzoScontato"
                                        label="Discounted Price"
                                        icon="sale"
-                                       value={(prezzo - (prezzo * (sconto.percentuale || 0) / 100)).toFixed(2)}
+                                       value={calcolaPrezzoScontato()}
                                        description="The price after applying the discount."
                         />
 
@@ -353,108 +343,112 @@ const AdminBookInventory = () => {
 
                 </div>
 
-                <div className="mt-12 pl-4">
-                    <h3 className="font-semibold">Reservations List</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-[35%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
+                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                        <h3 className="font-semibold">Reservations List</h3>
 
-                    {prenotatiList.length === 0 && (
-                        <div className="text-gray-500 mt-2">
-                            No reservations found.
-                        </div>
-                    )}
-
-                    {prenotatiList.length > 0 && (
-                        <>
-                            <div className="mt-5">
-                                {showPrenotati ? (
-                                    <button
-                                        className="bg-gray-300 hover:bg-gray-400 text-gray-700  rounded p-3 transition"
-                                        onClick={() => setShowPrenotati(false)}>
-                                        Hide Reservations
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="bg-gray-300 hover:bg-gray-400 text-gray-700  rounded p-3 transition"
-                                        onClick={() => setShowPrenotati(true)}>
-                                        Show Reservations ({prenotatiList.length})
-                                    </button>
-                                )}
+                        {prenotatiList.length === 0 && (
+                            <div className="text-gray-500 mt-2">
+                                No reservations found.
                             </div>
+                        )}
+
+                        {prenotatiList.length > 0 && (
+                            <>
+                                <div className="mt-5">
+                                    {showPrenotati ? (
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-700  rounded p-3 transition"
+                                            onClick={() => setShowPrenotati(false)}>
+                                            Hide Reservations
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="bg-gray-300 hover:bg-gray-400 text-gray-700  rounded p-3 transition"
+                                            onClick={() => setShowPrenotati(true)}>
+                                            Show Reservations ({prenotatiList.length})
+                                        </button>
+                                    )}
+                                </div>
 
 
-                            {showPrenotati && (
+                                {showPrenotati && (
 
-                                prenotatiList.map((reservation, index) => (
+                                    prenotatiList.map((reservation, index) => (
 
-                                    < div className={(index % 2 === 0 ? "bg-gray-300" : "bg-white") + " ml-4"}>
-                                        <div className="mt-6 p-4">
-                                            <span className="font-semibold">User ID:</span> {reservation.userId} <br/>
-                                            <span
-                                                className="font-semibold">Reserved Quantity:</span> {reservation.quantity}
-                                        </div>
+                                        < div
+                                            className={(index % 2 === 0 ? "bg-gray-200" : "bg-white") + " ml-4 rounded-md"}>
 
-                                        <div className="flex flex-row items-center gap-6 pb-4">
-                                            <ButtonField key={`decrease-${index}`}
-                                                         id={`decrease-${index}`}
-                                                         icon="minus-circle"
-                                                         value={reservation.quantity}
-                                                         actionText="Decrease"
-                                                         onChange={() => {
-                                                             const updatedList = [...prenotatiList];
-                                                             if (updatedList[index].quantity > 0) {
-                                                                 updatedList[index].quantity -= 1;
+                                            <div className="mt-6 p-4">
+                                                <span className="font-semibold">User ID:</span> {reservation.userId}
+                                                <br/>
+                                                <span
+                                                    className="font-semibold">Reserved Quantity:</span> {reservation.quantity}
+                                            </div>
+
+                                            <div className="flex flex-row items-center">
+                                                <ButtonField key={`decrease-${index}`}
+                                                             id={`decrease-${index}`}
+                                                             icon="minus-circle"
+                                                             value={reservation.quantity}
+                                                             actionText="Decrease"
+                                                             onChange={() => {
+                                                                 const updatedList = [...prenotatiList];
+                                                                 if (updatedList[index].quantity > 0) {
+                                                                     updatedList[index].quantity -= 1;
+                                                                     setPrenotatiList(updatedList);
+                                                                     setPrenotati(prenotati - 1);
+                                                                     setDisponibili(disponibili + 1);
+                                                                     setHasUnsavedChanges(true); // Aggiorna lo stato
+                                                                 } else {
+                                                                     toast.error("Cannot decrease reservation below zero.");
+                                                                 }
+                                                             }}
+                                                />
+
+                                                <ButtonField key={`increase-${index}`}
+                                                             id={`increase-${index}`}
+                                                             icon="plus-circle"
+                                                             value={reservation.quantity}
+                                                             actionText="Increase"
+                                                             onChange={() => {
+                                                                 const updatedList = [...prenotatiList];
+
+                                                                 if (prenotati + 1 > quantity) {
+                                                                     toast.error("Cannot increase reservation beyond available stock.");
+                                                                     return;
+                                                                 }
+
+                                                                 updatedList[index].quantity += 1;
                                                                  setPrenotatiList(updatedList);
-                                                                 setPrenotati(prenotati - 1);
-                                                                 setDisponibili(disponibili + 1);
+                                                                 setPrenotati(prenotati + 1);
+                                                                 setDisponibili(disponibili - 1);
                                                                  setHasUnsavedChanges(true); // Aggiorna lo stato
-                                                             } else {
-                                                                 toast.error("Cannot decrease reservation below zero.");
-                                                             }
-                                                         }}
-                                            />
+                                                             }}
+                                                />
 
-                                            <ButtonField key={`increase-${index}`}
-                                                         id={`increase-${index}`}
-                                                         icon="plus-circle"
-                                                         value={reservation.quantity}
-                                                         actionText="Increase"
-                                                         onChange={() => {
-                                                             const updatedList = [...prenotatiList];
-
-                                                             if (prenotati + 1 > quantity) {
-                                                                 toast.error("Cannot increase reservation beyond available stock.");
-                                                                 return;
-                                                             }
-
-                                                             updatedList[index].quantity += 1;
-                                                             setPrenotatiList(updatedList);
-                                                             setPrenotati(prenotati + 1);
-                                                             setDisponibili(disponibili - 1);
-                                                             setHasUnsavedChanges(true); // Aggiorna lo stato
-                                                         }}
-                                            />
-
-                                            <ButtonField key={`remove-${index}`}
-                                                         id={`remove-${index}`}
-                                                         icon="trash"
-                                                         value={reservation.quantity}
-                                                         actionText="Remove"
-                                                         onChange={() => {
-                                                             const updatedList = prenotatiList.filter((_, i) => i !== index);
-                                                             setPrenotatiList(updatedList);
-                                                             setPrenotati(prenotati - reservation.quantity);
-                                                             setDisponibili(disponibili + reservation.quantity);
-                                                             setHasUnsavedChanges(true); // Aggiorna lo stato
-                                                         }}
-                                            />
+                                                <ButtonField key={`remove-${index}`}
+                                                             id={`remove-${index}`}
+                                                             icon="trash"
+                                                             value={reservation.quantity}
+                                                             actionText="Remove"
+                                                             onChange={() => {
+                                                                 const updatedList = prenotatiList.filter((_, i) => i !== index);
+                                                                 setPrenotatiList(updatedList);
+                                                                 setPrenotati(prenotati - reservation.quantity);
+                                                                 setDisponibili(disponibili + reservation.quantity);
+                                                                 setHasUnsavedChanges(true); // Aggiorna lo stato
+                                                             }}
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                ))
-                            )}
-                        </>
-                    )}
+                                    ))
+                                )}
+                            </>
+                        )}
+                    </div>
                 </div>
-
             </div>
 
             <div className="fixed bottom-4 right-4">

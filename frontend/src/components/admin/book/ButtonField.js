@@ -18,21 +18,19 @@ const ButtonField = ({
                 </div>
             )}
 
-            <div className={"flex items-center space-x-2 border-b-4 transition-all"}>
+            <button className={"flex items-center space-x-1.5 border-b-4 transition-all hover:bg-gray-300 p-2 rounded-lg"}
+                 onClick={() => {
+                     if (onChange) {
+                         onChange(value);
+                     }
+                 }}>
                 <i className={`bx bx-${icon} text-2xl`}></i>
 
-                <button
-                    type="button"
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => {
-                        if (onChange) {
-                            onChange(value);
-                        }
-                    }}
-                >
+                <span
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none">
                     {actionText}
-                </button>
-            </div>
+                </span>
+            </button>
         </div>
     );
 }

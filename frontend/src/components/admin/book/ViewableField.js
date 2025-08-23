@@ -4,8 +4,6 @@ const ViewableField = ({
                            id, label, icon, value, description
                        }) => {
 
-    const borderColor = 'border-gray-300';
-
     return (
         <div className={"mt-8  ml-4"}>
 
@@ -15,22 +13,15 @@ const ViewableField = ({
                 </label>
 
                 {description && <span className="text-sm text-gray-500 mb-1">{description}</span>}
+            </div>
 
-                <span className="text-xs text-amber-600 mb-1">
-                    <i className="bx bx-info-circle mr-1"></i>
-                    Solo visualizzazione
-                </span>  </div>
+            <div className={"flex items-center space-x-2 rounded-xl transition-all"}>
+                {icon && (
+                    <i className={`bx bx-${icon} text-2xl`}></i>
+                )}
 
-            <div className={"flex items-center space-x-2 border-b-2 rounded-xl " + borderColor + " transition-all"}>
-                <i className={`bx bx-${icon} text-2xl`}></i>
+                <span className="text-2xl">{value}</span>
 
-                <input
-                    id={id}
-                    value={value}
-                    disabled={true}
-
-                    className="flex-1 bg-transparent outline-none text-lg"
-                />
             </div>
         </div>
     );

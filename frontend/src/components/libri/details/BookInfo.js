@@ -73,7 +73,7 @@ const BookInfo = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { addToCartMutation } = useCartMutations();
+    const {addToCartMutation} = useCartMutations();
 
     const bookId = Number.parseInt(id);
     const previousId = bookId - 1;
@@ -291,7 +291,13 @@ const BookInfo = () => {
 
                             <span className="p-2 rounded-2xl font-semibold uppercase text-sm mb"
                                   style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
-                                <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
+
+                                {rifornimento.sconto.percentuale > 0 ? (
+                                        <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
+                                    ) :
+                                    (
+                                    <span className="">-{rifornimento.sconto.valore}€ sconto</span>
+                                    )}
                             </span>
 
 

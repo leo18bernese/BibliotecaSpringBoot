@@ -8,6 +8,7 @@ import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
 import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.utils.Sconto;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,13 @@ public class LibroController {
                                      LibroDimension dimensioni,
                                      String descrizione,
                                      Map<String, String> caratteristiche) {
+    }
+
+    // DTO per rifornimento
+    public record PriceAndPrenotatiRequest(double prezzo, Sconto sconto, Map<Long, Integer> prenotatiMap) {
+    }
+    public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna, Date prossimoRifornimento,
+                                      @Nullable  Map<Long, Integer> prenotatiMap) {
     }
 
     // Tutti i libri
@@ -98,12 +106,17 @@ public class LibroController {
 
     // Crea libro
     @PostMapping
-    public Libro createLibro(@RequestBody Libro libro) {
-        // Usa AutoreService per gestire l'autore con getOrCreate
-        if (libro.getAutore() != null) {
-            libro.setAutore(autoreService.getOrCreate(libro.getAutore()));
+    public ResponseEntity<Libro> createLibro(@RequestBody Libro libro) {
+        // Validazione autore
+        if (libro.getAutore() == null || libro.getAutore().getNome() == null || libro.getAutore().getNome().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
-        return libroRepository.save(libro);
+
+        // Usa AutoreService per gestire l'autore con getOrCreate
+        libro.setAutore(autoreService.getOrCreate(libro.getAutore()));
+        Libro savedLibro = libroRepository.save(libro);
+
+        return ResponseEntity.ok(savedLibro);
     }
 
     // Modifica libro
@@ -127,13 +140,27 @@ public class LibroController {
         return libroRepository.save(libroToUpdate);
     }
 
+    @PutMapping("/{id}/rifornimento")
+    public Libro updateRifornimento(@PathVariable Long id, @RequestBody PriceAndPrenotatiRequest request) {
+        Libro libroToUpdate = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        System.out.println("request: " + request);
+
+        libroToUpdate.getRifornimento().updatePriceAndPrenotati(request);
+
+        System.out.println("Updated libro rifornimento: " + libroToUpdate.getRifornimento());
+
+        return libroRepository.save(libroToUpdate);
+    }
+
     // hide book
     @PutMapping("/{id}/hide")
     public ResponseEntity<Libro> hideLibro(@PathVariable Long id) {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
-        libro.setHidden(false);
+        libro.setHidden(true );
         libroRepository.save(libro);
 
         return ResponseEntity.ok(libro);
@@ -145,7 +172,7 @@ public class LibroController {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
-        libro.setHidden(true);
+        libro.setHidden(false);
         libroRepository.save(libro);
 
         return ResponseEntity.ok(libro);

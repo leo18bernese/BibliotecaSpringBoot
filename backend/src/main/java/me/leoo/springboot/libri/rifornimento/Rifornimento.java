@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.leoo.springboot.libri.libri.LibroController;
 import me.leoo.springboot.libri.utils.LibriUtils;
 import me.leoo.springboot.libri.utils.Sconto;
 import me.leoo.utils.common.random.RandomUtil;
@@ -200,13 +201,10 @@ public class Rifornimento {
 
 
     // Update
-    public Rifornimento updateFrom(Rifornimento rifornimento) {
-        this.quantita = rifornimento.getQuantita();
-        this.prenotatiMap = rifornimento.getPrenotatiMap();
-        this.prezzo = rifornimento.getPrezzo();
-        this.sconto = rifornimento.getSconto();
-        this.giorniConsegna = rifornimento.getGiorniConsegna();
-        this.prossimoRifornimento = rifornimento.getProssimoRifornimento();
+    public Rifornimento updatePriceAndPrenotati(LibroController.PriceAndPrenotatiRequest rifornimento) {
+        this.prezzo = rifornimento.prezzo();
+        this.sconto = rifornimento.sconto();
+        this.prenotatiMap = rifornimento.prenotatiMap() != null ? rifornimento.prenotatiMap() : new HashMap<>();
 
         return this;
     }
