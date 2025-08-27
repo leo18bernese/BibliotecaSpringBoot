@@ -8,6 +8,7 @@ import RemovableField from "./RemovableField";
 import toast from "react-hot-toast";
 import MaskedSuggestionInput from "./MaskedSuggetionInput";
 import CheckableField from "./CheckableField";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookExists = async (id) => {
     if (!id || id <= 0) return false;
@@ -125,6 +126,9 @@ const AdminBookImages = () => {
         e.preventDefault();
         setIsDragOver(false);
     };
+
+    usePageTitle('Book #' + id + ' - Images');
+
 
     if (isBookExistsLoading || areImagesLoading) {
         return (

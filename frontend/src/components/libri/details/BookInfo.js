@@ -9,6 +9,7 @@ import BookInfoTabs from "./BookInfoTabs";
 import {UserContext} from "../../user/UserContext";
 import {useAuth} from "../../user/AuthContext";
 import {useCartMutations} from "../../hook/useCartMutations";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const API_URL = '/api/images';
 
@@ -218,6 +219,8 @@ const BookInfo = () => {
         }
     }, [areReviewsLoading, focusReview, isLoading]);
 
+    usePageTitle(book?.titolo || 'Libro');
+
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-screen">Caricamento...</div>;
     }
@@ -248,6 +251,10 @@ const BookInfo = () => {
 
     const rifornimento = book.rifornimento;
     const isDisponibile = rifornimento.quantita > 0;
+
+    const sconto = rifornimento.sconto;
+    const hasSconto = sconto.percentuale > 0 || sconto.valore > 0;
+
 
     return (
         <>
@@ -283,25 +290,39 @@ const BookInfo = () => {
 
                             <div className="flex items-center space-x-3">
                                 {rifornimento.prezzoTotale < rifornimento.prezzo &&
-                                    <p className="text-red-600 text-2xl line-through font-bold mb-2"
-                                       style={{textDecorationThickness: '3px'}}> {rifornimento.prezzo.toFixed(2)} €</p>
+                                    <p className="text-red-600 text-2xl line-through font-semibold mb-2"
+                                       style={{textDecorationThickness: '2px'}}> {rifornimento.prezzo.toFixed(2)} €</p>
+
                                 }
+
                                 <p className="text-2xl font-semibold mb-2"> {rifornimento.prezzoTotale.toFixed(2)} €</p>
+
+
+                                <div className="group relative flex items-center">
+                                    <span className="w-4 h-4 bg-gray-400 text-white text-xs rounded-full flex items-center justify-center cursor-help">i</span>
+
+                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                        Prezzo comprensivo di IVA
+                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <span className="p-2 rounded-2xl font-semibold uppercase text-sm mb"
-                                  style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
+
+                            {hasSconto && (
+                                <div className="p-2 rounded-2xl font-semibold uppercase text-sm mb-5 inline-block"
+                                      style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
 
                                 {rifornimento.sconto.percentuale > 0 ? (
-                                        <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
-                                    ) :
-                                    (
+                                    <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
+                                ) : rifornimento.sconto.valore > 0 && (
                                     <span className="">-{rifornimento.sconto.valore}€ sconto</span>
-                                    )}
-                            </span>
+                                )}
+                            </div>
+                            )}
 
 
-                            <p className="mt-6 "><b className="font-bold"
+                            <p className="mt-2 "><b className="font-bold"
                                                     style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
 
                             <p className="mt-1 mb-4">

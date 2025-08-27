@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import MaskedSuggestionInput from "./MaskedSuggetionInput";
 import CheckableField from "./CheckableField";
 import {Button} from "antd";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -57,6 +58,8 @@ const AdminBookOverview = () => {
         queryKey: ['images', id],
         queryFn: () => fetchImageIds(id),
     });
+
+    usePageTitle('Book #' + id + ' - Overview');
 
     if (isBookLoading || isBookExistsLoading || areImagesLoading) {
         return <div>Loading...</div>;

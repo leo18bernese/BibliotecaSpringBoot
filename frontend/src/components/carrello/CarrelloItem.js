@@ -59,6 +59,8 @@ const CarrelloItem = ({item}) => {
 
     const imageSource = imageUrl ? `${API_URL}/${item.libroId}/first` : `${API_URL}/nf.jpg`;
 
+    console.log("data libro", item);
+
     return (
         <div key={item.libroId} className="bg-white shadow-md rounded-lg p-4 flex items-center">
             <img
@@ -84,8 +86,9 @@ const CarrelloItem = ({item}) => {
                     </div>
                 </div>
 
-                <div className="text-right font-semibold text-lg ml-4">
-                    <p className="text-gray-500">{item.prezzo} €</p>
+                <div className="text-right font-semibold ml-4">
+                    <p className="text-gray-500  text-lg ">{item.prezzo} €</p>
+                    <span className="text-gray-400 ">ID: {item.libroId}</span>
                 </div>
             </div>
         </div>

@@ -8,6 +8,7 @@ import RemovableField from "./RemovableField";
 import toast from "react-hot-toast";
 import MaskedSuggestionInput from "./MaskedSuggetionInput";
 import CheckableField from "./CheckableField";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -157,6 +158,8 @@ const AdminBook = () => {
             autore.nome.toLowerCase().includes(query.toLowerCase())
         ).map(autore => autore.nome);
     };
+
+    usePageTitle('Book #' + id + ' - Editor');
 
     const initialContent = useMemo(() => {
         return book?.descrizione?.descrizioneHtml || '';

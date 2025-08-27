@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.libri;
 
 import lombok.extern.slf4j.Slf4j;
+import me.leoo.springboot.libri.carrello.CarrelloService;
 import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.autore.AutoreRepository;
 import me.leoo.springboot.libri.libri.autore.AutoreService;
@@ -36,8 +37,11 @@ public class LibroController {
     @Autowired
     private AutoreService autoreService;
 
+    @Autowired
+    private CarrelloService carrelloService;
+
     // DTO per le risposte
-    public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzo,
+    public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzoOriginale, double prezzo,
                                    Sconto sconto) {
     }
 

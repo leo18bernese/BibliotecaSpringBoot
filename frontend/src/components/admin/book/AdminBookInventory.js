@@ -2,6 +2,7 @@ import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "./EditableField";
+import SelectableRadioField from "./SelectableRadioField";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import DescriptionEditor from "../../libri/details/DescriptionEditor";
 import RemovableField from "./RemovableField";
@@ -10,6 +11,7 @@ import MaskedSuggestionInput from "./MaskedSuggetionInput";
 import CheckableField from "./CheckableField";
 import ViewableField from "./ViewableField";
 import ButtonField from "./ButtonField";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -66,20 +68,24 @@ const AdminBookInventory = () => {
         if (book) {
             const rifornimento = book.rifornimento || {};
 
-            console.log(rifornimento.prenotatiMap || []);
+            console.log(rifornimento, " <-- rifornimento");
             setQuantity(rifornimento.quantita || 0);
             setPrenotati(rifornimento.prenotati || 0);
             setDisponibili(rifornimento.disponibili || 0);
 
             setPrezzo(rifornimento.prezzo || 0);
-            setSconto(rifornimento.sconto || {});
 
             // Determina il tipo di sconto basandosi sui dati esistenti
             const scontoData = rifornimento.sconto || {};
-            if (scontoData.percentuale > 0 ){
+            if (scontoData.percentuale > 0) {
+                setSconto({percentuale: scontoData.percentuale});
                 setScontoType('percentage');
             } else if (scontoData.valore > 0) {
+                setSconto({valore: scontoData.valore});
                 setScontoType('fixed');
+            } else {
+                setSconto({});
+                setScontoType('none');
             }
 
             setGiorniConsegna(rifornimento.giorniConsegna || 0);
@@ -98,9 +104,11 @@ const AdminBookInventory = () => {
         if (scontoType === 'percentage') {
             const percentuale = sconto.percentuale || 0;
             return (prezzo - (prezzo * percentuale / 100)).toFixed(2);
+        } else if (scontoType === 'fixed') {
+            const valore = sconto.valore || 0;
+            return Math.max(0, prezzo - valore).toFixed(2);
         } else {
-            const importoFisso = sconto.importoFisso || 0;
-            return Math.max(0, prezzo - importoFisso).toFixed(2);
+            return prezzo.toFixed(2);
         }
     };
 
@@ -121,7 +129,7 @@ const AdminBookInventory = () => {
         // Costruisci l'oggetto sconto nel formato richiesto
         const scontoFormatted = scontoType === 'percentage'
             ? {percentuale: sconto.percentuale || 0, valore: 0}
-            : {percentuale: 0, valore: sconto.importoFisso || 0};
+            : {percentuale: 0, valore: sconto.valore || 0};
 
         const bookData = {
             prezzo: prezzo,
@@ -146,15 +154,21 @@ const AdminBookInventory = () => {
     // Gestisce il cambio di tipo di sconto
     const handleScontoTypeChange = (newType) => {
         setScontoType(newType);
-        // Reset dei valori di sconto quando si cambia tipo
-        if (newType === 'percentage') {
-            setSconto({percentuale: 0});
-        } else {
-            setSconto({importoFisso: 0});
+
+        switch (newType) {
+            case 'percentage':
+                setSconto({percentuale: sconto.percentuale || 0});
+                break;
+            case 'fixed':
+                setSconto({valore: sconto.valore || 0});
+                break;
+            case 'none':
+                setSconto({});
+                break;
         }
+
         setHasUnsavedChanges(true);
     };
-
     // Gestisce navigazione browser (tasti avanti/indietro)
     useEffect(() => {
         if (!hasUnsavedChanges) return;
@@ -195,6 +209,8 @@ const AdminBookInventory = () => {
         };
     }, [hasUnsavedChanges]);
 
+    usePageTitle('Book #' + id + ' - Inventory');
+
     if (isBookLoading || isBookExistsLoading) {
         return <div>Loading...</div>;
     }
@@ -206,6 +222,7 @@ const AdminBookInventory = () => {
     if (!book || !bookExists) {
         return <div className="p-4">Book not found or does not exist.</div>;
     }
+
 
     return (
         <div className="container mx-auto p-4">
@@ -268,68 +285,73 @@ const AdminBookInventory = () => {
                         />
 
                         {/* Discount Type Selector */}
-                        <div className="mt-4 mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Discount Type
-                            </label>
-                            <div className="flex space-x-4">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        value="percentage"
-                                        checked={scontoType === 'percentage'}
-                                        onChange={(e) => handleScontoTypeChange(e.target.value)}
-                                        className="mr-2"
-                                    />
-                                    Percentage
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        value="fixed"
-                                        checked={scontoType === 'fixed'}
-                                        onChange={(e) => handleScontoTypeChange(e.target.value)}
-                                        className="mr-2"
-                                    />
-                                    Fixed Amount
-                                </label>
-                            </div>
-                        </div>
+                        <SelectableRadioField
+                            id="discountType"
+                            label="Discount Type"
+                            description="Select the type of discount to apply"
+                            selectedValue={scontoType}
+                            orientation="horizontal"
+                            options={[
+                                {
+                                    value: 'percentage',
+                                    label: 'Percentage',
+                                    action: (value) => handleScontoTypeChange(value)
+                                },
+                                {
+                                    value: 'fixed',
+                                    label: 'Fixed Amount',
+                                    action: (value) => handleScontoTypeChange(value)
+                                },
+                                {
+                                    value: 'none',
+                                    label: 'No Discount',
+                                    action: (value) => handleScontoTypeChange(value)
+                                }
+                            ]}
+                            onChange={(value) => handleScontoTypeChange(value)}
+                        />
 
                         {/* Discount Value Field */}
-                        {scontoType === 'percentage' ? (
-                            <EditableField key="scontoPercentuale"
-                                           id="scontoPercentuale"
-                                           label="Discount Percentage"
-                                           icon="tag"
-                                           value={sconto.percentuale || 0}
-                                           onChange={(newValue) => {
-                                               const newSconto = parseFloat(newValue);
-                                               if (!isNaN(newSconto) && newSconto >= 0 && newSconto <= 100) {
-                                                   handleFieldChange(setSconto)({percentuale: newSconto});
-                                               } else {
-                                                   toast.error("Invalid discount percentage (0-100).");
-                                               }
-                                           }}
-                                           description="The discount percentage applied to the base price (0-100%)."
-                            />
-                        ) : (
-                            <EditableField key="scontoFisso"
-                                           id="scontoFisso"
-                                           label="Fixed Discount Amount"
-                                           icon="tag"
-                                           value={sconto.importoFisso || 0}
-                                           onChange={(newValue) => {
-                                               const newSconto = parseFloat(newValue);
-                                               if (!isNaN(newSconto) && newSconto >= 0 && newSconto <= prezzo) {
-                                                   handleFieldChange(setSconto)({importoFisso: newSconto});
-                                               } else {
-                                                   toast.error("Invalid fixed discount amount (cannot exceed price).");
-                                               }
-                                           }}
-                                           description="The fixed amount to subtract from the base price."
-                            />
-                        )}
+                        <div className="ml-6">
+                            {scontoType === 'percentage' ? (
+                                <EditableField key="scontoPercentuale"
+                                               id="scontoPercentuale"
+                                               label="Discount Percentage"
+                                               icon="tag"
+                                               value={sconto.percentuale || 0}
+                                               onChange={(newValue) => {
+                                                   const newSconto = parseFloat(newValue);
+                                                   if (!isNaN(newSconto) && newSconto >= 0 && newSconto < 100) {
+                                                       handleFieldChange(setSconto)({percentuale: newSconto});
+                                                   } else {
+                                                       toast.error("Invalid discount percentage (0-100).");
+                                                   }
+                                               }}
+                                               description="The discount percentage applied to the base price (0-100%)."
+                                />
+                            )  : scontoType === 'fixed' ? (
+                                <EditableField key="scontoFisso"
+                                               id="scontoFisso"
+                                               label="Fixed Discount Amount"
+                                               icon="tag"
+                                               value={sconto.valore || 0}
+                                               onChange={(newValue) => {
+                                                   const newSconto = parseFloat(newValue);
+
+                                                   if (!isNaN(newSconto) && newSconto >= 0 && newSconto < prezzo) {
+                                                       handleFieldChange(setSconto)({valore: newSconto});
+                                                   } else {
+                                                       toast.error("Invalid fixed discount amount (0 < newPrice < price).");
+                                                   }
+                                               }}
+                                               description="The fixed amount to subtract from the base price."
+                                />
+                            ) : (
+                                <div className="text-gray-500 italic p-2">
+                                    No discount applied
+                                </div>
+                            )}
+                        </div>
 
                         <ViewableField key="prezzoScontato"
                                        id="prezzoScontato"

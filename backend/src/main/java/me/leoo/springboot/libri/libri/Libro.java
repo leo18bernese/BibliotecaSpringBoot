@@ -126,6 +126,7 @@ public class Libro {
                 this.titolo,
                 this.autore != null ? this.autore.getNome() : null,
                 this.annoPubblicazione,
+                this.rifornimento.getPrezzo(),
                 this.rifornimento.getPrezzoTotale(),
                 this.rifornimento.getSconto()
         );
@@ -175,8 +176,6 @@ public class Libro {
         try {
             String finalPath = IMAGE_DIR + "/" + id;
             Path dirPath = Paths.get(finalPath);
-
-            System.out.println("does " + dirPath + " exist? " + Files.exists(dirPath));
 
             if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
                 return List.of();
