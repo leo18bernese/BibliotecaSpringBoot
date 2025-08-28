@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { UserContext } from "../../user/UserContext";
+import {useAuth} from "../../user/AuthContext";
 
 const fetchHasWishlisted = async (bookId) => {
     const { data } = await axios.get(`/api/wishlist/has/${bookId}`);
@@ -12,15 +13,18 @@ const fetchHasWishlisted = async (bookId) => {
 export const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
-    const { user, showLoginPrompt } = useContext(UserContext);
+    const { user } = useContext(UserContext);
+    const {showLoginPrompt} = useAuth();
     const queryClient = useQueryClient();
 
     // Ho inserito `bookId` come prop in `WishlistProvider`
     const addToWishlist = async (bookId) => {
+        console.log("used:", user);
         if (!user) {
             showLoginPrompt();
             return;
         }
+
         try {
             const { data } = await axios.post(`/api/wishlist/${bookId}`);
             await queryClient.invalidateQueries({
@@ -56,7 +60,7 @@ export const WishlistProvider = ({ children }) => {
             addToWishlist,
             removeFromWishlist,
         }),
-        [addToWishlist, removeFromWishlist]
+        []
     );
 
     return (

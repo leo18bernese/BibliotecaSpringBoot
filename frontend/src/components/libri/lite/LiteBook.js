@@ -90,7 +90,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
                             {hasSconto && (
                                 <div
-                                    className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-semibold">
+                                    className="absolute top-2 left-2 bg-red-500 text-white px-4 py-2 rounded-md font-semibold">
                                     -{sconto.percentuale > 0 ? `${sconto.percentuale}%` : `${sconto.valore}€`}
                                 </div>
                             )}
@@ -102,7 +102,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                         e.stopPropagation();
                                         hasWishlisted ? removeFromWishlist(bookId) : addToWishlist(bookId);
                                     }}
-                                    className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors"
+                                    className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md shadow-gray-500 hover:bg-gray-50 transition-colors"
                                 >
                                     <i className={`${hasWishlisted ? 'bxs-heart text-red-500' : 'bx-heart text-gray-400'} bx text-lg`}></i>
                                 </button>
@@ -114,17 +114,21 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
                     <div className="p-4">
                         <h3>{book.titolo}</h3>
-                        <p>by {book.autore.nome}</p>
+                        <p>by {book.autore}</p>
 
-                        <h3 className="text-gray-600 text-lg">
+                        <div className="mt-8 mb-4">Producted by {book.editore}</div>
+
+                        <h3 className="text-lg font-semibold">
                             {hasSconto && (
-                                <span className="line-through mr-2 text-red-500">
-                                        €{book.prezzoOriginale}
-                                    </span>
+                                <span className="line-through mr-2 text-gray-400 text-base font-normal">
+                                  €{book.prezzoOriginale.toFixed(2)}
+                                </span>
                             )}
-
-                            {book.prezzo ? `€${book.prezzo.toFixed(2)}` : 'Price not available'}
+                            <span className="text-green-600 text-xl font-bold">
+                                {book.prezzo ? `€${book.prezzo.toFixed(2)}` : 'Price not available'}
+                              </span>
                         </h3>
+
                     </div>
 
                 </div>

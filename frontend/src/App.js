@@ -50,11 +50,11 @@ const queryClient = new QueryClient();
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <UserProvider>
-                <CartProvider>
-                    <WishlistProvider>
-                        <Router>
-                            <AuthProvider>
+            <Router>
+                <AuthProvider>
+                    <UserProvider>
+                        <CartProvider>
+                            <WishlistProvider>
                                 <ScrollToTop/>
 
                                 <Toaster position="top-center" reverseOrder={false}/>
@@ -115,11 +115,11 @@ function App() {
                                     <Route path="/register" element={<Register/>}/>
                                     <Route path="/logout" element={<Logout/>}/>
                                 </Routes>
-                            </AuthProvider>
-                        </Router>
-                    </WishlistProvider>
-                </CartProvider>
-            </UserProvider>
+                            </WishlistProvider>
+                        </CartProvider>
+                    </UserProvider>
+                </AuthProvider>
+            </Router>
         </QueryClientProvider>
     );
 }

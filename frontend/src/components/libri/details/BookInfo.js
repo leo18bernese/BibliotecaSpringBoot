@@ -86,6 +86,8 @@ const BookInfo = () => {
     const params = new URLSearchParams(location.search);
     const focusReview = params.get("focusReview");
 
+    const [quantityForCart, setQuantity] = useState(1);
+
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['book', bookId],
@@ -124,6 +126,7 @@ const BookInfo = () => {
         queryFn: () => fetchHasWishlisted(bookId),
         enabled: !!user
     });
+
 
 
     const handlePreviousBook = () => {
@@ -190,6 +193,14 @@ const BookInfo = () => {
         }
     }
 
+    const handleIncrement = () => {
+        setQuantity(prev => prev + 1);
+    };
+
+    const handleDecrement = () => {
+        setQuantity(prev => Math.max(1, prev - 1)); // Non scende sotto 1
+    };
+
     const handleAddToCart = () => {
         if (!user) {
             showLoginPrompt();
@@ -198,7 +209,7 @@ const BookInfo = () => {
 
         addToCartMutation.mutate({
             bookId: book.id,
-            quantity: 1
+            quantity: quantityForCart || 1
         });
     };
 
@@ -299,11 +310,14 @@ const BookInfo = () => {
 
 
                                 <div className="group relative flex items-center">
-                                    <span className="w-4 h-4 bg-gray-400 text-white text-xs rounded-full flex items-center justify-center cursor-help">i</span>
+                                    <span
+                                        className="w-4 h-4 bg-gray-400 text-white text-xs rounded-full flex items-center justify-center cursor-help">i</span>
 
-                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                    <div
+                                        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                                         Prezzo comprensivo di IVA
-                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
+                                        <div
+                                            className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
                                     </div>
                                 </div>
                             </div>
@@ -311,14 +325,14 @@ const BookInfo = () => {
 
                             {hasSconto && (
                                 <div className="p-2 rounded-2xl font-semibold uppercase text-sm mb-5 inline-block"
-                                      style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
+                                     style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
 
-                                {rifornimento.sconto.percentuale > 0 ? (
-                                    <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
-                                ) : rifornimento.sconto.valore > 0 && (
-                                    <span className="">-{rifornimento.sconto.valore}€ sconto</span>
-                                )}
-                            </div>
+                                    {rifornimento.sconto.percentuale > 0 ? (
+                                        <span className="">-{rifornimento.sconto.percentuale}% sconto</span>
+                                    ) : rifornimento.sconto.valore > 0 && (
+                                        <span className="">-{rifornimento.sconto.valore}€ sconto</span>
+                                    )}
+                                </div>
                             )}
 
 
@@ -348,12 +362,25 @@ const BookInfo = () => {
                                 : <p className="mb-4"></p>}
 
                             <div className="flex flex-col gap-2">
-                                <button
-                                    className={`${!isDisponibile || addToCartMutation.isPending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded-xl transition`}
-                                    onClick={handleAddToCart}
-                                    disabled={!isDisponibile || addToCartMutation.isPending}>
-                                    {addToCartMutation.isPending ? 'Aggiungendo...' : 'Aggiungi al carrello'}
-                                </button>
+
+                                <div className="flex items-center gap-4 sm:flex-col md:flex-row lg:flex-row">
+
+                                    <div className="flex gap-3">
+                                        <button className="text-blue-500 font-bold text-2xl" onClick={handleDecrement}>-</button>
+
+                                        <div className="border-4 border-blue-500 p-1.5 rounded-lg ">{quantityForCart}</div>
+
+                                        <button className="text-blue-500 font-bold text-2xl" onClick={handleIncrement}>+</button>
+                                      </div>
+
+                                    <button
+                                        className={`flex-grow ${!isDisponibile || addToCartMutation.isPending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded-xl transition`}
+                                        onClick={handleAddToCart}
+                                        disabled={!isDisponibile || addToCartMutation.isPending}>
+                                        {addToCartMutation.isPending ? 'Aggiungendo...' : 'Aggiungi al carrello'}
+                                    </button>
+                                </div>
+
 
                                 {isDisponibile &&
                                     <button
@@ -436,35 +463,6 @@ const BookInfo = () => {
                             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl transition"
                             onClick={() => navigate(`/book/${bookId}/recensioni/nuova`)}>
                             Pubblica una recensione
-                        </button>
-                    </div>
-                </div>
-
-                <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-                    <h3 className="text-xl font-semibold mb-2">Amministrazione</h3>
-                    <p className="text-gray-600 mb-4">Comandi utili per la gestione del libro</p>
-
-                    <div className="flex flex-wrap gap-4 items-center">
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition">
-                            Modifica
-                        </button>
-
-                        <div className="flex flex-wrap gap-2 items-center">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => setFile(e.target.files[0])}
-                                className="file:mr-4 cursor-pointer file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-600 dark:file:text-white dark:hover:file:bg-blue-700 ..."/>
-                            <button
-                                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition"
-                                onClick={handleUpload}
-                            >
-                                Carica foto
-                            </button>
-                        </div>
-
-                        <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition">
-                            Elimina
                         </button>
                     </div>
                 </div>
