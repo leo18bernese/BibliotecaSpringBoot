@@ -261,7 +261,7 @@ const BookInfo = () => {
     console.log("Book data:", book);
 
     const rifornimento = book.rifornimento;
-    const isDisponibile = rifornimento.quantita > 0;
+    const isDisponibile = rifornimento.quantita > 0 && (!cartItem || (cartItem && (rifornimento.quantita - cartItem.quantita) >= quantityForCart));
 
     const sconto = rifornimento.sconto;
     const hasSconto = sconto.percentuale > 0 || sconto.valore > 0;
@@ -336,9 +336,6 @@ const BookInfo = () => {
                             )}
 
 
-                            <p className="mt-2 "><b className="font-bold"
-                                                    style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
-
                             <p className="mt-1 mb-4">
                                 <b className="text-red-500 font-bold">
                                     {hasWishlisted ?
@@ -356,21 +353,26 @@ const BookInfo = () => {
                                 </b>
                             </p>
 
+
+                            <p className="mt-8 "><b className="font-bold"
+                                                    style={{color: rifornimento.color}}>{rifornimento.status}</b></p>
+
+
                             {cartItem && cartItem.quantita > 0 ?
-                                <p className="mt-1 mb-4"><b className="text-blue-500 font-bold">Hai
+                                <p className=" mb-4"><b className="text-blue-500 font-bold">Hai
                                     già {cartItem.quantita} unità nel carrello</b></p>
                                 : <p className="mb-4"></p>}
 
                             <div className="flex flex-col gap-2">
 
-                                <div className="flex items-center gap-4 sm:flex-col md:flex-row lg:flex-row">
+                                <div className="flex items-center gap-4 flex-row">
 
                                     <div className="flex gap-3">
-                                        <button className="text-blue-500 font-bold text-2xl" onClick={handleDecrement}>-</button>
+                                        <button className="text-blue-500 font-black text-2xl" onClick={handleDecrement}>-</button>
 
-                                        <div className="border-4 border-blue-500 p-1.5 rounded-lg ">{quantityForCart}</div>
+                                        <div className="border-4 border-blue-500 p-1.5 rounded-lg text-blue-800 ">{quantityForCart}</div>
 
-                                        <button className="text-blue-500 font-bold text-2xl" onClick={handleIncrement}>+</button>
+                                        <button className="text-blue-500 font-black text-2xl" onClick={handleIncrement}>+</button>
                                       </div>
 
                                     <button

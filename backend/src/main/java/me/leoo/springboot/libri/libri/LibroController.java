@@ -41,7 +41,7 @@ public class LibroController {
     private CarrelloService carrelloService;
 
     // DTO per le risposte
-    public record LiteBookResponse(Long libroId, String titolo, String autore, int annoPubblicazione, double prezzoOriginale, double prezzo,
+    public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione, double prezzoOriginale, double prezzo,
                                    Sconto sconto) {
     }
 

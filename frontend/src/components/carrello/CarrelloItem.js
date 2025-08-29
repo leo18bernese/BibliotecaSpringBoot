@@ -58,39 +58,64 @@ const CarrelloItem = ({item}) => {
     }
 
     const imageSource = imageUrl ? `${API_URL}/${item.libroId}/first` : `${API_URL}/nf.jpg`;
-
+    const rifornimento = item.rifornimento;
     console.log("data libro", item);
 
     return (
-        <div key={item.libroId} className="bg-white shadow-md rounded-lg p-4 flex items-center">
-            <img
-                src={imageSource}
-                alt={item.titolo}
-                className="w-24 h-32 object-cover rounded-md mr-4"/>
+        <div className="bg-white shadow-md rounded-lg p-4">
+            <div key={item.libroId} className=" flex items-center">
+                <img
+                    src={imageSource}
+                    alt={item.titolo}
+                    className="w-24 h-32 object-cover rounded-md mr-4"/>
 
-            <div className="flex-1 flex justify-between items-start">
-                <div>
-                    <Link to={`/book/${item.libroId}`} className="text-xl font-semibold hover:underline">
-                        {item.titolo}
-                    </Link>
+                <div className="flex-1 flex justify-between items-start">
+                    <div>
+                        <Link to={`/book/${item.libroId}`} className="text-xl font-semibold hover:underline">
+                            {item.titolo}
+                        </Link>
 
-                    <p className="text-gray-700">di {item.autore.nome}</p>
-                    <p className="text-gray-700 mb-4">Scritto nel: {item.annoPubblicazione}</p>
+                        <p className="text-gray-700">di {item.autore.nome}</p>
+                        <p className="text-gray-700 mb-4">Scritto nel: {item.annoPubblicazione}</p>
 
-                    <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
-                        <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => removeItem(item.libroId, 1)}>-</button>
+                        <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
+                            <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => removeItem(item.libroId, 1)}>-
+                            </button>
 
-                        <div className="sm:mx-4 md:mx-2 lg:mx-2">{item.quantita}</div>
+                            <div className="sm:mx-4 md:mx-2 lg:mx-2">{item.quantita}</div>
 
-                        <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => addItem(item.libroId, 1)}>+</button>
+                            <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => addItem(item.libroId, 1)}>+
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="text-right font-semibold ml-4">
+                        <p className="text-gray-500  text-lg ">{item.prezzo} €</p>
+                        <span className="text-gray-400 ">ID: {item.libroId}</span>
                     </div>
                 </div>
 
-                <div className="text-right font-semibold ml-4">
-                    <p className="text-gray-500  text-lg ">{item.prezzo} €</p>
-                    <span className="text-gray-400 ">ID: {item.libroId}</span>
-                </div>
+
             </div>
+
+            {item.quantita > rifornimento.disponibili && (
+                <div className="mt">
+                    <p className="text-red-600 bg-red-200 font-semibold mt-2 p-4 rounded-xl">
+                        <b>Attenzione</b>: La quantità ordinata supera le copie disponibili ({rifornimento.disponibili} in
+                        magazzino).
+
+                        <br/>
+
+                        Clicca qui per ridurre la quantità o aspetta il rifornimento.
+
+                        <br/>
+
+                        {rifornimento.prossimoRifornimento && (
+                            <span> Prossimo rifornimento previsto per il {new Date(rifornimento.prossimoRifornimento).toLocaleDateString()}.</span>
+                        )}
+                    </p>
+                </div>
+            )}
         </div>
     );
 };

@@ -125,6 +125,7 @@ public class Libro {
                 this.id,
                 this.titolo,
                 this.autore != null ? this.autore.getNome() : null,
+                this.editore,
                 this.annoPubblicazione,
                 this.rifornimento.getPrezzo(),
                 this.rifornimento.getPrezzoTotale(),

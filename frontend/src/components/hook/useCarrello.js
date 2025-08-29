@@ -27,9 +27,11 @@ export const useCarrello = () => {
         enabled: !!user?.id,
         staleTime: 5 * 60 * 1000,
         select: (data) => {
-            if (data && Array.isArray(data)) {
-                return [...data].sort((a, b) => a.dataAggiunta.localeCompare(b.dataAggiunta));
+            if (data && Array.isArray(data.items)) {
+                const sortedItems = [...data.items].sort((a, b) => a.dataAggiunta.localeCompare(b.dataAggiunta));
+                return { ...data, items: sortedItems };
             }
+
             return data;
         },
     });
