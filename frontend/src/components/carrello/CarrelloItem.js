@@ -76,7 +76,8 @@ const CarrelloItem = ({item}) => {
                         </Link>
 
                         <p className="text-gray-700">di {item.autore.nome}</p>
-                        <p className="text-gray-700 mb-4">Scritto nel: {item.annoPubblicazione}</p>
+                        <p className="text-gray-700 mb-4">Edizione anno {item.annoPubblicazione}</p>
+                        <p className="text-gray-500 text-sm"> Aggiunto al carrello il: {new Date(item.dataAggiunta).toLocaleString()}</p>
 
                         <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
                             <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => removeItem(item.libroId, 1)}>-
@@ -101,7 +102,8 @@ const CarrelloItem = ({item}) => {
             {item.quantita > rifornimento.disponibili && (
                 <div className="mt">
                     <p className="text-red-600 bg-red-200 font-semibold mt-2 p-4 rounded-xl">
-                        <b>Attenzione</b>: La quantità ordinata supera le copie disponibili ({rifornimento.disponibili} in
+                        <b>Attenzione</b>: La quantità ordinata supera le copie disponibili
+                        ({rifornimento.disponibili} in
                         magazzino).
 
                         <br/>

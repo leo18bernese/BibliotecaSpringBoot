@@ -227,6 +227,7 @@ public class CarrelloController {
             System.out.println("carrello1");
             Ordine ordine = new Ordine(carrello, spedizioneLuogo, request.corriereId(), request.tipoSpedizioneId(), request.indirizzoSpedizione(), request.speseSpedizione(), request.metodoPagamento());
             System.out.println("carrello2");
+
             return ResponseEntity.ok(ordineService.inviaOrdine(ordine));
         } catch (Exception e) {
             System.out.println("Errore durante l'invio dell'ordine: " + e.getMessage());

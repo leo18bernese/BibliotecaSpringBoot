@@ -114,6 +114,12 @@ public class Ordine {
         this.utente = carrello.getUtente();
 
         carrello.clear();
+
+        // Scala le quantità di stock e di prenotati
+        for (OrdineItem item : items) {
+            item.getLibro().getRifornimento().removeQuantita(item.getQuantita());
+            item.getLibro().getRifornimento().removePrenotati( utente.getId());
+        }
     }
 
     public String getNomeCorriere() {

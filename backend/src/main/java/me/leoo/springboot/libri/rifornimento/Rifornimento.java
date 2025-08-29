@@ -73,14 +73,19 @@ public class Rifornimento {
     }
 
     // Reservation
+
+    @Deprecated
     public int getPrenotati() {
-        return prenotatiMap.values().stream().mapToInt(Integer::intValue).sum();
+        return 0;
+        //return prenotatiMap.values().stream().mapToInt(Integer::intValue).sum();
     }
 
+    @Deprecated
     public int getDisponibili() {
-        return quantita - getPrenotati();
+        return quantita /*- getPrenotati()*/;
     }
 
+    @Deprecated
     public boolean isDisponibile(int quantita) {
         return getDisponibili() >= quantita;
     }
@@ -163,7 +168,7 @@ public class Rifornimento {
             return "⚠ In esaurimento. Disponibili solo " + disponibili + " pezzi";
         }
 
-        return "Disponibile. Consegna in " + giorniConsegna + " giorni";
+        return "Disponibili " + disponibili + " unità al momento.";
     }
 
     public String getColor() {
