@@ -2,6 +2,7 @@ package me.leoo.springboot.libri.carrello;
 
 import jakarta.transaction.NotSupportedException;
 import me.leoo.springboot.libri.buono.BuonoService;
+import me.leoo.springboot.libri.carrello.item.CarrelloItem;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.autore.Autore;
@@ -178,6 +179,33 @@ public class CarrelloController {
             return ResponseEntity.badRequest().body("Errore nell'aggiunta del libro al carrello: " + e.getMessage());
         }
     }
+
+    @PutMapping("/set-quantity/{utenteId}")
+    public ResponseEntity<?> setLibroQuantity(@AuthenticationPrincipal Utente utente,
+                                              @RequestBody ItemRequest request,
+                                              @PathVariable Long utenteId) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        if (!utente.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            Utente targetUtente = utenteRepository.findById(utenteId)
+                    .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utenteId));
+
+            System.out.println("Impostazione quantità per l'utente: " + targetUtente.getUsername() + " " + request);
+
+            Carrello carrello = carrelloService.setItemQuantity(targetUtente, request.libroId(), request.quantita());
+            System.out.println("Quantità impostata. Carrello ora ha " + carrello.getItems().size() + " item.");
+            return ResponseEntity.ok(mapToCarrelloResponse(carrello));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore nell'impostazione della quantità del libro nel carrello: " + e.getMessage());
+        }
+    }
+
 
     @DeleteMapping("/items")
     public ResponseEntity<?> removeLibro(@AuthenticationPrincipal Utente utente,

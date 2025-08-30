@@ -14,8 +14,6 @@ import me.leoo.utils.common.time.TimeUtil;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @Entity
@@ -29,11 +27,11 @@ public class Rifornimento {
 
     private int quantita;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    /*@ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "rifornimento_prenotati", joinColumns = @JoinColumn(name = "rifornimento_id"))
     @MapKeyColumn(name = "user_id")
     @Column(name = "quantita_prenotata")
-    private Map<Long, Integer> prenotatiMap = new HashMap<>();
+    private Map<Long, Integer> prenotatiMap = new HashMap<>();*/
 
     private double prezzo;
 
@@ -90,19 +88,20 @@ public class Rifornimento {
         return getDisponibili() >= quantita;
     }
 
+    @Deprecated
     public String addPrenotati(int prenotati, Long userId) {
 
-        //se prenotati attuali + da aggiunge > disponibili, non si può prenotare
+        //se prenotati attuali + da aggiungere > disponibili, non si può prenotare
         //quindi aggiungo prenotati tanti quanti sono i disponibili
         if (getPrenotati() + prenotati > quantita) {
             int disponibili = getDisponibili();
-            prenotatiMap.put(userId, disponibili);
+            //prenotatiMap.put(userId, disponibili);
 
             return "Prenotazione non riuscita. Troppi prenotati. Prenotati solo " + disponibili + " pezzi.";
         }
 
         // Aggiungo prenotati per l'utente
-        prenotatiMap.put(userId, prenotatiMap.getOrDefault(userId, 0) + prenotati);
+       // prenotatiMap.put(userId, prenotatiMap.getOrDefault(userId, 0) + prenotati);
 
         return "Prenotazione riuscita. Prenotati " + prenotati + " pezzi.";
     }
@@ -110,15 +109,17 @@ public class Rifornimento {
     /**
      * remove all prenotati for userId
      */
+    @Deprecated
     public void removePrenotati(Long userId) {
-        prenotatiMap.remove(userId);
+        //prenotatiMap.remove(userId);
     }
 
     /**
      * remove amount of prenotati for userId
      */
+    @Deprecated
     public void removePrenotati(Long userId, int toRemove) {
-        if (!prenotatiMap.containsKey(userId)) return;
+       /* if (!prenotatiMap.containsKey(userId)) return;
 
         int prenotati = prenotatiMap.get(userId);
 
@@ -127,7 +128,7 @@ public class Rifornimento {
             return;
         }
 
-        prenotatiMap.put(userId, prenotati - toRemove);
+        prenotatiMap.put(userId, prenotati - toRemove);*/
     }
     // Price
 
@@ -206,10 +207,10 @@ public class Rifornimento {
 
 
     // Update
-    public Rifornimento updatePriceAndPrenotati(LibroController.PriceAndPrenotatiRequest rifornimento) {
+    public Rifornimento updatePrice(LibroController.PriceRequest rifornimento) {
         this.prezzo = rifornimento.prezzo();
         this.sconto = rifornimento.sconto();
-        this.prenotatiMap = rifornimento.prenotatiMap() != null ? rifornimento.prenotatiMap() : new HashMap<>();
+        //this.prenotatiMap = rifornimento.prenotatiMap() != null ? rifornimento.prenotatiMap() : new HashMap<>();
 
         return this;
     }

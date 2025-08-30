@@ -54,7 +54,7 @@ public class LibroController {
     }
 
     // DTO per rifornimento
-    public record PriceAndPrenotatiRequest(double prezzo, Sconto sconto, Map<Long, Integer> prenotatiMap) {
+    public record PriceRequest(double prezzo, Sconto sconto, Map<Long, Integer> prenotatiMap) {
     }
     public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna, Date prossimoRifornimento,
                                       @Nullable  Map<Long, Integer> prenotatiMap) {
@@ -145,13 +145,13 @@ public class LibroController {
     }
 
     @PutMapping("/{id}/rifornimento")
-    public Libro updateRifornimento(@PathVariable Long id, @RequestBody  PriceAndPrenotatiRequest request) {
+    public Libro updateRifornimento(@PathVariable Long id, @RequestBody PriceRequest request) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
         System.out.println("request: " + request);
 
-        libroToUpdate.getRifornimento().updatePriceAndPrenotati(request);
+        libroToUpdate.getRifornimento().updatePrice(request);
 
         System.out.println("Updated libro rifornimento: " + libroToUpdate.getRifornimento());
 

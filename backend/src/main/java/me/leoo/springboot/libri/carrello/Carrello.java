@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.transaction.NotSupportedException;
 import lombok.*;
 import me.leoo.springboot.libri.buono.Buono;
+import me.leoo.springboot.libri.carrello.item.CarrelloItem;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
@@ -116,7 +117,7 @@ public class Carrello {
         }
 
         if (item.getQuantita() <= quantita) {
-            // remuovi tutti se quantità carrello <= quantità da rimuovere
+            // rimuovi tutti se quantità carrello <= quantità da rimuovere
 
             items.remove(item);
 
@@ -129,6 +130,36 @@ public class Carrello {
 
             rifornimento.removePrenotati(utente.getId(), quantita);
         }
+
+        ultimaModifica = new Date();
+    }
+
+    public void setItemQuantity(Libro libro, int quantita) {
+        if (quantita < 0) {
+            throw new IllegalArgumentException("La quantità non può essere negativa");
+        }
+
+        Rifornimento rifornimento = libro.getRifornimento();
+
+        CarrelloItem item = getItem(libro);
+        if (item == null) {
+            throw new IllegalArgumentException("Libro non trovato nel carrello");
+        }
+
+        int available = rifornimento.getQuantita();
+
+        if (available < quantita) {
+            quantita = available;
+        }
+
+        if (available <= 0) {
+            throw new IllegalArgumentException("Quantità richiesta non disponibile");
+        }
+
+        System.out.println("Setting quantity of " + libro.getTitolo() + " to " + quantita + " (available: " + available + ")");
+        item.setQuantita(quantita);
+        item.setPrezzoAggiunta(libro.getRifornimento().getPrezzoTotale());
+        item.setUltimaModifica(new Date());
 
         ultimaModifica = new Date();
     }

@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "./EditableField";
 import SelectableRadioField from "./SelectableRadioField";
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import DescriptionEditor from "../../libri/details/DescriptionEditor";
 import RemovableField from "./RemovableField";
 import toast from "react-hot-toast";
@@ -15,7 +15,6 @@ import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
-    console.log("fetched book data:", data);
     return data;
 };
 
@@ -23,20 +22,20 @@ const fetchBookExists = async (id) => {
     if (!id || id <= 0) return false;
     const {data} = await axios.get(`/api/libri/exists/${id}`);
     return data;
-}
+};
 
-const updateRifornimento = async ({id, bookData}) => {
-    const {data} = await axios.put(`/api/libri/${id}/rifornimento`, bookData);
-    return data;
-}
-
+// Nuova funzione per fetch delle prenotazioni
+const fetchPrenotazioni = async (id) => {
+    if (!id || id <= 0) return [];
+    const {data} = await axios.get(`/api/rifornimento/${id}/prenotazioni`);
+    return data.content || [];
+};
 
 const AdminBookInventory = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    // 1. Nuovo stato per le modifiche non salvate
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
@@ -47,17 +46,21 @@ const AdminBookInventory = () => {
     const {data: bookExists, isLoading: isBookExistsLoading, error: bookExistsError} = useQuery({
         queryKey: ['bookExists', id],
         queryFn: () => fetchBookExists(id),
+    });
 
+    // Nuova query per le prenotazioni
+    const {data: prenotazioni, isLoading: isPrenotazioniLoading, error: prenotazioniError} = useQuery({
+        queryKey: ['prenotazioni', id],
+        queryFn: () => fetchPrenotazioni(id),
+        enabled: !!id
     });
 
     const [quantity, setQuantity] = useState(0);
-    const [prenotati, setPrenotati] = useState(0);
     const [prenotatiList, setPrenotatiList] = useState([]);
-    const [disponibili, setDisponibili] = useState(0);
 
     const [prezzo, setPrezzo] = useState(0);
     const [sconto, setSconto] = useState({});
-    const [scontoType, setScontoType] = useState('percentage'); // 'percentage' or 'fixed'
+    const [scontoType, setScontoType] = useState('percentage');
 
     const [giorniConsegna, setGiorniConsegna] = useState(0);
 
@@ -67,15 +70,9 @@ const AdminBookInventory = () => {
     useEffect(() => {
         if (book) {
             const rifornimento = book.rifornimento || {};
-
-            console.log(rifornimento, " <-- rifornimento");
             setQuantity(rifornimento.quantita || 0);
-            setPrenotati(rifornimento.prenotati || 0);
-            setDisponibili(rifornimento.disponibili || 0);
-
             setPrezzo(rifornimento.prezzo || 0);
 
-            // Determina il tipo di sconto basandosi sui dati esistenti
             const scontoData = rifornimento.sconto || {};
             if (scontoData.percentuale > 0) {
                 setSconto({percentuale: scontoData.percentuale});
@@ -89,15 +86,18 @@ const AdminBookInventory = () => {
             }
 
             setGiorniConsegna(rifornimento.giorniConsegna || 0);
-
-            const prenotatiMap = rifornimento.prenotatiMap || {};
-            const prenotatiArray = Object.entries(prenotatiMap).map(([userId, quantity]) => ({
-                userId: userId,
-                quantity: quantity
-            }));
-            setPrenotatiList(prenotatiArray)
         }
     }, [book]);
+
+    // Aggiorna la lista prenotazioni quando arrivano i dati
+    useEffect(() => {
+        if (prenotazioni) {
+            setPrenotatiList(prenotazioni.map(p => ({
+                userId: p.utenteId,
+                quantity: p.quantita
+            })));
+        }
+    }, [prenotazioni]);
 
     // Calcola il prezzo scontato basandosi sul tipo di sconto
     const calcolaPrezzoScontato = () => {
@@ -112,12 +112,29 @@ const AdminBookInventory = () => {
         }
     };
 
+    const updateRifornimento = async ({id, bookData}) => {
+
+        {
+            prenotatiList && prenotatiList.forEach(prenota => {
+
+                const requestBody = {
+                    libroId: id,
+                    quantita: prenota.quantity
+                };
+
+                const {data} = axios.put(`/api/carrello/set-quantity/${prenota.userId}`, requestBody);
+                return data;
+            })
+        }
+
+        const {data} = await axios.put(`/api/libri/${id}/rifornimento`, bookData);
+        return data;
+    };
+
     const priceMutation = useMutation({
         mutationFn: updateRifornimento,
         onSuccess: () => {
             toast.success('Libro aggiornato con successo!');
-            // 3. Resetta lo stato dopo un salvataggio riuscito
-
             queryClient.invalidateQueries({queryKey: ['book', id]});
         },
         onError: (error) => {
@@ -126,35 +143,28 @@ const AdminBookInventory = () => {
     });
 
     const handleSave = () => {
-        // Costruisci l'oggetto sconto nel formato richiesto
         const scontoFormatted = scontoType === 'percentage'
             ? {percentuale: sconto.percentuale || 0, valore: 0}
             : {percentuale: 0, valore: sconto.valore || 0};
 
         const bookData = {
             prezzo: prezzo,
-            sconto: scontoFormatted,
-            prenotatiMap: prenotatiList.reduce((acc, curr) => ({...acc, [curr.userId]: curr.quantity}), {})
+            sconto: scontoFormatted
+            // prenotatiMap rimosso
         };
 
         priceMutation.mutate({id, bookData});
-
-        // to check
         setHasUnsavedChanges(false);
-
         navigate("/admin/book/" + id);
     };
 
-    // 4. Funzione helper per gestire le modifiche e impostare lo stato
     const handleFieldChange = (setterFunction) => (value) => {
         setterFunction(value);
         setHasUnsavedChanges(true);
     };
 
-    // Gestisce il cambio di tipo di sconto
     const handleScontoTypeChange = (newType) => {
         setScontoType(newType);
-
         switch (newType) {
             case 'percentage':
                 setSconto({percentuale: sconto.percentuale || 0});
@@ -166,13 +176,11 @@ const AdminBookInventory = () => {
                 setSconto({});
                 break;
         }
-
         setHasUnsavedChanges(true);
     };
-    // Gestisce navigazione browser (tasti avanti/indietro)
+
     useEffect(() => {
         if (!hasUnsavedChanges) return;
-
         const handlePopState = (event) => {
             const confirmLeave = window.confirm(
                 'Hai modifiche non salvate. Sei sicuro di voler lasciare questa pagina?'
@@ -183,16 +191,13 @@ const AdminBookInventory = () => {
                 setHasUnsavedChanges(false);
             }
         };
-
         window.history.pushState(null, '', window.location.pathname);
         window.addEventListener('popstate', handlePopState);
-
         return () => {
             window.removeEventListener('popstate', handlePopState);
         };
     }, [hasUnsavedChanges]);
 
-    // Mantieni l'useEffect per beforeunload (per reload/chiusura tab)
     useEffect(() => {
         const handleBeforeUnload = (event) => {
             if (hasUnsavedChanges) {
@@ -201,9 +206,7 @@ const AdminBookInventory = () => {
                 return event.returnValue;
             }
         };
-
         window.addEventListener('beforeunload', handleBeforeUnload);
-
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
@@ -211,18 +214,17 @@ const AdminBookInventory = () => {
 
     usePageTitle('Book #' + id + ' - Inventory');
 
-    if (isBookLoading || isBookExistsLoading) {
+    if (isBookLoading || isBookExistsLoading || isPrenotazioniLoading) {
         return <div>Loading...</div>;
     }
 
-    if (bookError || bookExistsError) {
+    if (bookError || bookExistsError || prenotazioniError) {
         return <div>Error loading book data.</div>;
     }
 
     if (!book || !bookExists) {
         return <div className="p-4">Book not found or does not exist.</div>;
     }
-
 
     return (
         <div className="container mx-auto p-4">
@@ -234,11 +236,9 @@ const AdminBookInventory = () => {
             </p>
 
             <div className="flex-col mt-4">
-
                 <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
                     <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h2 className="text-md font-semibold rounded-md">Stock information</h2>
-
                         <ViewableField key="quantity"
                                        id="quantity"
                                        label="Available Quantity"
@@ -247,7 +247,7 @@ const AdminBookInventory = () => {
                                        description="The number of copies available in stock."
                         />
 
-                        <ViewableField key="prenotati"
+                        {/*<ViewableField key="prenotati"
                                        id="prenotati"
                                        label="Reserved Copies"
                                        icon="bookmark"
@@ -255,7 +255,6 @@ const AdminBookInventory = () => {
                                        description="The number of copies that are reserved by users.
                                  You can see the list of reservations in the 'Reservations' section."
                         />
-
                         <ViewableField key="disponibili"
                                        id="disponibili"
                                        label="Available for Sale"
@@ -263,11 +262,10 @@ const AdminBookInventory = () => {
                                        value={disponibili}
                                        description="The number of copies available for sale after reservations."
                         />
+                        */}
                     </div>
-
                     <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h3 className="font-semibold">Prices and Discounts</h3>
-
                         <EditableField key="prezzo"
                                        id="prezzo"
                                        label="Price"
@@ -283,8 +281,6 @@ const AdminBookInventory = () => {
                                        }}
                                        description="The base price of the book. You can apply discounts to this price."
                         />
-
-                        {/* Discount Type Selector */}
                         <SelectableRadioField
                             id="discountType"
                             label="Discount Type"
@@ -310,8 +306,6 @@ const AdminBookInventory = () => {
                             ]}
                             onChange={(value) => handleScontoTypeChange(value)}
                         />
-
-                        {/* Discount Value Field */}
                         <div className="ml-6">
                             {scontoType === 'percentage' ? (
                                 <EditableField key="scontoPercentuale"
@@ -329,7 +323,7 @@ const AdminBookInventory = () => {
                                                }}
                                                description="The discount percentage applied to the base price (0-100%)."
                                 />
-                            )  : scontoType === 'fixed' ? (
+                            ) : scontoType === 'fixed' ? (
                                 <EditableField key="scontoFisso"
                                                id="scontoFisso"
                                                label="Fixed Discount Amount"
@@ -337,7 +331,6 @@ const AdminBookInventory = () => {
                                                value={sconto.valore || 0}
                                                onChange={(newValue) => {
                                                    const newSconto = parseFloat(newValue);
-
                                                    if (!isNaN(newSconto) && newSconto >= 0 && newSconto < prezzo) {
                                                        handleFieldChange(setSconto)({valore: newSconto});
                                                    } else {
@@ -352,7 +345,6 @@ const AdminBookInventory = () => {
                                 </div>
                             )}
                         </div>
-
                         <ViewableField key="prezzoScontato"
                                        id="prezzoScontato"
                                        label="Discounted Price"
@@ -360,21 +352,16 @@ const AdminBookInventory = () => {
                                        value={calcolaPrezzoScontato()}
                                        description="The price after applying the discount."
                         />
-
                     </div>
-
                 </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-[35%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
                     <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h3 className="font-semibold">Reservations List</h3>
-
                         {prenotatiList.length === 0 && (
                             <div className="text-gray-500 mt-2">
                                 No reservations found.
                             </div>
                         )}
-
                         {prenotatiList.length > 0 && (
                             <>
                                 <div className="mt-5">
@@ -392,22 +379,16 @@ const AdminBookInventory = () => {
                                         </button>
                                     )}
                                 </div>
-
-
                                 {showPrenotati && (
-
                                     prenotatiList.map((reservation, index) => (
-
-                                        < div
+                                        <div
                                             className={(index % 2 === 0 ? "bg-gray-200" : "bg-white") + " ml-4 rounded-md"}>
-
                                             <div className="mt-6 p-4">
                                                 <span className="font-semibold">User ID:</span> {reservation.userId}
                                                 <br/>
                                                 <span
                                                     className="font-semibold">Reserved Quantity:</span> {reservation.quantity}
                                             </div>
-
                                             <div className="flex flex-row items-center">
                                                 <ButtonField key={`decrease-${index}`}
                                                              id={`decrease-${index}`}
@@ -419,15 +400,13 @@ const AdminBookInventory = () => {
                                                                  if (updatedList[index].quantity > 0) {
                                                                      updatedList[index].quantity -= 1;
                                                                      setPrenotatiList(updatedList);
-                                                                     setPrenotati(prenotati - 1);
-                                                                     setDisponibili(disponibili + 1);
-                                                                     setHasUnsavedChanges(true); // Aggiorna lo stato
+
+                                                                     setHasUnsavedChanges(true);
                                                                  } else {
                                                                      toast.error("Cannot decrease reservation below zero.");
                                                                  }
                                                              }}
                                                 />
-
                                                 <ButtonField key={`increase-${index}`}
                                                              id={`increase-${index}`}
                                                              icon="plus-circle"
@@ -436,19 +415,12 @@ const AdminBookInventory = () => {
                                                              onChange={() => {
                                                                  const updatedList = [...prenotatiList];
 
-                                                                 if (prenotati + 1 > quantity) {
-                                                                     toast.error("Cannot increase reservation beyond available stock.");
-                                                                     return;
-                                                                 }
-
                                                                  updatedList[index].quantity += 1;
                                                                  setPrenotatiList(updatedList);
-                                                                 setPrenotati(prenotati + 1);
-                                                                 setDisponibili(disponibili - 1);
-                                                                 setHasUnsavedChanges(true); // Aggiorna lo stato
+
+                                                                 setHasUnsavedChanges(true);
                                                              }}
                                                 />
-
                                                 <ButtonField key={`remove-${index}`}
                                                              id={`remove-${index}`}
                                                              icon="trash"
@@ -457,14 +429,12 @@ const AdminBookInventory = () => {
                                                              onChange={() => {
                                                                  const updatedList = prenotatiList.filter((_, i) => i !== index);
                                                                  setPrenotatiList(updatedList);
-                                                                 setPrenotati(prenotati - reservation.quantity);
-                                                                 setDisponibili(disponibili + reservation.quantity);
-                                                                 setHasUnsavedChanges(true); // Aggiorna lo stato
+
+                                                                 setHasUnsavedChanges(true);
                                                              }}
                                                 />
                                             </div>
                                         </div>
-
                                     ))
                                 )}
                             </>
@@ -472,22 +442,18 @@ const AdminBookInventory = () => {
                     </div>
                 </div>
             </div>
-
             <div className="fixed bottom-4 right-4">
                 <button
                     onClick={handleSave}
-                    className={`px-6 py-3 text-white rounded-lg transition-colors duration-200 
+                    className={`px-6 py-3 text-white rounded-lg transition-colors duration-200
                   ${hasUnsavedChanges ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
                     disabled={!hasUnsavedChanges}
                 >
                     {hasUnsavedChanges ? 'Save Changes' : 'No Changes'}
                 </button>
             </div>
-
-
         </div>
     );
-
-}
+};
 
 export default AdminBookInventory;

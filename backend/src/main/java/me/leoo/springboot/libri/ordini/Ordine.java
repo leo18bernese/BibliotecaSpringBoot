@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.carrello.Carrello;
-import me.leoo.springboot.libri.carrello.CarrelloItem;
+import me.leoo.springboot.libri.carrello.item.CarrelloItem;
 import me.leoo.springboot.libri.spedizione.*;
 import me.leoo.springboot.libri.utente.Utente;
 

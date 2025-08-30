@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.carrello;
 
 import me.leoo.springboot.libri.buono.Buono;
+import me.leoo.springboot.libri.carrello.item.CarrelloItem;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.utente.Utente;
@@ -45,6 +46,17 @@ public class CarrelloService {
                 .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
 
         carrello.removeItem(libro, quantita);
+        return carrelloRepository.save(carrello);
+    }
+
+    @Transactional
+    public Carrello setItemQuantity(Utente utente, Long libroId, int quantita) {
+        Carrello carrello = getCarrelloByUtente(utente);
+        Libro libro = libroRepository.findById(libroId)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
+        System.out.println("Setting quantity of libro ID " + libroId + " to " + quantita);
+
+        carrello.setItemQuantity(libro, quantita);
         return carrelloRepository.save(carrello);
     }
 

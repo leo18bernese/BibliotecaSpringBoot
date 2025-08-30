@@ -1,9 +1,10 @@
-package me.leoo.springboot.libri.carrello;
+package me.leoo.springboot.libri.carrello.item;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.libri.Libro;
 
 import java.util.Date;

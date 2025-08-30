@@ -125,12 +125,12 @@ const CarrelloItem = ({item}) => {
                             il: {new Date(item.dataAggiunta).toLocaleString()}</p>
 
                         <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
-                            <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => removeItem(item.libroId, 1)}>-
+                            <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md" onClick={() => removeItem(item.libroId, 1)}>-
                             </button>
 
                             <div className="sm:mx-4 md:mx-2 lg:mx-2">{item.quantita}</div>
 
-                            <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => addItem(item.libroId, 1)}>+
+                            <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md" onClick={() => addItem(item.libroId, 1)}>+
                             </button>
                         </div>
                     </div>

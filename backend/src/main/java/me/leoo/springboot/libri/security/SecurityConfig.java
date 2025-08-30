@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,11 +34,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/assets/**", "/favicon.ico", "/ws/**").permitAll()
                         // Endpoints pubblici
-                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**","/api/home/**", "/api/autori", "/h2-console/**", "/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**", "/api/home/**", "/api/autori", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione
-                        .requestMatchers("/api/utenti/current", "/api/carrello/**",  "/api/buono/**", "/api/ordini/**", "api/resi/**", "/api/wishlist/**").authenticated()
+                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/buono/**", "/api/ordini/**", "api/resi/**", "/api/wishlist/**").authenticated()
                         // Endpoints per gli amministratori
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/api/rifornimento").hasRole("ADMIN")
                         // Proteggi tutti gli altri endpoint per default
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
