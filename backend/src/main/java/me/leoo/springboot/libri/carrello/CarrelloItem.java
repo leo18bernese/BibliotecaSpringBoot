@@ -27,6 +27,7 @@ public class CarrelloItem {
     private Libro libro;
 
     private int quantita;
+    private double prezzoAggiunta;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date aggiunta;
@@ -38,7 +39,18 @@ public class CarrelloItem {
         this.carrello = carrello;
         this.libro = libro;
         this.quantita = quantita;
+        this.prezzoAggiunta = libro.getRifornimento().getPrezzoTotale();
         this.aggiunta = new Date();
+        this.ultimaModifica = new Date();
+    }
+
+    public void fixQuantity(Libro libro) {
+        this.quantita = Math.min(this.quantita, libro.getRifornimento().getQuantita());
+        this.ultimaModifica = new Date();
+    }
+
+    public void confirmNotices(Libro libro) {
+        this.prezzoAggiunta = libro.getRifornimento().getPrezzoTotale();
         this.ultimaModifica = new Date();
     }
 }

@@ -49,7 +49,8 @@ public class CarrelloController {
 
     // DTO per le risposte
     public record CarrelloItemResponse(Long libroId, String titolo, Autore autore, int annoPubblicazione, int quantita,
-                                       Date dataAggiunta, double prezzo, Rifornimento rifornimento) {
+                                       Date dataAggiunta, double prezzo, double prezzoAggiunta,
+                                       Rifornimento rifornimento) {
     }
 
     public record CouponResponse(String codice, double percentuale, double valore) {
@@ -81,6 +82,7 @@ public class CarrelloController {
                             item.getQuantita(),
                             item.getAggiunta(),
                             libro.getRifornimento().getPrezzoTotale(),
+                            item.getPrezzoAggiunta(),
                             libro.getRifornimento()
                     );
                 })
@@ -202,11 +204,61 @@ public class CarrelloController {
                     item.getQuantita(),
                     item.getUltimaModifica(),
                     libro.getRifornimento().getPrezzoTotale(),
+                    item.getPrezzoAggiunta(),
                     libro.getRifornimento());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/fix-quantity/{libroId}")
+    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
+        try {
+            Utente user = utenteRepository.findById(utente.getId())
+                    .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
+
+            Libro libro = libroRepository.findById(libroId)
+                    .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
+
+            Carrello carrello = carrelloService.getCarrelloByUtente(user);
+
+            CarrelloItem item = carrello.getItem(libro);
+            if (item == null) {
+                return ResponseEntity.badRequest().body("Il libro non è presente nel carrello.");
+            }
+
+            item.fixQuantity(libro);
+            carrelloRepository.save(carrello);
+            return ResponseEntity.ok("Quantità aggiornata se necessario.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore nell'aggiornamento della quantità: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/confirm-notices/{libroId}")
+    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
+        try {
+            Utente user = utenteRepository.findById(utente.getId())
+                    .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
+
+            Libro libro = libroRepository.findById(libroId)
+                    .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
+
+            Carrello carrello = carrelloService.getCarrelloByUtente(user);
+
+            CarrelloItem item = carrello.getItem(libro);
+            if (item == null) {
+                return ResponseEntity.badRequest().body("Il libro non è presente nel carrello.");
+            }
+
+            item.confirmNotices(libro);
+            carrelloRepository.save(carrello);
+
+            return ResponseEntity.ok("Notifica confermata e rimossa.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore nella conferma della notifica: " + e.getMessage());
         }
     }
 

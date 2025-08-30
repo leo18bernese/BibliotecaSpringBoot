@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import {Link} from "react-router-dom";
@@ -24,9 +24,32 @@ const fetchImageByBookId = async (bookId) => {
     }
 };
 
+const confirmNotices = async (bookId) => {
+    try {
+        const {data} = await axios.put(`/api/carrello/confirm-notices/${bookId}`);
+        return data;
+    } catch (error) {
+        console.error(`Error confirming notices for book ID ${bookId}:`, error);
+        toast.error('Errore durante la conferma degli avvisi di rifornimento.');
+        throw error;
+    }
+}
+
+const fixQuantity = async (bookId) => {
+    try {
+        const {data} = await axios.put(`/api/carrello/fix-quantity/${bookId}`);
+        return data;
+    } catch (error) {
+        console.error(`Error fixing quantity for book ID ${bookId}:`, error);
+        toast.error('Errore durante la sistemazione della quantità.');
+        throw error;
+    }
+}
+
 const CarrelloItem = ({item}) => {
 
     const {addItem, removeItem} = useContext(CartContext);
+    const queryClient = useQueryClient();
 
     const {
         data: imageUrl,
@@ -40,6 +63,27 @@ const CarrelloItem = ({item}) => {
         enabled: !!item.libroId,
         staleTime: Infinity, // Images typically don't change often
     });
+
+    const fixQuantityMutation = useMutation({
+        mutationFn: fixQuantity,
+        onSuccess: () => {
+            toast.success('La quantità è stata corretta.');
+        },
+        onSettled: () => {
+            return queryClient.invalidateQueries({queryKey: ['carrello']});
+        }
+    });
+
+    const confirmNoticesMutation = useMutation({
+        mutationFn: confirmNotices,
+        onSuccess: () => {
+            toast.success('Avviso confermato.');
+        },
+        onSettled: () => {
+            return queryClient.invalidateQueries({queryKey: ['carrello']});
+        }
+    });
+
 
     if (areImageLoading) {
         return (
@@ -67,7 +111,7 @@ const CarrelloItem = ({item}) => {
                 <img
                     src={imageSource}
                     alt={item.titolo}
-                    className="w-24 h-32 object-cover rounded-md mr-4"/>
+                    className="w-32 h-40 object-cover rounded-md mr-4"/>
 
                 <div className="flex-1 flex justify-between items-start">
                     <div>
@@ -77,7 +121,8 @@ const CarrelloItem = ({item}) => {
 
                         <p className="text-gray-700">di {item.autore.nome}</p>
                         <p className="text-gray-700 mb-4">Edizione anno {item.annoPubblicazione}</p>
-                        <p className="text-gray-500 text-sm"> Aggiunto al carrello il: {new Date(item.dataAggiunta).toLocaleString()}</p>
+                        <p className="text-gray-500 text-sm"> Aggiunto al carrello
+                            il: {new Date(item.dataAggiunta).toLocaleString()}</p>
 
                         <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
                             <button className="sm:mx-2 md:mx-1 lg:mx-1" onClick={() => removeItem(item.libroId, 1)}>-
@@ -108,7 +153,14 @@ const CarrelloItem = ({item}) => {
 
                         <br/>
 
-                        Clicca qui per ridurre la quantità o aspetta il rifornimento.
+                        <button
+                            className="font-bold underline hover:text-red-800"
+                            onClick={() => fixQuantityMutation.mutate(item.libroId)}
+                            disabled={fixQuantityMutation.isPending}
+                        >
+                            {fixQuantityMutation.isPending ? 'Sistemando...' : 'Clicca qui'}
+                        </button>
+                        {' '}per ridurre la quantità o aspetta il rifornimento.
 
                         <br/>
 
@@ -118,6 +170,68 @@ const CarrelloItem = ({item}) => {
                     </p>
                 </div>
             )}
+
+            {item.prezzoAggiunta > 0 && (
+                <>
+                    {item.prezzoAggiunta > item.prezzo && (
+                        <div className="mt-2">
+                            <p className="text-green-600 bg-green-200 font-semibold p-4 rounded-xl">
+                                Il prezzo di questo articolo è diminuito
+                                di {((item.prezzoAggiunta - item.prezzo)).toFixed(2)} €
+                                per unità rispetto a quando è stato aggiunto al carrello.
+
+                                <br/>
+                                <br/>
+
+                                <span className=" text-gray-500">Prezzo:
+                                    <span className="line-through">{item.prezzoAggiunta}</span> € → <span className="font-bold">{item.prezzo} €</span>
+                                </span>
+
+                                <br/>
+                                <br/>
+
+                                <button
+                                    className="font-bold underline hover:text-green-800"
+                                    onClick={() => confirmNoticesMutation.mutate(item.libroId)}
+                                    disabled={confirmNoticesMutation.isPending}
+                                >
+                                    {confirmNoticesMutation.isPending ? 'Confermando...' : 'Clicca per rimuovere l\'avviso'}
+                                </button>
+                            </p>
+                        </div>
+                    )}
+
+                    {item.prezzoAggiunta < item.prezzo && (
+                        <div className="mt-2">
+                            <p className="text-orange-600 bg-orange-200 font-semibold p-4 rounded-xl">
+                                Il prezzo di questo articolo è aumentato
+                                di {((item.prezzo - item.prezzoAggiunta)).toFixed(2)} €
+                                per unità rispetto a quando è stato aggiunto al carrello.
+
+                                <br/>
+                                <br/>
+
+                                <span className=" text-gray-500">Prezzo:
+                                    <span className="line-through">{item.prezzoAggiunta}</span> € → <span className="font-bold">{item.prezzo} €</span>
+                                </span>
+
+                                <br/>
+                                <br/>
+
+                                <button
+                                    className="font-bold underline hover:text-orange-800"
+                                    onClick={() => confirmNoticesMutation.mutate(item.libroId)}
+                                    disabled={confirmNoticesMutation.isPending}
+                                >
+                                    {confirmNoticesMutation.isPending ? 'Confermando...' : 'Clicca per rimuovere l\'avviso'}
+                                </button>
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
+
+
         </div>
     );
 };

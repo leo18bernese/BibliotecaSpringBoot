@@ -79,11 +79,11 @@ public class Carrello {
         int existingQuantity = item != null ? item.getQuantita() : 0;
         int available = rifornimento.getQuantita() - existingQuantity;
 
-        if(available <= 0) {
+        if (available <= 0) {
             throw new IllegalArgumentException("Quantità richiesta non disponibile");
         }
 
-        if(available < quantita) {
+        if (available < quantita) {
             quantita = available;
         }
 
@@ -93,6 +93,7 @@ public class Carrello {
         } else {
             System.out.println("item is not null, updating existing item");
             item.setQuantita(item.getQuantita() + quantita);
+            item.setPrezzoAggiunta(libro.getRifornimento().getPrezzoTotale());
             item.setUltimaModifica(new Date());
         }
 
@@ -257,7 +258,7 @@ public class Carrello {
         return !items.isEmpty() && items.stream().allMatch(i -> i.getLibro().getRifornimento().isDisponibile(i.getQuantita()));
     }
 
-    public void clearItems(){
+    public void clearItems() {
         items.forEach(i -> i.getLibro().getRifornimento().removePrenotati(utente.getId()));
         items.clear();
 
@@ -271,7 +272,7 @@ public class Carrello {
         dataCreazione = new Date();
         ultimaModifica = new Date();
 
-        return  this;
+        return this;
     }
 
 }

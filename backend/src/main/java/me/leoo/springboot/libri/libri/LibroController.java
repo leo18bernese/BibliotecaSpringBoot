@@ -145,7 +145,7 @@ public class LibroController {
     }
 
     @PutMapping("/{id}/rifornimento")
-    public Libro updateRifornimento(@PathVariable Long id, @RequestBody PriceAndPrenotatiRequest request) {
+    public Libro updateRifornimento(@PathVariable Long id, @RequestBody  PriceAndPrenotatiRequest request) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 

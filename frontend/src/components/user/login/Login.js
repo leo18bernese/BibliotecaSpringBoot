@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import { UserContext } from "../UserContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,6 +11,7 @@ const Login = () => {
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
 
+    const [showPassword, setShowPassword] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
 
     if(user && !loggedIn) {
@@ -82,17 +83,23 @@ const Login = () => {
                     />
                 </div>
 
-                <div>
+                <div className="relative">
                     <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
                         Password
                     </label>
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         id="password"
                         name="password"
                         placeholder="Enter your password"
                         className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                     />
+
+                    <div className="absolute top-8 right-0 pr-3 flex items-center text-sm leading-5">
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-gray-500">
+                            <i className={`bx bx-${showPassword ? "eye-slash" : "eye"} text-xl`}></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="text-center mt-4">
