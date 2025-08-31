@@ -357,11 +357,13 @@ const AdminBookInventory = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-[35%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
                     <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h3 className="font-semibold">Reservations List</h3>
+
                         {prenotatiList.length === 0 && (
                             <div className="text-gray-500 mt-2">
                                 No reservations found.
                             </div>
                         )}
+
                         {prenotatiList.length > 0 && (
                             <>
                                 <div className="mt-5">

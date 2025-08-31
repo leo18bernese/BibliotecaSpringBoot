@@ -39,6 +39,9 @@ const CheckOut = () => {
         country: ''
     });
 
+    const [showSavedAddresses, setShowSavedAddresses] = useState(false);
+    const [selectedSavedAddress, setSelectedSavedAddress] = useState(null);
+
     const handleAddressChange = (e) => {
         const {name, value} = e.target;
         setShippingAddress(prev => ({...prev, [name]: value}));
@@ -69,7 +72,7 @@ const CheckOut = () => {
     const [countdown, setCountdown] = useState(5);
 
     useEffect(() => {
-        if (!carrello || !isLoadingCart ||  !carrello.canCheckout) {
+        if (!carrello || !isLoadingCart || !carrello.canCheckout) {
 
             console.log("counter", countdown);
 
@@ -79,7 +82,7 @@ const CheckOut = () => {
             }
 
             const countdownInterval = setInterval(() => {
-                if(!carrello.canCheckout) {
+                if (!carrello.canCheckout) {
                     setCountdown(prevCountdown => prevCountdown > 0 ? prevCountdown - 1 : 0);
                 }
             }, 1000);
@@ -290,6 +293,85 @@ const CheckOut = () => {
                                         PRIMA che l'ordine venga impacchettato. <br/>
                                         Se commetti un errore correggilo il prima possibile essendo che l'ordine viene
                                         poi gestito dal corriere e non da noi.</p>
+
+                                    {user.indirizzi.length > 0 && (
+                                        <div className="mb-8">
+                                            <div className="mt-5">
+                                                {showSavedAddresses ? (
+                                                    <button
+                                                        className="bg-gray-200 hover:bg-gray-300 text-gray-700  rounded p-3 transition"
+                                                        onClick={() => setShowSavedAddresses(false)}>
+                                                       Nascondi Indirizzi Salvati
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        className="bg-gray-200 hover:bg-gray-300 text-gray-700  rounded p-3 transition"
+                                                        onClick={() => setShowSavedAddresses(true)}>
+                                                        Mostra Indirizzi Salvati ({user.indirizzi.length})
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {showSavedAddresses &&
+                                                <div className="ml-6 mt-4">
+
+                                                    <div
+                                                        className="border px-3 py-3 mb-2 rounded hover:bg-gray-50 cursor-pointer flex items-center"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Implement edit functionality if needed
+                                                            toast("Add new address functionality not implemented yet.");
+                                                        }}>
+
+                                                            <i className='bxr bxs-plus-square text-2xl' style={{color: '#00c90b'}}></i>
+                                                            <span className="ml-2 font-semibold underline">Aggiungi Nuovo Indirizzo</span>
+                                                    </div>
+
+                                                        {user.indirizzi.map((addr) => (
+                                                        <div key={addr.id}
+                                                             className="border px-3 py-3 mb-2 rounded hover:bg-gray-50 cursor-pointer"
+                                                             onClick={() => setShippingAddress({
+                                                                 name: addr.nome,
+                                                                 address: addr.indirizzo,
+                                                                 city: addr.citta,
+                                                                 postalCode: addr.cap,
+                                                                 country: addr.provincia
+                                                             })}>
+
+                                                            <div className="flex flex-row justify-between">
+                                                                <div>
+                                                                    <p className="font-semibold">{addr.nome}</p>
+                                                                    <p>{addr.indirizzo}, {addr.citta}, {addr.provincia}, {addr.cap}</p>
+                                                                </div>
+
+                                                                <div>
+                                                                    <button className="ml-4 text-2xl hover:underline"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                // Implement edit functionality if needed
+                                                                                toast("Edit functionality not implemented yet.");
+                                                                            }}>
+                                                                        <i className="bxr bx-edit"></i>
+                                                                    </button>
+
+                                                                    <button className="ml-2 text-2xl hover:underline"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                // Implement delete functionality if needed
+                                                                                toast("Delete functionality not implemented yet.");
+                                                                            }}>
+                                                                        <i className="bxr bx-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            }
+                                        </div>
+                                    )}
+
 
                                     <AddressForm
                                         addressData={shippingAddress}
