@@ -1,4 +1,4 @@
-package me.leoo.springboot.libri.libri.recommendation;
+package me.leoo.springboot.libri.recommendation;
 
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;

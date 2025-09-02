@@ -151,7 +151,7 @@ public class LibroController {
 
         System.out.println("request: " + request);
 
-        libroToUpdate.getRifornimento().updatePrice(request);
+        libroToUpdate.getPrezzo().updatePrice(request);
 
         System.out.println("Updated libro rifornimento: " + libroToUpdate.getRifornimento());
 

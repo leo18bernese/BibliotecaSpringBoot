@@ -9,4 +9,8 @@ public record LibroDimension(double length, double width, double height,
     public LibroDimension() {
         this(0.0, 0.0, 0.0, 0.0);
     }
+
+    public double getVolume() {
+        return length * width * height;
+    }
 }

@@ -41,8 +41,8 @@ public class OrdineItem {
         this.libro = libro;
         this.titolo = libro.getTitolo();
         this.quantita = quantita;
-        this.prezzo = libro.getRifornimento().getPrezzoTotale();
-        this.sconto = libro.getRifornimento().getSconto();
+        this.prezzo = libro.getPrezzo().getPrezzoTotale();
+        this.sconto = libro.getPrezzo().getSconto();
         this.dataAggiunta = dataAggiunta;
     }
 

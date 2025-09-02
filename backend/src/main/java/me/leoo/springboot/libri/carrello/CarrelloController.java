@@ -82,7 +82,7 @@ public class CarrelloController {
                             libro.getAnnoPubblicazione(),
                             item.getQuantita(),
                             item.getAggiunta(),
-                            libro.getRifornimento().getPrezzoTotale(),
+                            libro.getPrezzo().getPrezzoTotale(),
                             item.getPrezzoAggiunta(),
                             libro.getRifornimento()
                     );
@@ -231,7 +231,7 @@ public class CarrelloController {
                     libro.getAnnoPubblicazione(),
                     item.getQuantita(),
                     item.getUltimaModifica(),
-                    libro.getRifornimento().getPrezzoTotale(),
+                    libro.getPrezzo().getPrezzoTotale(),
                     item.getPrezzoAggiunta(),
                     libro.getRifornimento());
 

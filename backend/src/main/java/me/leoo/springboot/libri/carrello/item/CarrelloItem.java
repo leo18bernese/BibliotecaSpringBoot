@@ -40,7 +40,7 @@ public class CarrelloItem {
         this.carrello = carrello;
         this.libro = libro;
         this.quantita = quantita;
-        this.prezzoAggiunta = libro.getRifornimento().getPrezzoTotale();
+        this.prezzoAggiunta = libro.getPrezzo().getPrezzoTotale();
         this.aggiunta = new Date();
         this.ultimaModifica = new Date();
     }
@@ -51,7 +51,7 @@ public class CarrelloItem {
     }
 
     public void confirmNotices(Libro libro) {
-        this.prezzoAggiunta = libro.getRifornimento().getPrezzoTotale();
+        this.prezzoAggiunta = libro.getPrezzo().getPrezzoTotale();
         this.ultimaModifica = new Date();
     }
 }

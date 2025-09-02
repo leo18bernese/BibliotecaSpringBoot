@@ -94,7 +94,7 @@ public class Carrello {
         } else {
             System.out.println("item is not null, updating existing item");
             item.setQuantita(item.getQuantita() + quantita);
-            item.setPrezzoAggiunta(libro.getRifornimento().getPrezzoTotale());
+            item.setPrezzoAggiunta(libro.getPrezzo().getPrezzoTotale());
             item.setUltimaModifica(new Date());
         }
 
@@ -158,7 +158,7 @@ public class Carrello {
 
         System.out.println("Setting quantity of " + libro.getTitolo() + " to " + quantita + " (available: " + available + ")");
         item.setQuantita(quantita);
-        item.setPrezzoAggiunta(libro.getRifornimento().getPrezzoTotale());
+        item.setPrezzoAggiunta(libro.getPrezzo().getPrezzoTotale());
         item.setUltimaModifica(new Date());
 
         ultimaModifica = new Date();
@@ -183,12 +183,12 @@ public class Carrello {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
 
-        return item.getQuantita() * libro.getRifornimento().getPrezzoTotale();
+        return item.getQuantita() * libro.getPrezzo().getPrezzoTotale();
     }
 
     public double getSommaPrezzi() {
         return items.stream()
-                .mapToDouble(i -> i.getQuantita() * i.getLibro().getRifornimento().getPrezzoTotale())
+                .mapToDouble(i -> i.getQuantita() * i.getLibro().getPrezzo().getPrezzoTotale())
                 .sum();
     }
 
@@ -238,7 +238,7 @@ public class Carrello {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
 
-        return item.getLibro().getRifornimento().getSconto();
+        return item.getLibro().getPrezzo().getSconto();
     }
 
     public DeliveryPackage getSmallestPackage() {
@@ -247,7 +247,7 @@ public class Carrello {
         }
 
         double totalVolume = items.stream()
-                .mapToDouble(i -> i.getLibro().getVolume() * i.getQuantita())
+                .mapToDouble(i -> i.getLibro().getDimensioni().getVolume() * i.getQuantita())
                 .sum();
 
         double totalWeight = items.stream()

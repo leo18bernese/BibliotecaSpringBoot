@@ -35,7 +35,7 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
 
     List<Libro> findTop10ByOrderByDataAggiuntaDesc();
 
-    @Query("SELECT l FROM Libro l WHERE l.rifornimento.sconto IS NOT NULL")
+    @Query("SELECT l FROM Libro l WHERE l.prezzo.sconto IS NOT NULL")
     List<Libro> findByInOffertaTrue();
 
     List<Libro> findTop5ByRifornimento_QuantitaBetweenOrderByRifornimento_QuantitaAsc(int min, int max);

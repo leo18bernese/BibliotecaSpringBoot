@@ -214,6 +214,8 @@ const AdminBookInventory = () => {
 
     usePageTitle('Book #' + id + ' - Inventory');
 
+    console.log(book);
+
     if (isBookLoading || isBookExistsLoading || isPrenotazioniLoading) {
         return <div>Loading...</div>;
     }

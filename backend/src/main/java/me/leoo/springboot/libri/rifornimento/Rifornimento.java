@@ -33,25 +33,18 @@ public class Rifornimento {
     @Column(name = "quantita_prenotata")
     private Map<Long, Integer> prenotatiMap = new HashMap<>();*/
 
-    private double prezzo;
-
-    @Nullable
-    public Sconto sconto;
-
     private int giorniConsegna;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Nullable
     private Date prossimoRifornimento;
 
-    public Rifornimento(int quantita, double prezzo) {
-        this(quantita, prezzo, Sconto.from(prezzo, 15), 3, TimeUtil.fromNow(3, Calendar.DAY_OF_MONTH).getTime());
+    public Rifornimento(int quantita) {
+        this(quantita, 3, TimeUtil.fromNow(3, Calendar.DAY_OF_MONTH).getTime());
     }
 
-    public Rifornimento(int quantita, double prezzo, Sconto sconto, int giorniConsegna, @Nullable Date prossimoRifornimento) {
+    public Rifornimento(int quantita, int giorniConsegna, @Nullable Date prossimoRifornimento) {
         this.quantita = quantita;
-        this.prezzo = prezzo;
-        this.sconto = sconto;
         this.giorniConsegna = giorniConsegna;
         this.prossimoRifornimento = RandomUtil.randomInt(0, 2) == 1 ? prossimoRifornimento : null;
     }
@@ -132,23 +125,7 @@ public class Rifornimento {
     }
     // Price
 
-    /**
-     * @return discounted price if present
-     */
-    public double getPrezzoTotale() {
-        if (sconto == null) {
-            return prezzo;
-        }
 
-        double scontoSoldi = sconto.getSconto(prezzo);
-
-        if (scontoSoldi == 0) return prezzo;
-
-        //System.out.println("Prezzo: " + prezzo + ", Sconto: " + scontoSoldi);
-        //System.out.println("Prezzo totale: " + String.format("%.2f", prezzo - scontoSoldi));
-
-        return LibriUtils.round(prezzo - scontoSoldi);
-    }
 
     // Status
     public String getStatus() {
@@ -205,13 +182,4 @@ public class Rifornimento {
         this.prossimoRifornimento = null;
     }
 
-
-    // Update
-    public Rifornimento updatePrice(LibroController.PriceRequest rifornimento) {
-        this.prezzo = rifornimento.prezzo();
-        this.sconto = rifornimento.sconto();
-        //this.prenotatiMap = rifornimento.prenotatiMap() != null ? rifornimento.prenotatiMap() : new HashMap<>();
-
-        return this;
-    }
 }

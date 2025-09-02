@@ -12,6 +12,7 @@ import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
+import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import org.springframework.http.ResponseEntity;
 
@@ -46,6 +47,9 @@ public class Libro {
     private String lingua;
     private String isbn;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> tags = List.of();
+
     // dimensioni
     private LibroDimension dimensioni = new LibroDimension();
 
@@ -57,6 +61,9 @@ public class Libro {
     @OneToOne(cascade = CascadeType.PERSIST, optional = false)
     private Rifornimento rifornimento;
 
+    @OneToOne(cascade = CascadeType.PERSIST, optional = false)
+    private Prezzo prezzo;
+
     @OneToOne(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     private LibroInfo descrizione;
 
@@ -64,7 +71,8 @@ public class Libro {
 
     public static final String IMAGE_DIR = "backend/src/main/resources/static/images";
 
-    public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine, String editore, String lingua, String isbn, int quantita, double prezzo) {
+    public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine, String editore, String lingua, String isbn,
+                 int quantita, double prezzo) {
         this.titolo = titolo;
         this.autore = autore;
         this.genere = genere;
@@ -89,7 +97,8 @@ public class Libro {
                 
                 """);
 
-        this.rifornimento = new Rifornimento(quantita, prezzo);
+        this.rifornimento = new Rifornimento(quantita);
+        this.prezzo = new Prezzo(prezzo);
     }
 
 
@@ -127,9 +136,9 @@ public class Libro {
                 this.autore != null ? this.autore.getNome() : null,
                 this.editore,
                 this.annoPubblicazione,
-                this.rifornimento.getPrezzo(),
-                this.rifornimento.getPrezzoTotale(),
-                this.rifornimento.getSconto()
+                this.prezzo.getPrezzo(),
+                this.prezzo.getPrezzoTotale(),
+                this.prezzo.getSconto()
         );
     }
 
@@ -140,7 +149,7 @@ public class Libro {
 
     @JsonIgnore
     public boolean isInOfferta() {
-        return rifornimento != null && rifornimento.getSconto() != null;
+        return prezzo != null && prezzo.getSconto() != null;
     }
 
     public DeliveryPackage getDeliveryPackage() {
@@ -152,9 +161,9 @@ public class Libro {
         );
     }
 
-    public double getVolume() {
+    /*public double getVolume() {
         return dimensioni.length() * dimensioni.width() * dimensioni.height();
-    }
+    }*/
 
     public ResponseEntity<byte[]> getPictureResponse(int index) {
         List<Path> paths = getAllImages();
@@ -172,7 +181,7 @@ public class Libro {
         }
     }
 
-
+    @Transient
     public List<Path> getAllImages() {
         try {
             String finalPath = IMAGE_DIR + "/" + id;
