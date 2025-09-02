@@ -64,72 +64,12 @@ public class Rifornimento {
     }
 
     // Reservation
-
-    @Deprecated
-    public int getPrenotati() {
-        return 0;
-        //return prenotatiMap.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
-    @Deprecated
-    public int getDisponibili() {
-        return quantita /*- getPrenotati()*/;
-    }
-
-    @Deprecated
     public boolean isDisponibile(int quantita) {
-        return getDisponibili() >= quantita;
+        return this.quantita >= quantita;
     }
-
-    @Deprecated
-    public String addPrenotati(int prenotati, Long userId) {
-
-        //se prenotati attuali + da aggiungere > disponibili, non si può prenotare
-        //quindi aggiungo prenotati tanti quanti sono i disponibili
-        if (getPrenotati() + prenotati > quantita) {
-            int disponibili = getDisponibili();
-            //prenotatiMap.put(userId, disponibili);
-
-            return "Prenotazione non riuscita. Troppi prenotati. Prenotati solo " + disponibili + " pezzi.";
-        }
-
-        // Aggiungo prenotati per l'utente
-       // prenotatiMap.put(userId, prenotatiMap.getOrDefault(userId, 0) + prenotati);
-
-        return "Prenotazione riuscita. Prenotati " + prenotati + " pezzi.";
-    }
-
-    /**
-     * remove all prenotati for userId
-     */
-    @Deprecated
-    public void removePrenotati(Long userId) {
-        //prenotatiMap.remove(userId);
-    }
-
-    /**
-     * remove amount of prenotati for userId
-     */
-    @Deprecated
-    public void removePrenotati(Long userId, int toRemove) {
-       /* if (!prenotatiMap.containsKey(userId)) return;
-
-        int prenotati = prenotatiMap.get(userId);
-
-        if (prenotati - toRemove <= 0) {
-            prenotatiMap.remove(userId);
-            return;
-        }
-
-        prenotatiMap.put(userId, prenotati - toRemove);*/
-    }
-    // Price
-
-
 
     // Status
     public String getStatus() {
-        //int disponibili = getDisponibili();
         int disponibili = quantita;
 
         if (disponibili == 0) {
@@ -146,11 +86,14 @@ public class Rifornimento {
             return "⚠ In esaurimento. Disponibili solo " + disponibili + " pezzi";
         }
 
+        if(disponibili == Integer.MAX_VALUE) {
+            return "Disponibilità illimitata";
+        }
+
         return "Disponibili " + disponibili + " unità al momento.";
     }
 
     public String getColor() {
-        //int disponibili = getDisponibili();
         int disponibili = quantita;
 
         if (disponibili == 0) {

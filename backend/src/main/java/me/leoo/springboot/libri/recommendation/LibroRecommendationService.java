@@ -26,7 +26,7 @@ public class LibroRecommendationService {
         List<Libro> booksOnSale = libroRepository.findByInOffertaTrue();
         addRandomBooks(libri, booksOnSale, 6); // Aggiungiamo 6 libri in promozione
 
-        List<Libro> limitedStock = libroRepository.findTop5ByRifornimento_QuantitaBetweenOrderByRifornimento_QuantitaAsc(1, 5);
+        List<Libro> limitedStock = libroRepository.findTop5ByVariantiRifornimentoQuantitaBetween(1, 5);
         addRandomBooks(libri, limitedStock, 4); // Aggiungiamo 2 libri a stock limitato
 
         if (libri.size() < limit) {

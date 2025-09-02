@@ -96,7 +96,7 @@ public class Ordine {
 
         // Copia gli articoli dal carrello all'ordine
         for (CarrelloItem item : carrello.getItems()) {
-            OrdineItem ordineItem = new OrdineItem(item.getLibro(), item.getQuantita(), item.getAggiunta());
+            OrdineItem ordineItem = new OrdineItem(item.getVariante(), item.getQuantita(), item.getAggiunta());
             ordineItem.setOrdine(this); // Imposta l'ordine corrente
 
             items.add(ordineItem);
@@ -117,8 +117,7 @@ public class Ordine {
 
         // Scala le quantità di stock e di prenotati
         for (OrdineItem item : items) {
-            item.getLibro().getRifornimento().removeQuantita(item.getQuantita());
-            item.getLibro().getRifornimento().removePrenotati( utente.getId());
+            item.getVariante().getRifornimento().removeQuantita(item.getQuantita());
         }
     }
 

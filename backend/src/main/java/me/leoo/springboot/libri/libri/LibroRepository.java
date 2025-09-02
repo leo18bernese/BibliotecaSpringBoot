@@ -11,6 +11,7 @@ import java.util.Set;
 
 public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecificationExecutor<Libro> {
 
+    // Query sui metadati del libro (non cambiano)
     List<Libro> findByTitoloEqualsIgnoreCase(String keyword);
 
     List<Libro> findByTitoloIsContainingIgnoreCase(String keyword);
@@ -25,21 +26,47 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
             "(:titolo IS NULL OR l.titolo = :titolo) AND " +
             "(:genere IS NULL OR l.genere = :genere) AND " +
             "(:autore IS NULL OR l.autore.nome = :autore)")
-    public Iterable<Libro> advanceSearch(@Param("titolo") String titolo,
-                                         @Param("genere") String genere,
-                                         @Param("autore") String autore);
+    Iterable<Libro> advanceSearch(@Param("titolo") String titolo,
+                                  @Param("genere") String genere,
+                                  @Param("autore") String autore);
 
-
-    @Query( "SELECT l FROM Libro l WHERE l.rifornimento.quantita > 0 AND l.id NOT IN (:excludeIds)")
+    // Query aggiornate per le varianti
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita > 0 AND l.id NOT IN (:excludeIds)")
     List<Libro> findRandomAvailableBooksExcluding(Pageable pageable, @Param("excludeIds") Set<Long> excludeIds);
 
+    // Libri più recenti (non cambia)
     List<Libro> findTop10ByOrderByDataAggiuntaDesc();
 
-    @Query("SELECT l FROM Libro l WHERE l.prezzo.sconto IS NOT NULL")
+    // Libri in offerta - ora basato sulle varianti
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.prezzo.sconto IS NOT NULL")
     List<Libro> findByInOffertaTrue();
 
-    List<Libro> findTop5ByRifornimento_QuantitaBetweenOrderByRifornimento_QuantitaAsc(int min, int max);
+    // Libri con scorte basse - ora basato sulle varianti
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita BETWEEN :min AND :max ORDER BY v.rifornimento.quantita ASC")
+    List<Libro> findTop5ByVariantiRifornimentoQuantitaBetween(@Param("min") int min, @Param("max") int max);
+
+    // Nuove query utili per le varianti
+
+    // Trova libri con almeno una variante disponibile
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita > 0")
+    List<Libro> findLibriConVariantiDisponibili();
+
+    // Trova libri con tutte le varianti esaurite
+    @Query("SELECT l FROM Libro l WHERE NOT EXISTS (SELECT v FROM Variante v WHERE v.libro = l AND v.rifornimento.quantita > 0)")
+    List<Libro> findLibriEsauriti();
 
 
+    // Statistiche utili
 
+    // Conta quante varianti ha un libro
+    @Query("SELECT COUNT(v) FROM Variante v WHERE v.libro.id = :libroId")
+    long countVariantiByLibroId(@Param("libroId") Long libroId);
+
+    // Trova libri simili per genere con almeno una variante disponibile
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE l.genere = :genere AND l.id != :excludeId AND v.rifornimento.quantita > 0")
+    List<Libro> findSimilarAvailableBooks(@Param("genere") String genere, @Param("excludeId") Long excludeId, Pageable pageable);
+
+    // Bestseller basati su vendite (assumendo che tu abbia un sistema di tracking vendite)
+    /*@Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.venduti > :minVenduti ORDER BY v.rifornimento.venduti DESC")
+    List<Libro> findBestsellers(@Param("minVenduti") int minVenduti, Pageable pageable);*/
 }

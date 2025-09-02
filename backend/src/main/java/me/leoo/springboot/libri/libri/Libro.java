@@ -11,17 +11,15 @@ import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
-import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
+import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import org.springframework.http.ResponseEntity;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @Getter
@@ -50,29 +48,21 @@ public class Libro {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> tags = List.of();
 
-    // dimensioni
-    private LibroDimension dimensioni = new LibroDimension();
-
     private Date dataAggiunta = new Date();
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Long> recensioni = List.of();
-
-    @OneToOne(cascade = CascadeType.PERSIST, optional = false)
-    private Rifornimento rifornimento;
-
-    @OneToOne(cascade = CascadeType.PERSIST, optional = false)
-    private Prezzo prezzo;
 
     @OneToOne(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     private LibroInfo descrizione;
+
+    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Variante> varianti = new ArrayList<>();
 
     private boolean hidden = false;
 
     public static final String IMAGE_DIR = "backend/src/main/resources/static/images";
 
-    public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine, String editore, String lingua, String isbn,
-                 int quantita, double prezzo) {
+    // Costruttore con variante predefinita per compatibilità
+    public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine,
+                 String editore, String lingua, String isbn, int quantita, double prezzo) {
         this.titolo = titolo;
         this.autore = autore;
         this.genere = genere;
@@ -82,25 +72,37 @@ public class Libro {
         this.lingua = lingua;
         this.isbn = isbn;
 
-        double length = new Random().nextInt(10, 20);
-        double width = length + new Random().nextInt(5, 10);
-        double height = new Random().nextInt(1, 5);
-        this.dimensioni = new LibroDimension(length, width, height, 0.5);
-
-
         this.descrizione = new LibroInfo(this, """
                 Un libro scritto per raccontare una storia, condividere conoscenza o semplicemente per intrattenere.
                 <br><br>
                 
                 Lo scopo di un libro è quello di trasmettere idee, emozioni e informazioni attraverso le parole scritte.
                 Quindi, un libro può essere un romanzo, un saggio, una biografia o qualsiasi altra forma di narrazione scritta.
-                
                 """);
 
-        this.rifornimento = new Rifornimento(quantita);
-        this.prezzo = new Prezzo(prezzo);
+        // Genera dimensioni casuali per la variante base
+        double length = new Random().nextInt(10, 20);
+        double width = length + new Random().nextInt(5, 10);
+        double height = new Random().nextInt(1, 5);
+        LibroDimension dimension = new LibroDimension(length, width, height, 0.5);
+
+        // Crea variante base (nome vuoto indica variante standard)
+        aggiungiVariante("", quantita, prezzo, dimension, Map.of());
+
+
+
     }
 
+    public Variante aggiungiVariante(String nomeVariante, int quantita, double prezzo, LibroDimension dimension, Map<String, String> attributiSpecifici) {
+        Variante variante = new Variante(this, nomeVariante, new Prezzo(prezzo), new Rifornimento(quantita), dimension);
+
+        if (attributiSpecifici != null) {
+            variante.addAttributi(attributiSpecifici);
+        }
+
+        this.varianti.add(variante);
+        return variante;
+    }
 
     public Libro updateFrom(LibroController.UpdateLibroRequest request) {
         this.titolo = request.titolo();
@@ -110,7 +112,6 @@ public class Libro {
         this.editore = request.editore();
         this.lingua = request.lingua();
         this.isbn = request.isbn();
-        this.dimensioni = request.dimensioni();
 
         if (this.descrizione == null) {
             this.descrizione = new LibroInfo(this, request.descrizione());
@@ -130,40 +131,76 @@ public class Libro {
     }
 
     public LibroController.LiteBookResponse toLiteBookResponse() {
+        // Usa la variante più economica per la risposta lite da usare in home page
+        Variante variante = getLowestVariant();
+
+        if (variante == null) {
+            throw new IllegalStateException("Il libro deve avere almeno una variante");
+        }
+
         return new LibroController.LiteBookResponse(
                 this.id,
                 this.titolo,
                 this.autore != null ? this.autore.getNome() : null,
                 this.editore,
                 this.annoPubblicazione,
-                this.prezzo.getPrezzo(),
-                this.prezzo.getPrezzoTotale(),
-                this.prezzo.getSconto()
+                variante.getPrezzo().getPrezzo(),
+                variante.getPrezzo().getPrezzoTotale(),
+                variante.getPrezzo().getSconto()
         );
     }
 
+    // Metodi utili per lavorare con le varianti
     @JsonIgnore
     public boolean isInStock() {
-        return rifornimento != null && rifornimento.getDisponibili() > 0;
+        return varianti.stream().anyMatch(v -> v.getRifornimento().getQuantita() > 0);
     }
 
     @JsonIgnore
     public boolean isInOfferta() {
-        return prezzo != null && prezzo.getSconto() != null;
+        return varianti.stream().anyMatch(v -> v.getPrezzo().getSconto() != null);
     }
 
-    public DeliveryPackage getDeliveryPackage() {
-        return DeliveryPackage.getMostSuitable(
-                dimensioni.length(),
-                dimensioni.width(),
-                dimensioni.height(),
-                dimensioni.weight()
-        );
+    @JsonIgnore
+    public double getLowestPrice() {
+        return varianti.stream()
+                .mapToDouble(v -> v.getPrezzo().getPrezzoTotale())
+                .min()
+                .orElse(0.0);
     }
 
-    /*public double getVolume() {
-        return dimensioni.length() * dimensioni.width() * dimensioni.height();
-    }*/
+    @JsonIgnore
+    public Variante getLowestVariant() {
+        return varianti.stream()
+                .min(Comparator.comparing(v -> v.getPrezzo().getPrezzoTotale()))
+                .orElse(null);
+    }
+
+    @JsonIgnore
+    public Variante getVarianteStandard() {
+        return varianti.stream()
+                .filter(v -> v.getNome().isEmpty())
+                .findFirst()
+                .orElse(varianti.isEmpty() ? null : varianti.get(0));
+    }
+
+    public Optional<Variante> getVariante(Long id) {
+        return varianti.stream()
+                .filter(v -> v.getId().equals(id))
+                .findFirst();
+    }
+
+    public Optional<Variante> getVariante(String nome) {
+        return varianti.stream()
+                .filter(v -> v.getNome().equalsIgnoreCase(nome))
+                .findFirst();
+    }
+
+    public List<Long> getTutteLeRecensioni() {
+        return varianti.stream()
+                .flatMap(v -> v.getRecensioni().stream())
+                .toList();
+    }
 
     public ResponseEntity<byte[]> getPictureResponse(int index) {
         List<Path> paths = getAllImages();

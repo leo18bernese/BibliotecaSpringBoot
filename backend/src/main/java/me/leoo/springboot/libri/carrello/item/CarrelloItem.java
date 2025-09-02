@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.variante.Variante;
 
 import java.util.Date;
 
@@ -24,8 +25,8 @@ public class CarrelloItem {
     private Carrello carrello;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "libro_id", nullable = false)
-    private Libro libro;
+    @JoinColumn(name = "variante_id", nullable = false)
+    private Variante variante;
 
     private int quantita;
     private double prezzoAggiunta;
@@ -36,22 +37,26 @@ public class CarrelloItem {
     @Temporal(TemporalType.TIMESTAMP)
     private Date ultimaModifica;
 
-    public CarrelloItem(Carrello carrello, Libro libro, int quantita) {
+    public CarrelloItem(Carrello carrello, Variante variante, int quantita) {
         this.carrello = carrello;
-        this.libro = libro;
+        this.variante = variante;
         this.quantita = quantita;
-        this.prezzoAggiunta = libro.getPrezzo().getPrezzoTotale();
+        this.prezzoAggiunta = variante.getPrezzo().getPrezzoTotale();
         this.aggiunta = new Date();
         this.ultimaModifica = new Date();
     }
 
-    public void fixQuantity(Libro libro) {
-        this.quantita = Math.min(this.quantita, libro.getRifornimento().getQuantita());
+    public void fixQuantity() {
+        this.quantita = Math.min(this.quantita, variante.getRifornimento().getQuantita());
         this.ultimaModifica = new Date();
     }
 
-    public void confirmNotices(Libro libro) {
-        this.prezzoAggiunta = libro.getPrezzo().getPrezzoTotale();
+    public void confirmNotices() {
+        this.prezzoAggiunta = variante.getPrezzo().getPrezzoTotale();
         this.ultimaModifica = new Date();
+    }
+
+    public Libro getLibro() {
+        return variante.getLibro();
     }
 }

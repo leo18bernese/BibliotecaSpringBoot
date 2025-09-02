@@ -3,6 +3,7 @@ package me.leoo.springboot.libri.libri.miscellaneous;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 
 import java.util.Map;
 
@@ -32,6 +33,10 @@ public enum DeliveryPackage {
                 "maxHeight", maxHeight,
                 "maxWeight", maxWeight
         );
+    }
+
+    public static DeliveryPackage getMostSuitable(LibroDimension dimension) {
+        return getMostSuitable(dimension.length(), dimension.width(), dimension.height(), dimension.weight());
     }
 
     public static DeliveryPackage getMostSuitable(double length, double width, double height, double weight) {

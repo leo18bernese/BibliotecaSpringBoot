@@ -6,6 +6,7 @@ import me.leoo.springboot.libri.carrello.item.CarrelloItem;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.autore.Autore;
+import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.ordini.OrdineService;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RestController
@@ -61,7 +64,7 @@ public class CarrelloController {
                                    Set<CouponResponse> couponCodes, boolean canCheckout) {
     }
 
-    public record ItemRequest(Long libroId, int quantita) {
+    public record ItemRequest(Long libroId, Long varianteId, int quantita) {
     }
 
     public record InviaOrdineRequest(String luogoSpedizione, String corriereId, String tipoSpedizioneId,
@@ -82,22 +85,20 @@ public class CarrelloController {
                             libro.getAnnoPubblicazione(),
                             item.getQuantita(),
                             item.getAggiunta(),
-                            libro.getPrezzo().getPrezzoTotale(),
+                            item.getVariante().getPrezzo().getPrezzoTotale(),
                             item.getPrezzoAggiunta(),
-                            libro.getRifornimento()
+                            item.getVariante().getRifornimento()
                     );
                 })
                 .collect(Collectors.toSet());
 
-        System.out.println("dto carrello 1");
         try {
             carrello.checkCoupons();
         } catch (Exception e) {
-            System.out.println("Errore durante il controllo dei coupon: " + e.getMessage());
+            Logger.getGlobal().log(Level.SEVERE, e.getMessage());
             throw e;
         }
 
-        System.out.println("dto carrello 2");
         Set<CouponResponse> couponResponses = carrello.getCouponCodes().stream()
                 .filter(coupon -> coupon.getSconto() != null)
                 .map(coupon -> new CouponResponse(
@@ -106,8 +107,6 @@ public class CarrelloController {
                         coupon.getSconto().getValore()
                 ))
                 .collect(Collectors.toSet());
-
-        System.out.println("dto carrello 3");
 
         return new CarrelloResponse(responseItems, carrello.getSommaPrezzi(), carrello.getPrezzoFinale(), responseItems.size(), couponResponses, carrello.canCheckout());
     }
@@ -119,7 +118,6 @@ public class CarrelloController {
         }
 
         try {
-            System.out.println("Recupero carrello per l'utente: " + utente.getUsername());
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
         } catch (Exception e) {
@@ -173,7 +171,7 @@ public class CarrelloController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
         try {
-            Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.quantita());
+            Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.varianteId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore nell'aggiunta del libro al carrello: " + e.getMessage());
@@ -196,10 +194,7 @@ public class CarrelloController {
             Utente targetUtente = utenteRepository.findById(utenteId)
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utenteId));
 
-            System.out.println("Impostazione quantità per l'utente: " + targetUtente.getUsername() + " " + request);
-
-            Carrello carrello = carrelloService.setItemQuantity(targetUtente, request.libroId(), request.quantita());
-            System.out.println("Quantità impostata. Carrello ora ha " + carrello.getItems().size() + " item.");
+            Carrello carrello = carrelloService.setItemQuantity(targetUtente, request.libroId(), request.varianteId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore nell'impostazione della quantità del libro nel carrello: " + e.getMessage());
@@ -211,7 +206,7 @@ public class CarrelloController {
     public ResponseEntity<?> removeLibro(@AuthenticationPrincipal Utente utente,
                                          @RequestBody ItemRequest request) {
         try {
-            Carrello carrello = carrelloService.removeItemFromCarrello(utente, request.libroId(), request.quantita());
+            Carrello carrello = carrelloService.removeItemFromCarrello(utente, request.libroId(), request.varianteId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore nella rimozione del libro dal carrello: " + e.getMessage());
@@ -219,9 +214,9 @@ public class CarrelloController {
     }
 
     @GetMapping("/items/{libroId}")
-    public ResponseEntity<?> getLibro(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
+    public ResponseEntity<?> getLibro(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @RequestParam Long varianteId) {
         try {
-            CarrelloItem item = carrelloService.getCarrelloItem(utente, libroId);
+            CarrelloItem item = carrelloService.getCarrelloItem(utente, libroId, varianteId);
             Libro libro = item.getLibro();
 
             CarrelloItemResponse response = new CarrelloItemResponse(
@@ -231,9 +226,9 @@ public class CarrelloController {
                     libro.getAnnoPubblicazione(),
                     item.getQuantita(),
                     item.getUltimaModifica(),
-                    libro.getPrezzo().getPrezzoTotale(),
+                    item.getVariante().getPrezzo().getPrezzoTotale(),
                     item.getPrezzoAggiunta(),
-                    libro.getRifornimento());
+                    item.getVariante().getRifornimento());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -242,7 +237,7 @@ public class CarrelloController {
     }
 
     @PutMapping("/fix-quantity/{libroId}")
-    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
+    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @RequestParam Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
@@ -252,13 +247,14 @@ public class CarrelloController {
 
             Carrello carrello = carrelloService.getCarrelloByUtente(user);
 
-            CarrelloItem item = carrello.getItem(libro);
+            CarrelloItem item = carrello.getItem(varianteId);
             if (item == null) {
                 return ResponseEntity.badRequest().body("Il libro non è presente nel carrello.");
             }
 
-            item.fixQuantity(libro);
+            item.fixQuantity();
             carrelloRepository.save(carrello);
+
             return ResponseEntity.ok("Quantità aggiornata se necessario.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore nell'aggiornamento della quantità: " + e.getMessage());
@@ -266,7 +262,7 @@ public class CarrelloController {
     }
 
     @PutMapping("/confirm-notices/{libroId}")
-    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
+    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId , @RequestParam Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
@@ -276,12 +272,12 @@ public class CarrelloController {
 
             Carrello carrello = carrelloService.getCarrelloByUtente(user);
 
-            CarrelloItem item = carrello.getItem(libro);
+            CarrelloItem item = carrello.getItem(varianteId);
             if (item == null) {
                 return ResponseEntity.badRequest().body("Il libro non è presente nel carrello.");
             }
 
-            item.confirmNotices(libro);
+            item.confirmNotices();
             carrelloRepository.save(carrello);
 
             return ResponseEntity.ok("Notifica confermata e rimossa.");
@@ -295,22 +291,17 @@ public class CarrelloController {
     public ResponseEntity<?> inviaOrdine(@AuthenticationPrincipal Utente utente,
                                          @RequestBody InviaOrdineRequest request) {
         try {
-            System.out.println("Invio ordine per l'utente: " + utente.getUsername());
             Carrello carrello = carrelloService.getCarrelloByUtente(utente);
             if (carrello.getItems().isEmpty()) {
                 return ResponseEntity.badRequest().body("Il carrello è vuoto");
             }
-            System.out.println("Carrello recuperato con " + carrello.getItems().size() + " item");
 
             SpedizioneLuogo spedizioneLuogo = SpedizioneLuogo.valueOf(request.luogoSpedizione().toUpperCase());
 
-            System.out.println("carrello1");
             Ordine ordine = new Ordine(carrello, spedizioneLuogo, request.corriereId(), request.tipoSpedizioneId(), request.indirizzoSpedizione(), request.speseSpedizione(), request.metodoPagamento());
-            System.out.println("carrello2");
 
             return ResponseEntity.ok(ordineService.inviaOrdine(ordine));
         } catch (Exception e) {
-            System.out.println("Errore durante l'invio dell'ordine: " + e.getMessage());
             return ResponseEntity.badRequest().body("Errore nell'invio dell'ordine: " + e.getMessage());
         }
     }

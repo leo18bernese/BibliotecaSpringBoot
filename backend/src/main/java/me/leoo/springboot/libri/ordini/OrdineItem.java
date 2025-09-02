@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.utils.Sconto;
 
 import java.util.Date;
@@ -27,8 +28,8 @@ public class OrdineItem {
     private Ordine ordine;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "libro_id", nullable = false)
-    private Libro libro;
+    @JoinColumn(name = "variante_id", nullable = false)
+    private Variante variante;
 
     private String titolo;
     private int quantita;
@@ -37,16 +38,16 @@ public class OrdineItem {
 
     private Sconto sconto;
 
-    public OrdineItem(Libro libro, int quantita, Date dataAggiunta) {
-        this.libro = libro;
-        this.titolo = libro.getTitolo();
+    public OrdineItem(Variante variante, int quantita, Date dataAggiunta) {
+        this.variante = variante;
+        this.titolo = variante.getLibro().getTitolo();
         this.quantita = quantita;
-        this.prezzo = libro.getPrezzo().getPrezzoTotale();
-        this.sconto = libro.getPrezzo().getSconto();
+        this.prezzo = variante.getPrezzo().getPrezzoTotale();
+        this.sconto = variante.getPrezzo().getSconto();
         this.dataAggiunta = dataAggiunta;
     }
 
     public Long getLibroId() {
-        return libro != null ? libro.getId() : null;
+        return variante != null ? variante.getId() : null;
     }
 }

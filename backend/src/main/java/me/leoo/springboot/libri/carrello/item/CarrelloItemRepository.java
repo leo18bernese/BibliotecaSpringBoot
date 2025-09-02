@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface CarrelloItemRepository extends JpaRepository<CarrelloItem, Long> {
 
     @Query("SELECT new me.leoo.springboot.libri.carrello.common.PrenotazioneUtenteInfo(ci.carrello.utente.id, SUM(ci.quantita)) " +
-            "FROM CarrelloItem ci WHERE ci.libro.id = :libroId GROUP BY ci.carrello.utente.id")
+            "FROM CarrelloItem ci WHERE ci.variante.libro.id = :libroId GROUP BY ci.carrello.utente.id")
     Page<PrenotazioneUtenteInfo> findPrenotazioniByLibroId(Long libroId, Pageable pageable);
 
     // Per il totale delle quantità prenotate (utile per dashboard)
-    @Query("SELECT COALESCE(SUM(ci.quantita), 0) FROM CarrelloItem ci WHERE ci.libro.id = :libroId")
+    @Query("SELECT COALESCE(SUM(ci.quantita), 0) FROM CarrelloItem ci WHERE ci.variante.libro.id = :libroId")
     Long getTotalePrenotatoByLibroId(Long libroId);
 }

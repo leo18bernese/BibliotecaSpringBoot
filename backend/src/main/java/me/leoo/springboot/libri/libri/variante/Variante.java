@@ -1,0 +1,75 @@
+package me.leoo.springboot.libri.libri.variante;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
+import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
+import me.leoo.springboot.libri.libri.prezzo.Prezzo;
+import me.leoo.springboot.libri.rifornimento.Rifornimento;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+public class Variante {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToOne
+    @JsonIgnore
+    private Libro libro;
+
+    private String nome;
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    private Prezzo prezzo;
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    private Rifornimento rifornimento;
+
+    private LibroDimension dimensioni;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Long> recensioni = List.of(); // Recensioni specifiche per questa variante
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, String> attributiSpecifici =  new HashMap<>();
+
+    public Variante(Libro libro, String nome, Prezzo prezzo, Rifornimento rifornimento, LibroDimension dimensioni) {
+        this.libro = libro;
+        this.nome = nome;
+        this.prezzo = prezzo;
+        this.rifornimento = rifornimento;
+        this.dimensioni = dimensioni;
+    }
+
+    public void addAttributo(String key, String value) {
+        this.attributiSpecifici.put(key, value);
+    }
+
+    public void addAttributi(Map<String, String> attributi) {
+        if (attributi == null) return;
+
+        this.attributiSpecifici.putAll(attributi);
+    }
+
+    public void removeAttributo(String key) {
+        this.attributiSpecifici.remove(key);
+    }
+
+    public DeliveryPackage getDeliveryPackage() {
+        return DeliveryPackage.getMostSuitable(dimensioni);
+    }
+
+}

@@ -41,7 +41,8 @@ public class LibroController {
     private CarrelloService carrelloService;
 
     // DTO per le risposte
-    public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione, double prezzoOriginale, double prezzo,
+    public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione,
+                                   double prezzoOriginale, double prezzo,
                                    Sconto sconto) {
     }
 
@@ -56,8 +57,10 @@ public class LibroController {
     // DTO per rifornimento
     public record PriceRequest(double prezzo, Sconto sconto, Map<Long, Integer> prenotatiMap) {
     }
-    public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna, Date prossimoRifornimento,
-                                      @Nullable  Map<Long, Integer> prenotatiMap) {
+
+    public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna,
+                                      Date prossimoRifornimento,
+                                      @Nullable Map<Long, Integer> prenotatiMap) {
     }
 
     // Tutti i libri
@@ -144,16 +147,19 @@ public class LibroController {
         return libroRepository.save(libroToUpdate);
     }
 
-    @PutMapping("/{id}/rifornimento")
-    public Libro updateRifornimento(@PathVariable Long id, @RequestBody PriceRequest request) {
+    @PutMapping("/{id}/{varianteId}/rifornimento")
+    public Libro updateRifornimento(@PathVariable Long id,
+                                    @PathVariable Long varianteId,
+                                    @RequestBody PriceRequest request) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
-        System.out.println("request: " + request);
-
-        libroToUpdate.getPrezzo().updatePrice(request);
-
-        System.out.println("Updated libro rifornimento: " + libroToUpdate.getRifornimento());
+        libroToUpdate.getVariante(varianteId)
+                .ifPresentOrElse(v -> v.getPrezzo().updatePrice(request),
+                        () -> {
+                            throw new RuntimeException("Variante non trovata");
+                        }
+                );
 
         return libroRepository.save(libroToUpdate);
     }
@@ -164,7 +170,7 @@ public class LibroController {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
-        libro.setHidden(true );
+        libro.setHidden(true);
         libroRepository.save(libro);
 
         return ResponseEntity.ok(libro);

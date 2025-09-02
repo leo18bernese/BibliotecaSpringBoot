@@ -30,7 +30,7 @@ public class Prezzo {
 
     public Prezzo(double prezzo) {
         this.prezzo = prezzo;
-        this.sconto = Sconto.from(prezzo, 15);
+        this.sconto = new Sconto();
     }
 
     public Prezzo(double prezzo, @Nullable Sconto sconto, Valuta valuta) {

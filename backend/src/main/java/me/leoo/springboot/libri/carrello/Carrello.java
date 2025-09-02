@@ -5,8 +5,8 @@ import jakarta.transaction.NotSupportedException;
 import lombok.*;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.carrello.item.CarrelloItem;
-import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
+import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utils.LibriUtils;
@@ -64,19 +64,16 @@ public class Carrello {
             try {
                 coupon.validate(utente, this);
             } catch (Exception ignored) {
-                System.out.println("Coupon " + coupon.getCodice() + " non valido, rimuovendo dal carrello.");
                 couponCodes.remove(coupon);
             }
         }
-
-        System.out.println("after checkCoupons: " + couponCodes.size() + " coupon(s) validi nel carrello.");
     }
 
-    public void addItem(Libro libro, int quantita) {
+    public void addItem(Variante variante, int quantita) {
 
-        Rifornimento rifornimento = libro.getRifornimento();
+        Rifornimento rifornimento = variante.getRifornimento();
 
-        CarrelloItem item = getItem(libro);
+        CarrelloItem item = getItem(variante);
         int existingQuantity = item != null ? item.getQuantita() : 0;
         int available = rifornimento.getQuantita() - existingQuantity;
 
@@ -89,29 +86,21 @@ public class Carrello {
         }
 
         if (item == null) {
-            System.out.println("item is null, creating new item");
-            items.add(new CarrelloItem(this, libro, quantita));
+            items.add(new CarrelloItem(this, variante, quantita));
         } else {
-            System.out.println("item is not null, updating existing item");
             item.setQuantita(item.getQuantita() + quantita);
-            item.setPrezzoAggiunta(libro.getPrezzo().getPrezzoTotale());
+            item.setPrezzoAggiunta(variante.getPrezzo().getPrezzoTotale());
             item.setUltimaModifica(new Date());
         }
 
-        System.out.println("Adding " + quantita + " of " + libro.getTitolo() + " to the cart");
-
-        rifornimento.addPrenotati(quantita, utente.getId());
-        System.out.println(libro + "    " + item + "    " + rifornimento + "    " + rifornimento.getPrenotati());
-
-        System.out.println("Updated rifornimento: " + rifornimento.getPrenotati() + " prenotati");
         ultimaModifica = new Date();
 
     }
 
-    public void removeItem(Libro libro, int quantita) {
-        Rifornimento rifornimento = libro.getRifornimento();
+    public void removeItem(Variante variante, int quantita) {
+        Rifornimento rifornimento = variante.getRifornimento();
 
-        CarrelloItem item = getItem(libro);
+        CarrelloItem item = getItem(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
@@ -120,28 +109,24 @@ public class Carrello {
             // rimuovi tutti se quantità carrello <= quantità da rimuovere
 
             items.remove(item);
-
-            rifornimento.removePrenotati(utente.getId());
         } else {
             // altrimenti rimuovi solo la quantità specificata
 
             item.setQuantita(item.getQuantita() - quantita);
             item.setUltimaModifica(new Date());
-
-            rifornimento.removePrenotati(utente.getId(), quantita);
         }
 
         ultimaModifica = new Date();
     }
 
-    public void setItemQuantity(Libro libro, int quantita) {
+    public void setItemQuantity(Variante variante, int quantita) {
         if (quantita < 0) {
             throw new IllegalArgumentException("La quantità non può essere negativa");
         }
 
-        Rifornimento rifornimento = libro.getRifornimento();
+        Rifornimento rifornimento = variante.getRifornimento();
 
-        CarrelloItem item = getItem(libro);
+        CarrelloItem item = getItem(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
@@ -156,39 +141,45 @@ public class Carrello {
             throw new IllegalArgumentException("Quantità richiesta non disponibile");
         }
 
-        System.out.println("Setting quantity of " + libro.getTitolo() + " to " + quantita + " (available: " + available + ")");
         item.setQuantita(quantita);
-        item.setPrezzoAggiunta(libro.getPrezzo().getPrezzoTotale());
+        item.setPrezzoAggiunta(variante.getPrezzo().getPrezzoTotale());
         item.setUltimaModifica(new Date());
 
         ultimaModifica = new Date();
     }
 
-    public CarrelloItem getItem(Libro libro) throws IllegalArgumentException {
+    public CarrelloItem getItem(Variante variante) throws IllegalArgumentException {
         return items.stream()
-                .filter(c -> c.getLibro().getId().equals(libro.getId()))
+                .filter(c -> c.getLibro().getId().equals(variante.getId()))
                 .findFirst()
                 .orElse(null);
     }
 
-    public boolean containsKey(Libro libro) {
-        return items.stream().anyMatch(c -> c.getLibro().getId().equals(libro.getId()));
+    public CarrelloItem getItem(Long varianteId) throws IllegalArgumentException {
+        return items.stream()
+                .filter(c -> c.getLibro().getId().equals(varianteId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public boolean containsKey(Variante variante) {
+        return items.stream().anyMatch(c -> c.getLibro().getId().equals(variante.getId()));
     }
 
 
-    public double getPrezzo(Libro libro) {
-        CarrelloItem item = getItem(libro);
+    public double getPrezzo(Variante variante) {
+        CarrelloItem item = getItem(variante);
 
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
 
-        return item.getQuantita() * libro.getPrezzo().getPrezzoTotale();
+        return item.getQuantita() * variante.getPrezzo().getPrezzoTotale();
     }
 
     public double getSommaPrezzi() {
         return items.stream()
-                .mapToDouble(i -> i.getQuantita() * i.getLibro().getPrezzo().getPrezzoTotale())
+                .mapToDouble(i -> i.getQuantita() * i.getVariante().getPrezzo().getPrezzoTotale())
                 .sum();
     }
 
@@ -205,10 +196,7 @@ public class Carrello {
     public double getPrezzoFinale() throws NotSupportedException {
         double value = getSommaPrezzi();
 
-        System.out.println("Coupon codes before sorting: " + couponCodes.stream().map(Buono::getCodice).collect(Collectors.joining(", ")));
         sortCoupons();
-
-        System.out.println("Coupon codes sorted " + couponCodes.stream().map(Buono::getCodice).collect(Collectors.joining(", ")));
 
         for (Buono coupon : couponCodes) {
             if (coupon.getSconto() != null) {
@@ -223,22 +211,22 @@ public class Carrello {
         return LibriUtils.round(value);
     }
 
-    public String getDisponibilita(Libro libro) {
-        CarrelloItem item = getItem(libro);
+    public String getDisponibilita(Variante variante) {
+        CarrelloItem item = getItem(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
 
-        return item.getLibro().getRifornimento().getStatus();
+        return variante.getRifornimento().getStatus();
     }
 
-    public Sconto getSconto(Libro libro) {
-        CarrelloItem item = getItem(libro);
+    public Sconto getSconto(Variante variante) {
+        CarrelloItem item = getItem(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
 
-        return item.getLibro().getPrezzo().getSconto();
+        return variante.getPrezzo().getSconto();
     }
 
     public DeliveryPackage getSmallestPackage() {
@@ -247,11 +235,11 @@ public class Carrello {
         }
 
         double totalVolume = items.stream()
-                .mapToDouble(i -> i.getLibro().getDimensioni().getVolume() * i.getQuantita())
+                .mapToDouble(i -> i.getVariante().getDimensioni().getVolume() * i.getQuantita())
                 .sum();
 
         double totalWeight = items.stream()
-                .mapToDouble(i -> i.getLibro().getDimensioni().weight() * i.getQuantita())
+                .mapToDouble(i -> i.getVariante().getDimensioni().weight() * i.getQuantita())
                 .sum();
 
         double sideLength = Math.cbrt(totalVolume);
@@ -262,17 +250,17 @@ public class Carrello {
         double finalWeight = totalWeight * 1.1; // Adding some margin
 
         double maxLength = items.stream()
-                .mapToDouble(i -> i.getLibro().getDimensioni().length())
+                .mapToDouble(i -> i.getVariante().getDimensioni().length())
                 .max()
                 .orElse(0);
 
         double maxWidth = items.stream()
-                .mapToDouble(i -> i.getLibro().getDimensioni().width())
+                .mapToDouble(i -> i.getVariante().getDimensioni().width())
                 .max()
                 .orElse(0);
 
         double maxHeight = items.stream()
-                .mapToDouble(i -> i.getLibro().getDimensioni().height())
+                .mapToDouble(i -> i.getVariante().getDimensioni().height())
                 .max()
                 .orElse(0);
 
@@ -286,11 +274,10 @@ public class Carrello {
     }
 
     public boolean canCheckout() {
-        return !items.isEmpty() && items.stream().allMatch(i -> i.getLibro().getRifornimento().isDisponibile(i.getQuantita()));
+        return !items.isEmpty() && items.stream().allMatch(i -> i.getVariante().getRifornimento().isDisponibile(i.getQuantita()));
     }
 
     public void clearItems() {
-        items.forEach(i -> i.getLibro().getRifornimento().removePrenotati(utente.getId()));
         items.clear();
 
         ultimaModifica = new Date();
