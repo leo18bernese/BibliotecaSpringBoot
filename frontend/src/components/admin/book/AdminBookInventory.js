@@ -1,15 +1,8 @@
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import EditableField from "./EditableField";
-import SelectableRadioField from "./SelectableRadioField";
 import React, {useEffect, useState} from "react";
-import DescriptionEditor from "../../libri/details/DescriptionEditor";
-import RemovableField from "./RemovableField";
 import toast from "react-hot-toast";
-import MaskedSuggestionInput from "./MaskedSuggetionInput";
-import CheckableField from "./CheckableField";
-import ViewableField from "./ViewableField";
 import ButtonField from "./ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
 

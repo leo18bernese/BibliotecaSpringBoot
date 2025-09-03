@@ -3,7 +3,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "./EditableField";
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import DescriptionEditor from "../../libri/details/DescriptionEditor";
 import RemovableField from "./RemovableField";
 import toast from "react-hot-toast";
 import MaskedSuggestionInput from "./MaskedSuggetionInput";

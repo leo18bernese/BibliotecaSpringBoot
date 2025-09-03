@@ -1,13 +1,8 @@
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import EditableField from "./EditableField";
-import React, {useEffect, useMemo, useRef, useState} from "react";
-import DescriptionEditor from "../../libri/details/DescriptionEditor";
-import RemovableField from "./RemovableField";
+import React, {useRef, useState} from "react";
 import toast from "react-hot-toast";
-import MaskedSuggestionInput from "./MaskedSuggetionInput";
-import CheckableField from "./CheckableField";
 import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookExists = async (id) => {

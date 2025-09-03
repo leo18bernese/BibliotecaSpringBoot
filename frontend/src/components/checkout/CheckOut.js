@@ -3,7 +3,7 @@ import {UserContext} from "../user/UserContext";
 import {Link, useNavigate} from "react-router-dom";
 import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import PaymentTabs from "./PaymentTabs";
 import AddressForm from "./AddressForm";
 import {useCarrello} from "../hook/useCarrello";
@@ -93,6 +93,48 @@ const CheckOut = () => {
         }
     }, [carrello, countdown, isLoadingCart, navigate]);
 
+
+
+
+    const sendOrder = async () => {
+
+        const addr = {
+            nome: shippingAddress.name,
+            indirizzo: shippingAddress.address + " " + (shippingAddress.houseNumber || ""),
+            citta: shippingAddress.city,
+            cap: shippingAddress.postalCode,
+            provincia: shippingAddress.country, // Assuming country is used as province here
+            telefono: "" // Add phone number if needed
+        }
+
+        const {data} = await axios.post(`/api/carrello/invia`, {
+            luogoSpedizione: locationType,
+            corriereId: courierType,
+            tipoSpedizioneId: shippingService,
+            indirizzoSpedizione: addr,
+            speseSpedizione: spedizione,
+            metodoPagamento: ""
+        });
+
+        console.log("Order sent successfully:", data);
+    }
+
+
+
+    const mutation = useMutation({
+        mutationFn: sendOrder,
+        onSuccess: () => {
+            toast.success('Ordine inviato con successo!');
+
+            queryClient.invalidateQueries(['carrello', user?.id]);
+            queryClient.invalidateQueries(['cartItemsCount', user?.id]);
+
+        },
+        onError: (error) => {
+            toast.error(`Errore nell'invio dell'ordine: ${error.response?.data?.message || error.message}`);
+        },
+    });
+
     const isLoading = isLoadingPlaces || isLoadingCouriers || isLoadingCart;
 
     if (isLoading) return <div>Loading...</div>;
@@ -171,32 +213,6 @@ const CheckOut = () => {
                 setErrors({coupon: error.response.data || "Error validating discount code."});
             });
     }
-
-
-    const sendOrder = async () => {
-
-        const addr = {
-            nome: shippingAddress.name,
-            indirizzo: shippingAddress.address + " " + (shippingAddress.houseNumber || ""),
-            citta: shippingAddress.city,
-            cap: shippingAddress.postalCode,
-            provincia: shippingAddress.country, // Assuming country is used as province here
-            telefono: "" // Add phone number if needed
-        }
-
-
-        const {data} = await axios.post(`/api/carrello/invia`, {
-            luogoSpedizione: locationType,
-            corriereId: courierType,
-            tipoSpedizioneId: shippingService,
-            indirizzoSpedizione: addr,
-            speseSpedizione: spedizione,
-            metodoPagamento: ""
-        });
-
-        console.log("Order sent successfully:", data);
-    }
-
 
     return <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Check Out</h1>
@@ -301,7 +317,7 @@ const CheckOut = () => {
                                                     <button
                                                         className="bg-gray-200 hover:bg-gray-300 text-gray-700  rounded p-3 transition"
                                                         onClick={() => setShowSavedAddresses(false)}>
-                                                       Nascondi Indirizzi Salvati
+                                                        Nascondi Indirizzi Salvati
                                                     </button>
                                                 ) : (
                                                     <button
@@ -323,11 +339,15 @@ const CheckOut = () => {
                                                             toast("Add new address functionality not implemented yet.");
                                                         }}>
 
-                                                            <i className='bxr bxs-plus-square text-2xl' style={{color: '#00c90b'}}></i>
-                                                            <span className="ml-2 font-semibold underline">Aggiungi Nuovo Indirizzo</span>
+                                                        <i className='bxr bxs-plus-square text-2xl'
+                                                           style={{color: '#00c90b'}}></i>
+                                                        <span className="ml-2 font-semibold underline">Aggiungi Nuovo Indirizzo</span>
                                                     </div>
 
-                                                        {user.indirizzi.map((addr) => (
+                                                    {user.indirizzi.map((addr) => (
+                                                        console.log("addr", addr) ||
+
+
                                                         <div key={addr.id}
                                                              className="border px-3 py-3 mb-2 rounded hover:bg-gray-50 cursor-pointer"
                                                              onClick={() => setShippingAddress({
@@ -402,8 +422,6 @@ const CheckOut = () => {
                              style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
 
                             <h2 className="text-lg font-semibold my-4">Buoni Sconto</h2>
-
-                            {console.log("cart", carrello)}
 
                             {carrello.couponCodes && carrello.couponCodes.map((couponCode) => {
                                 console.log("couponCode", couponCode);
@@ -499,6 +517,7 @@ const CheckOut = () => {
                             onClick={() => {
 
                                 if (validate()) {
+                                    mutation.mutate();
                                     sendOrder();
 
                                     toast.success("Order placed successfully!");

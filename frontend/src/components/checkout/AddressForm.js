@@ -17,7 +17,8 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
         mask: /^[a-zA-Z'À-ÖØ-öø-ÿ\s]*$/,
     };
 
-    const { ref: nameRef } = useIMask(textMask, { onAccept: (value) => handleChange({ target: { name: 'name', value } }) });
+    const { ref: nameRef, setValue: setNameValue } = useIMask(textMask,
+        { onAccept: (value) => handleChange({ target: { name: 'name', value } }) });
     const { ref: cityRef, setValue: setCityValue } = useIMask(textMask, { onAccept: (value) => handleChange({ target: { name: 'city', value } }) });
     const { ref: countryRef, setValue: setCountryValue } = useIMask(textMask, { onAccept: (value) => handleChange({ target: { name: 'country', value } }) });
 
@@ -40,6 +41,15 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
+    // ✨ EFFETTO PER SINCRONIZZARE I CAMPI MASCHERATI CON LE PROPS
+    useEffect(() => {
+        setPostalCodeValue(addressData.postalCode || '');
+        setNameValue(addressData.name || '');
+        setCityValue(addressData.city || '');
+        setCountryValue(addressData.country || '');
+    }, [addressData, setPostalCodeValue, setNameValue, setCityValue, setCountryValue]);
+
+
     const handleSuggestionClick = (suggestion) => {
         const { address } = suggestion;
         const street = address.road || suggestion.display_name.split(',')[0];
@@ -53,6 +63,7 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
         handleChange({ target: { name: 'postalCode', value: postalCode } });
         handleChange({ target: { name: 'country', value: country } });
 
+        // Questi sono già chiamati dall'effetto, ma li teniamo per chiarezza immediata
         setCityValue(city);
         setPostalCodeValue(postalCode);
         setCountryValue(country);
@@ -65,7 +76,7 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
         <div className="space-y-4">
             <div>
                 <label className="block text-sm font-medium text-gray-700">Nome</label>
-                <input ref={node => { nameRef.current = node; if (errors.name) errorRef.current = node; }} type="text" name="name" defaultValue={addressData.name} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.name ? 'border-red-500' : ''}`} />
+                <input ref={node => { nameRef.current = node; if (errors.name) errorRef.current = node; }} type="text" name="name" value={addressData.name} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.name ? 'border-red-500' : ''}`} />
 
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
             </div>
@@ -101,19 +112,19 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Città</label>
-                    <input ref={node => { cityRef.current = node; if (errors.city) errorRef.current = node; }} type="text" name="city" defaultValue={addressData.city} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.city ? 'border-red-500' : ''}`} />
+                    <input ref={node => { cityRef.current = node; if (errors.city) errorRef.current = node; }} type="text" name="city" value={addressData.city} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.city ? 'border-red-500' : ''}`} />
                     {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">CAP</label>
-                    <input ref={node => { postalCodeRef.current = node; if (errors.postalCode) errorRef.current = node; }} type="text" name="postalCode" defaultValue={addressData.postalCode} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.postalCode ? 'border-red-500' : ''}`} />
+                    <input ref={node => { postalCodeRef.current = node; if (errors.postalCode) errorRef.current = node; }} type="text" name="postalCode" value={addressData.postalCode} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.postalCode ? 'border-red-500' : ''}`} />
                     {errors.postalCode && <p className="text-red-500 text-sm">{errors.postalCode}</p>}
                 </div>
             </div>
 
             <div>
                 <label className="block text-sm font-medium text-gray-700">Provincia</label>
-                <input ref={node => { countryRef.current = node; if (errors.country) errorRef.current = node; }} type="text" name="country" defaultValue={addressData.country} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.country ? 'border-red-500' : ''}`} />
+                <input ref={node => { countryRef.current = node; if (errors.country) errorRef.current = node; }} type="text" name="country" value={addressData.country} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.country ? 'border-red-500' : ''}`} />
                 {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
             </div>
         </div>

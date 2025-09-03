@@ -46,7 +46,8 @@ const fetchReviews = async (id) => {
 
 const fetchCartItem = async (bookId, variantId) => {
     try {
-        const {data} = await axios.get(`/api/carrello/items/${bookId}`);
+        const {data} = await axios.get(`/api/carrello/items/${bookId}/${variantId}`);
+        console.log("fetched cart item:", data);
         return data;
     } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -367,6 +368,7 @@ const BookInfo = () => {
                                             {selectedVariant.rifornimento.status}
                                         </b>
                                     </p>
+
                                     {cartItem && cartItem.quantita > 0 ? (
                                         <p className="mb-4">
                                             <b className="text-blue-500 font-bold">

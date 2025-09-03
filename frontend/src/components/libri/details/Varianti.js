@@ -4,6 +4,14 @@ const Varianti = ({varianti, onSelect, selected}) => {
     const [alberoVarianti, setAlberoVarianti] = useState({});
     const [selectedPath, setSelectedPath] = useState("");
 
+    const updateOrResetPath = (newPath) => {
+        if (selectedPath === newPath) {
+            setSelectedPath("");
+        } else {
+            setSelectedPath(newPath);
+        }
+    };
+
     // Funzione per costruire l'albero delle varianti
 
     const costruisciAlbero = (varianti) => {
@@ -66,7 +74,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
             key={path}
             className={`bg-white p-3 border-2 rounded-lg cursor-pointer transition-colors
              ${selectedPath.startsWith(path) && (selectedPath.length > path.length) ? 'border-blue-500 shadow-md' : 'border-gray-300 hover:border-gray-400'}`}
-            onClick={() => setSelectedPath(path)}
+            onClick={() => updateOrResetPath(path)}
         >
             <div className="flex justify-between items-center">
                 <div>
