@@ -42,8 +42,8 @@ const NavBar = () => {
         <nav className="bg-gray-800 text-white shadow-md">
             <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                 {/* Left side - Navigation links */}
-                <ul className="flex space-x-6">
-                    <li>
+                <ul className="flex space-x-2 list-none m-0 p-0">
+                              <li>
                         <Link to="/" className="text-white hover:text-gray-300 font-medium">
                             Home
                         </Link>
@@ -56,7 +56,7 @@ const NavBar = () => {
                 </ul>
 
                 {/* search bar */}
-                <div className="">
+                <div className="mx-2">
                     <input
                         type="text"
                         placeholder="Search..."

@@ -121,8 +121,13 @@ const CarrelloItem = ({item}) => {
 
                         <p className="text-gray-700">di {item.autore.nome}</p>
                         <p className="text-gray-700 mb-4">Edizione anno {item.annoPubblicazione}</p>
+
                         <p className="text-gray-500 text-sm"> Aggiunto al carrello
                             il: {new Date(item.dataAggiunta).toLocaleString()}</p>
+
+                        {item.varianteNome && item.varianteNome.length > 0 && (
+                        <p className="text-gray-500 text-sm">Variante: {item.varianteNome}</p>
+                        )}
 
                         <div className="inline-flex space-x-2 ">
                             <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">

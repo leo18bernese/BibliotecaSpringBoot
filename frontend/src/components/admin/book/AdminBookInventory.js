@@ -237,215 +237,29 @@ const AdminBookInventory = () => {
                 You can also edit the price, create discounts, and manage other inventory-related details.
             </p>
 
-            <div className="flex-col mt-4">
-                <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
-                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
-                        <h2 className="text-md font-semibold rounded-md">Stock information</h2>
-                        <ViewableField key="quantity"
-                                       id="quantity"
-                                       label="Available Quantity"
-                                       icon="book"
-                                       value={quantity}
-                                       description="The number of copies available in stock."
-                        />
 
-                        {/*<ViewableField key="prenotati"
-                                       id="prenotati"
-                                       label="Reserved Copies"
-                                       icon="bookmark"
-                                       value={prenotati}
-                                       description="The number of copies that are reserved by users.
-                                 You can see the list of reservations in the 'Reservations' section."
-                        />
-                        <ViewableField key="disponibili"
-                                       id="disponibili"
-                                       label="Available for Sale"
-                                       icon="check-circle"
-                                       value={disponibili}
-                                       description="The number of copies available for sale after reservations."
-                        />
-                        */}
-                    </div>
-                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
-                        <h3 className="font-semibold">Prices and Discounts</h3>
-                        <EditableField key="prezzo"
-                                       id="prezzo"
-                                       label="Price"
-                                       icon="dollar"
-                                       value={prezzo}
-                                       onChange={(newValue) => {
-                                           const newPrezzo = parseFloat(newValue);
-                                           if (!isNaN(newPrezzo) && newPrezzo >= 0) {
-                                               handleFieldChange(setPrezzo)(newPrezzo);
-                                           } else {
-                                               toast.error("Invalid price value.");
-                                           }
-                                       }}
-                                       description="The base price of the book. You can apply discounts to this price."
-                        />
-                        <SelectableRadioField
-                            id="discountType"
-                            label="Discount Type"
-                            description="Select the type of discount to apply"
-                            selectedValue={scontoType}
-                            orientation="horizontal"
-                            options={[
-                                {
-                                    value: 'percentage',
-                                    label: 'Percentage',
-                                    action: (value) => handleScontoTypeChange(value)
-                                },
-                                {
-                                    value: 'fixed',
-                                    label: 'Fixed Amount',
-                                    action: (value) => handleScontoTypeChange(value)
-                                },
-                                {
-                                    value: 'none',
-                                    label: 'No Discount',
-                                    action: (value) => handleScontoTypeChange(value)
-                                }
-                            ]}
-                            onChange={(value) => handleScontoTypeChange(value)}
-                        />
-                        <div className="ml-6">
-                            {scontoType === 'percentage' ? (
-                                <EditableField key="scontoPercentuale"
-                                               id="scontoPercentuale"
-                                               label="Discount Percentage"
-                                               icon="tag"
-                                               value={sconto.percentuale || 0}
-                                               onChange={(newValue) => {
-                                                   const newSconto = parseFloat(newValue);
-                                                   if (!isNaN(newSconto) && newSconto >= 0 && newSconto < 100) {
-                                                       handleFieldChange(setSconto)({percentuale: newSconto});
-                                                   } else {
-                                                       toast.error("Invalid discount percentage (0-100).");
-                                                   }
-                                               }}
-                                               description="The discount percentage applied to the base price (0-100%)."
-                                />
-                            ) : scontoType === 'fixed' ? (
-                                <EditableField key="scontoFisso"
-                                               id="scontoFisso"
-                                               label="Fixed Discount Amount"
-                                               icon="tag"
-                                               value={sconto.valore || 0}
-                                               onChange={(newValue) => {
-                                                   const newSconto = parseFloat(newValue);
-                                                   if (!isNaN(newSconto) && newSconto >= 0 && newSconto < prezzo) {
-                                                       handleFieldChange(setSconto)({valore: newSconto});
-                                                   } else {
-                                                       toast.error("Invalid fixed discount amount (0 < newPrice < price).");
-                                                   }
-                                               }}
-                                               description="The fixed amount to subtract from the base price."
-                                />
-                            ) : (
-                                <div className="text-gray-500 italic p-2">
-                                    No discount applied
-                                </div>
-                            )}
-                        </div>
-                        <ViewableField key="prezzoScontato"
-                                       id="prezzoScontato"
-                                       label="Discounted Price"
-                                       icon="sale"
-                                       value={calcolaPrezzoScontato()}
-                                       description="The price after applying the discount."
+            <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                <h2 className="text-md font-semibold rounded-md">Seleziona una variante qui sotto</h2>
+
+                {book.varianti.map((variante) => (
+                    console.log(variante)||
+                    <div key={variante.id} className="mt-4 p-4 border rounded-md bg-white">
+                        <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
+                        <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
+
+                        <ButtonField key={variante.id}
+                                     id={`var-${variante.id}-quantity`}
+                                        icon={"book"}
+                                        actionText={`Variante ${variante.nome} (global #${variante.id}) `}
                         />
                     </div>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-[35%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
-                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
-                        <h3 className="font-semibold">Reservations List</h3>
+                    ))}
 
-                        {prenotatiList.length === 0 && (
-                            <div className="text-gray-500 mt-2">
-                                No reservations found.
-                            </div>
-                        )}
 
-                        {prenotatiList.length > 0 && (
-                            <>
-                                <div className="mt-5">
-                                    {showPrenotati ? (
-                                        <button
-                                            className="bg-gray-300 hover:bg-gray-400 text-gray-700  rounded p-3 transition"
-                                            onClick={() => setShowPrenotati(false)}>
-                                            Hide Reservations
-                                        </button>
-                                    ) : (
-                                        <button
-                                            className="bg-gray-300 hover:bg-gray-400 text-gray-700  rounded p-3 transition"
-                                            onClick={() => setShowPrenotati(true)}>
-                                            Show Reservations ({prenotatiList.length})
-                                        </button>
-                                    )}
-                                </div>
-                                {showPrenotati && (
-                                    prenotatiList.map((reservation, index) => (
-                                        <div
-                                            className={(index % 2 === 0 ? "bg-gray-200" : "bg-white") + " ml-4 rounded-md"}>
-                                            <div className="mt-6 p-4">
-                                                <span className="font-semibold">User ID:</span> {reservation.userId}
-                                                <br/>
-                                                <span
-                                                    className="font-semibold">Reserved Quantity:</span> {reservation.quantity}
-                                            </div>
-                                            <div className="flex flex-row items-center">
-                                                <ButtonField key={`decrease-${index}`}
-                                                             id={`decrease-${index}`}
-                                                             icon="minus-circle"
-                                                             value={reservation.quantity}
-                                                             actionText="Decrease"
-                                                             onChange={() => {
-                                                                 const updatedList = [...prenotatiList];
-                                                                 if (updatedList[index].quantity > 0) {
-                                                                     updatedList[index].quantity -= 1;
-                                                                     setPrenotatiList(updatedList);
 
-                                                                     setHasUnsavedChanges(true);
-                                                                 } else {
-                                                                     toast.error("Cannot decrease reservation below zero.");
-                                                                 }
-                                                             }}
-                                                />
-                                                <ButtonField key={`increase-${index}`}
-                                                             id={`increase-${index}`}
-                                                             icon="plus-circle"
-                                                             value={reservation.quantity}
-                                                             actionText="Increase"
-                                                             onChange={() => {
-                                                                 const updatedList = [...prenotatiList];
-
-                                                                 updatedList[index].quantity += 1;
-                                                                 setPrenotatiList(updatedList);
-
-                                                                 setHasUnsavedChanges(true);
-                                                             }}
-                                                />
-                                                <ButtonField key={`remove-${index}`}
-                                                             id={`remove-${index}`}
-                                                             icon="trash"
-                                                             value={reservation.quantity}
-                                                             actionText="Remove"
-                                                             onChange={() => {
-                                                                 const updatedList = prenotatiList.filter((_, i) => i !== index);
-                                                                 setPrenotatiList(updatedList);
-
-                                                                 setHasUnsavedChanges(true);
-                                                             }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </>
-                        )}
-                    </div>
-                </div>
+               
             </div>
+
             <div className="fixed bottom-4 right-4">
                 <button
                     onClick={handleSave}

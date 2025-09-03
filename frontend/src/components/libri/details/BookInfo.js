@@ -46,7 +46,7 @@ const fetchReviews = async (id) => {
 
 const fetchCartItem = async (bookId, variantId) => {
     try {
-        const {data} = await axios.get(`/api/carrello/items/${bookId}/${variantId}`);
+        const {data} = await axios.get(`/api/carrello/items/${bookId}`);
         return data;
     } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -57,7 +57,7 @@ const fetchCartItem = async (bookId, variantId) => {
 };
 
 const fetchHasWishlisted = async (id, variantId) => {
-    const {data} = await axios.get(`/api/wishlist/has/${id}/${variantId}`);
+    const {data} = await axios.get(`/api/wishlist/has/${id}`);
     console.log("Has wishlisted:", data);
     return data;
 };
@@ -199,13 +199,18 @@ const BookInfo = () => {
             showLoginPrompt();
             return;
         }
+        console.log("Adding to cart:", {
+            bookId: book.id,
+            varianteId: selectedVariant?.id,
+            quantity: quantityForCart || 1,
+        });
         if (!selectedVariant) {
             toast.error('Please select a variant');
             return;
         }
         addToCartMutation.mutate({
             bookId: book.id,
-            variantId: selectedVariant.id,
+            varianteId: selectedVariant.id,
             quantity: quantityForCart || 1,
         });
     };
@@ -285,14 +290,17 @@ const BookInfo = () => {
                             </div>
 
                             <div className="mt-12">
-                                <Varianti varianti={book.varianti}></Varianti>
+                                <Varianti varianti={book.varianti}
+                                          onSelect={setSelectedVariant}
+                                          selected={selectedVariant}
+                                ></Varianti>
                             </div>
 
 
                         </div>
                     </div>
 
-                    <div className="w-3/12" >
+                    <div className="md:w-3/12 ">
 
                         <div className="bg-white shadow-md rounded-lg p-4">
                             <h3 className="text-xl font-semibold mb-4">Acquisto</h3>
@@ -369,7 +377,7 @@ const BookInfo = () => {
                                         <p className="mb-4"></p>
                                     )}
                                     <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-4 flex-row">
+                                        <div className="flex items-center gap-4 flex-row  ">
                                             <div className="flex gap-3">
                                                 <button className="text-blue-500 font-black text-2xl"
                                                         onClick={handleDecrement}>-
@@ -380,8 +388,11 @@ const BookInfo = () => {
                                                         onClick={handleIncrement}>+
                                                 </button>
                                             </div>
+
                                             <button
-                                                className={`flex-grow ${!isDisponibile || addToCartMutation.isPending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-2 px-4 rounded-xl transition`}
+                                                className={`flex-grow ${!isDisponibile || addToCartMutation.isPending ?
+                                                    'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
+                                                    text-white font-semibold py-2 px-4 rounded-xl transition`}
                                                 onClick={handleAddToCart}
                                                 disabled={!isDisponibile || addToCartMutation.isPending}
                                             >

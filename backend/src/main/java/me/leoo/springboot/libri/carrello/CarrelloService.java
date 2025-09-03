@@ -50,8 +50,8 @@ public class CarrelloService {
         Libro libro = libroRepository.findById(libroId)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
 
-         Variante variante = libro.getVariante(varianteId)
-                 .orElseThrow(() -> new RuntimeException("Variante non trovata"));
+        Variante variante = libro.getVariante(varianteId)
+                .orElseThrow(() -> new RuntimeException("Variante non trovata"));
 
         carrello.removeItem(variante, quantita);
         return carrelloRepository.save(carrello);
@@ -72,16 +72,17 @@ public class CarrelloService {
     }
 
     @Transactional(readOnly = false)
-    public CarrelloItem getCarrelloItem(Utente utente, Long libroId, Long varianteId) {
+    public CarrelloItem getCarrelloItem(Utente utente, Long libroId) {
         Carrello carrello = getCarrelloByUtente(utente);
 
-        Libro libro = libroRepository.findById(libroId)
-                .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
+        return carrello.getItemByBook(libroId);
+    }
 
-        Variante variante = libro.getVariante(varianteId)
-                .orElseThrow(() -> new RuntimeException("Variante non trovata"));
+    @Transactional(readOnly = false)
+    public CarrelloItem getCarrelloItemByVariante(Utente utente,  Long varianteId) {
+        Carrello carrello = getCarrelloByUtente(utente);
 
-        return carrello.getItem(variante);
+        return carrello.getItemByVariante(varianteId);
     }
 
     @Transactional

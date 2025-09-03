@@ -20,7 +20,7 @@ export const CartProvider = ({children}) => {
 
     }
 
-    const addItem = async (itemId, quantity) => {
+    const addItem = async (itemId, varianteId, quantity) => {
         if (!user) {
             console.error("User not logged in");
             toast.error("Devi essere loggato per aggiungere un elemento al carrello.");
@@ -29,6 +29,7 @@ export const CartProvider = ({children}) => {
 
         const requestBody = {
             libroId: itemId,
+            varianteId: varianteId,
             quantita: quantity
         };
 
@@ -48,7 +49,7 @@ export const CartProvider = ({children}) => {
 
     };
 
-    const removeItem = async (itemId, quantity) => {
+    const removeItem = async (itemId, varianteId, quantity) => {
         if (!user) {
             console.error("User not logged in");
             toast.error("Devi essere loggato per rimuovere un elemento dal carrello.");
@@ -57,6 +58,7 @@ export const CartProvider = ({children}) => {
 
         const requestBody = {
             libroId: itemId,
+            varianteId: varianteId,
             quantita: quantity
         };
 

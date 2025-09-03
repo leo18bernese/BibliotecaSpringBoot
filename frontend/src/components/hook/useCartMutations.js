@@ -7,8 +7,8 @@ export const useCartMutations = () => {
     const { addItem, removeItem } = useContext(CartContext);
 
     const addToCartMutation = useMutation({
-        mutationFn: async ({ bookId, quantity }) => {
-            return await addItem(bookId, quantity);
+        mutationFn: async ({ bookId, varianteId, quantity }) => {
+            return await addItem(bookId, varianteId, quantity);
         },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries(['cartItem', variables.bookId]);
@@ -20,8 +20,8 @@ export const useCartMutations = () => {
     });
 
     const removeFromCartMutation = useMutation({
-        mutationFn: async ({ bookId, quantity }) => {
-            return await removeItem(bookId, quantity);
+        mutationFn: async ({ bookId,varianteId, quantity }) => {
+            return await removeItem(bookId, varianteId,quantity);
         },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries(['cartItem', variables.bookId]);

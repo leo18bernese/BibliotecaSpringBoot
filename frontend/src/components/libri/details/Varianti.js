@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-const Varianti = ({ varianti }) => {
+const Varianti = ({varianti, onSelect, selected}) => {
     const [alberoVarianti, setAlberoVarianti] = useState({});
     const [selectedPath, setSelectedPath] = useState("");
+
+    // Funzione per costruire l'albero delle varianti
 
     const costruisciAlbero = (varianti) => {
         const albero = {};
@@ -11,6 +13,7 @@ const Varianti = ({ varianti }) => {
             if (!attr) return;
             const chiavi = Object.keys(attr).sort();
             let nodoCorrente = albero;
+
             chiavi.forEach((chiave, index) => {
                 const valore = attr[chiave];
                 if (!nodoCorrente[valore]) {
@@ -32,13 +35,17 @@ const Varianti = ({ varianti }) => {
     };
 
     const renderVarianteCard = (variante) => (
-        <div key={variante.id} className="bg-gray-100 p-2 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500
-        transition-colors shadow-sm hover:shadow-md">
+        <div key={variante.id} className={` p-2 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500
+            transition-colors shadow-sm hover:shadow-md ` + (variante.id === selected.id ? 'bg-blue-100 ' : 'bg-gray-100 ')}
+             onClick={() => {
+                 if (onSelect) onSelect(variante);
+             }}>
+
             <h4 className="font-semibold text-sm mb-2">{variante.nome}</h4>
 
             <div className="space-y-1">
 
-                {(variante.prezzo.sconto.percentuale > 0||variante.prezzo.sconto.valore > 0) && (
+                {(variante.prezzo.sconto.percentuale > 0 || variante.prezzo.sconto.valore > 0) && (
                     <span className="text-sm text-gray-500 line-through">
                         {variante.prezzo.prezzo.toFixed(2)} €
                     </span>
@@ -126,12 +133,8 @@ const Varianti = ({ varianti }) => {
         }
     }, [varianti]);
 
-    if (!varianti || varianti.length === 0) {
-        return (
-            <div className="my-4">
-                <p className="text-gray-500">Nessuna variante disponibile.</p>
-            </div>
-        );
+    if (!varianti || varianti.length <= 1) {
+        return null;
     }
 
     return (

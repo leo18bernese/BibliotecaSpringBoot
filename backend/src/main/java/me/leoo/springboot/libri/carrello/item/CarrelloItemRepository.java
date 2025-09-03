@@ -14,6 +14,11 @@ public interface CarrelloItemRepository extends JpaRepository<CarrelloItem, Long
             "FROM CarrelloItem ci WHERE ci.variante.libro.id = :libroId GROUP BY ci.carrello.utente.id")
     Page<PrenotazioneUtenteInfo> findPrenotazioniByLibroId(Long libroId, Pageable pageable);
 
+    // Nuova query per ottenere oggetto con variante id specifico
+    @Query("SELECT new me.leoo.springboot.libri.carrello.common.PrenotazioneUtenteInfo(ci.carrello.utente.id, SUM(ci.quantita)) " +
+            "FROM CarrelloItem ci WHERE ci.variante.id = :varianteId GROUP BY ci.carrello.utente.id")
+    Page<PrenotazioneUtenteInfo> findPrenotazioniByVarianteId(Long varianteId, Pageable pageable);
+
     // Per il totale delle quantità prenotate (utile per dashboard)
     @Query("SELECT COALESCE(SUM(ci.quantita), 0) FROM CarrelloItem ci WHERE ci.variante.libro.id = :libroId")
     Long getTotalePrenotatoByLibroId(Long libroId);

@@ -5,6 +5,7 @@ import jakarta.transaction.NotSupportedException;
 import lombok.*;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.carrello.item.CarrelloItem;
+import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
@@ -73,7 +74,7 @@ public class Carrello {
 
         Rifornimento rifornimento = variante.getRifornimento();
 
-        CarrelloItem item = getItem(variante);
+        CarrelloItem item = getItemByVariante(variante);
         int existingQuantity = item != null ? item.getQuantita() : 0;
         int available = rifornimento.getQuantita() - existingQuantity;
 
@@ -100,7 +101,7 @@ public class Carrello {
     public void removeItem(Variante variante, int quantita) {
         Rifornimento rifornimento = variante.getRifornimento();
 
-        CarrelloItem item = getItem(variante);
+        CarrelloItem item = getItemByVariante(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
@@ -126,7 +127,7 @@ public class Carrello {
 
         Rifornimento rifornimento = variante.getRifornimento();
 
-        CarrelloItem item = getItem(variante);
+        CarrelloItem item = getItemByVariante(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
@@ -148,19 +149,29 @@ public class Carrello {
         ultimaModifica = new Date();
     }
 
-    public CarrelloItem getItem(Variante variante) throws IllegalArgumentException {
+    public CarrelloItem getItemByBook(Libro libro) {
+        return getItemByBook(libro.getId());
+    }
+
+    public CarrelloItem getItemByBook(Long libroId) {
         return items.stream()
-                .filter(c -> c.getLibro().getId().equals(variante.getId()))
+                .filter(c -> c.getLibro().getId().equals(libroId))
                 .findFirst()
                 .orElse(null);
     }
 
-    public CarrelloItem getItem(Long varianteId) throws IllegalArgumentException {
+
+    public CarrelloItem getItemByVariante(Variante variante) throws IllegalArgumentException {
+        return getItemByVariante(variante.getId());
+    }
+
+    public CarrelloItem getItemByVariante(Long varianteId) throws IllegalArgumentException {
         return items.stream()
-                .filter(c -> c.getLibro().getId().equals(varianteId))
+                .filter(c -> c.getVariante().getId().equals(varianteId))
                 .findFirst()
                 .orElse(null);
     }
+
 
     public boolean containsKey(Variante variante) {
         return items.stream().anyMatch(c -> c.getLibro().getId().equals(variante.getId()));
@@ -168,7 +179,7 @@ public class Carrello {
 
 
     public double getPrezzo(Variante variante) {
-        CarrelloItem item = getItem(variante);
+        CarrelloItem item = getItemByVariante(variante);
 
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
@@ -212,7 +223,7 @@ public class Carrello {
     }
 
     public String getDisponibilita(Variante variante) {
-        CarrelloItem item = getItem(variante);
+        CarrelloItem item = getItemByVariante(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }
@@ -221,7 +232,7 @@ public class Carrello {
     }
 
     public Sconto getSconto(Variante variante) {
-        CarrelloItem item = getItem(variante);
+        CarrelloItem item = getItemByVariante(variante);
         if (item == null) {
             throw new IllegalArgumentException("Libro non trovato nel carrello");
         }

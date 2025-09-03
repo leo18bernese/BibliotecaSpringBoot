@@ -30,4 +30,17 @@ public class RifornimentoController {
 
         return ResponseEntity.ok(prenotazioni);
     }
+
+    @GetMapping("/variante/{varianteId}/prenotazioni")
+    public ResponseEntity<Page<PrenotazioneUtenteInfo>> getPrenotazioniByVarianteId(
+            @PathVariable Long varianteId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<PrenotazioneUtenteInfo> prenotazioni = carrelloItemRepository
+                .findPrenotazioniByVarianteId(varianteId, pageable);
+
+        return ResponseEntity.ok(prenotazioni);
+    }
 }

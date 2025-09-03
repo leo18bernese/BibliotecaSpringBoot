@@ -87,9 +87,12 @@ public class Libro {
         LibroDimension dimension = new LibroDimension(length, width, height, 0.5);
 
         // Crea variante base (nome vuoto indica variante standard)
-        aggiungiVariante("", quantita, prezzo, dimension, Map.of());
 
+       // aggiungiVariante("", quantita, prezzo, dimension, Map.of());
 
+        aggiungiVariante("rosso flex", quantita, prezzo, dimension, Map.of("colore", "rosso", "materiale", "flex"));
+        aggiungiVariante("rosso rigido", quantita, prezzo + 5, dimension, Map.of("colore", "rosso", "materiale", "rigido"));
+        aggiungiVariante("blu flex", quantita, prezzo, dimension, Map.of("colore", "blu", "materiale", "flex"));
 
     }
 
@@ -185,6 +188,7 @@ public class Libro {
     }
 
     public Optional<Variante> getVariante(Long id) {
+        System.out.println("Searching for variante with ID: " + id);
         return varianti.stream()
                 .filter(v -> v.getId().equals(id))
                 .findFirst();

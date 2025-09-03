@@ -8,6 +8,7 @@ import me.leoo.springboot.libri.libri.autore.AutoreService;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
 import me.leoo.springboot.libri.libri.search.SearchService;
+import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,22 @@ public class LibroController {
                 //.orElseThrow(() -> new RuntimeException("Libro non trovato"));*/
     }
 
+    @GetMapping("/{id}/variante/{varianteId}")
+    public ResponseEntity<Variante> getVarianteById(@PathVariable Long id, @PathVariable Long varianteId) {
+        try {
+            Libro libro = libroRepository.findById(id)
+                    .orElseThrow();
+
+            Variante variante = libro.getVariante(varianteId)
+                    .orElseThrow();
+
+            return ResponseEntity.ok(variante);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @GetMapping("/lite/{id}")
     public ResponseEntity<LiteBookResponse> getLibroLiteById(@PathVariable Long id) {
         try {
@@ -110,6 +127,12 @@ public class LibroController {
     public boolean existsLibro(@PathVariable Long id) {
         return libroRepository.existsById(id);
     }
+
+    @GetMapping("/exists/variante/{id}")
+    public boolean existsVariante(@PathVariable Long id) {
+        return libroRepository.existsVarianteById(id);
+    }
+
 
     // Crea libro
     @PostMapping

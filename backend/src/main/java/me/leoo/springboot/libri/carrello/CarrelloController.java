@@ -54,7 +54,7 @@ public class CarrelloController {
     // DTO per le risposte
     public record CarrelloItemResponse(Long libroId, String titolo, Autore autore, int annoPubblicazione, int quantita,
                                        Date dataAggiunta, double prezzo, double prezzoAggiunta,
-                                       Rifornimento rifornimento) {
+                                       Rifornimento rifornimento, String varianteNome) {
     }
 
     public record CouponResponse(String codice, double percentuale, double valore) {
@@ -87,7 +87,8 @@ public class CarrelloController {
                             item.getAggiunta(),
                             item.getVariante().getPrezzo().getPrezzoTotale(),
                             item.getPrezzoAggiunta(),
-                            item.getVariante().getRifornimento()
+                            item.getVariante().getRifornimento(),
+                            item.getVariante().getNome()
                     );
                 })
                 .collect(Collectors.toSet());
@@ -171,6 +172,7 @@ public class CarrelloController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
         try {
+            System.out.println("request: " + request.libroId() + " variante: " + request.varianteId() + " quantita: " + request.quantita());
             Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.varianteId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
         } catch (Exception e) {
@@ -214,9 +216,37 @@ public class CarrelloController {
     }
 
     @GetMapping("/items/{libroId}")
-    public ResponseEntity<?> getLibro(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @RequestParam Long varianteId) {
+    public ResponseEntity<?> getLibro(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
         try {
-            CarrelloItem item = carrelloService.getCarrelloItem(utente, libroId, varianteId);
+            System.out.println("Fetching item for libroId: " + libroId + " and user: " + utente.getUsername());
+            CarrelloItem item = carrelloService.getCarrelloItem(utente, libroId);
+            Libro libro = item.getLibro();
+
+            System.out.println("Found item: " + item + " for libro: " + libro.getTitolo());
+
+            CarrelloItemResponse response = new CarrelloItemResponse(
+                    libro.getId(),
+                    libro.getTitolo(),
+                    libro.getAutore(),
+                    libro.getAnnoPubblicazione(),
+                    item.getQuantita(),
+                    item.getUltimaModifica(),
+                    item.getVariante().getPrezzo().getPrezzoTotale(),
+                    item.getPrezzoAggiunta(),
+                    item.getVariante().getRifornimento(),
+                    item.getVariante().getNome()
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/items/{libroId}/{varianteId}")
+    public ResponseEntity<?> getLibroVariante(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
+        try {
+            CarrelloItem item = carrelloService.getCarrelloItemByVariante(utente,varianteId);
             Libro libro = item.getLibro();
 
             CarrelloItemResponse response = new CarrelloItemResponse(
@@ -228,7 +258,9 @@ public class CarrelloController {
                     item.getUltimaModifica(),
                     item.getVariante().getPrezzo().getPrezzoTotale(),
                     item.getPrezzoAggiunta(),
-                    item.getVariante().getRifornimento());
+                    item.getVariante().getRifornimento(),
+                    item.getVariante().getNome()
+            );
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -236,8 +268,8 @@ public class CarrelloController {
         }
     }
 
-    @PutMapping("/fix-quantity/{libroId}")
-    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @RequestParam Long varianteId) {
+    @PutMapping("/fix-quantity/{libroId}/{varianteId}")
+    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
@@ -247,7 +279,7 @@ public class CarrelloController {
 
             Carrello carrello = carrelloService.getCarrelloByUtente(user);
 
-            CarrelloItem item = carrello.getItem(varianteId);
+            CarrelloItem item = carrello.getItemByVariante(varianteId);
             if (item == null) {
                 return ResponseEntity.badRequest().body("Il libro non è presente nel carrello.");
             }
@@ -261,8 +293,8 @@ public class CarrelloController {
         }
     }
 
-    @PutMapping("/confirm-notices/{libroId}")
-    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId , @RequestParam Long varianteId) {
+    @PutMapping("/confirm-notices/{libroId}/{varianteId}")
+    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId ,@PathVariable Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
@@ -272,7 +304,7 @@ public class CarrelloController {
 
             Carrello carrello = carrelloService.getCarrelloByUtente(user);
 
-            CarrelloItem item = carrello.getItem(varianteId);
+            CarrelloItem item = carrello.getItemByVariante(varianteId);
             if (item == null) {
                 return ResponseEntity.badRequest().body("Il libro non è presente nel carrello.");
             }
