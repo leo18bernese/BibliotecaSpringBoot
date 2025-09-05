@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CarrelloService {
 
@@ -72,7 +74,7 @@ public class CarrelloService {
     }
 
     @Transactional(readOnly = false)
-    public CarrelloItem getCarrelloItem(Utente utente, Long libroId) {
+    public List<CarrelloItem> getCarrelloItem(Utente utente, Long libroId) {
         Carrello carrello = getCarrelloByUtente(utente);
 
         return carrello.getItemByBook(libroId);

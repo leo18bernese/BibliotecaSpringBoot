@@ -62,11 +62,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                    //System.out.println("authenticated user: " + username);
                 }
             }
-
         } catch (ExpiredJwtException e) {
             log.debug("JWT token expired: {}", e.getMessage());
             // Non logghiamo come errore perché è un comportamento normale

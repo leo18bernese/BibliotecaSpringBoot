@@ -296,8 +296,23 @@ const ChatTemplate = ({
                                     onChange={(e) => {
                                         if (!isSendingMessage) {
                                             const files = Array.from(e.target.files);
-                                            setAttachments(prev => [...prev, ...files]);
-                                            if(fileInputRef.current) fileInputRef.current.value = '';
+
+                                            // Validazione lato client
+                                            const allowedTypes = ['image/', 'video/', 'audio/', 'application/pdf', 'text/plain'];
+                                            const allowedExtensions = ['.doc', '.docx'];
+
+                                            const validFiles = files.filter(file => {
+                                                const isValidType = allowedTypes.some(type => file.type.startsWith(type));
+                                                const isValidExt = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+                                                return isValidType || isValidExt;
+                                            });
+
+                                            if (validFiles.length !== files.length) {
+                                                alert('Alcuni file non sono supportati');
+                                            }else {
+                                                setAttachments(prev => [...prev, ...validFiles]);
+                                                if(fileInputRef.current) fileInputRef.current.value = '';
+                                            }
                                         }
                                     }}
                                     className="hidden"

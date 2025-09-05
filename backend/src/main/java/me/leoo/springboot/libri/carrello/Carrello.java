@@ -13,10 +13,7 @@ import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utils.LibriUtils;
 import me.leoo.springboot.libri.utils.Sconto;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Builder
@@ -149,15 +146,14 @@ public class Carrello {
         ultimaModifica = new Date();
     }
 
-    public CarrelloItem getItemByBook(Libro libro) {
+    public List<CarrelloItem> getItemByBook(Libro libro) {
         return getItemByBook(libro.getId());
     }
 
-    public CarrelloItem getItemByBook(Long libroId) {
+    public List<CarrelloItem> getItemByBook(Long libroId) {
         return items.stream()
                 .filter(c -> c.getLibro().getId().equals(libroId))
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toList());
     }
 
 

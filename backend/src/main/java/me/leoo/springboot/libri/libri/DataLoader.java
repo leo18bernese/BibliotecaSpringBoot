@@ -53,8 +53,9 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("Caricamento utenti, carrelli, recensioni e buoni nel database...");
 
         // Crea utente di test
-        SpedizioneIndirizzo ind1 = new SpedizioneIndirizzo("Mario Rossi", "Via Roma 1", "Milano", "MI", "20100", "1234567890");
-        SpedizioneIndirizzo ind2 = new SpedizioneIndirizzo("Luigi Bianchi", "Via Milano 2", "Roma", "RM", "00100", "0987654321");
+        SpedizioneIndirizzo ind1 = new SpedizioneIndirizzo("Mario Rossi", "Via Roma 1", "Milano", "Milano", "20100", "1234567890");
+        SpedizioneIndirizzo ind2 = new SpedizioneIndirizzo("Luigi Bianchi", "Via Milano 2", "Roma", "Roma", "00100", "0987654321");
+        SpedizioneIndirizzo ind3 = new SpedizioneIndirizzo("Anna Verdi", "Via Napoli 3", "Grugliasco", "Torino", "10095", "1122334455");
 
         Utente u = new Utente("Daniel18", "ciao1234", "Daniel", "Bello", "daniel@gmail.com");
 
@@ -66,6 +67,7 @@ public class DataLoader implements CommandLineRunner {
 
         u.addIndirizzo(ind1);
         u.addIndirizzo(ind2);
+        u.addIndirizzo(ind3);
         Utente uu = utenteService.register(u);
 
         // Crea carrello per l'utente

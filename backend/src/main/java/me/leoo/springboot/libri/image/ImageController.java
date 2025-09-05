@@ -1,15 +1,15 @@
 package me.leoo.springboot.libri.image;
 
+import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import me.leoo.springboot.libri.libri.LibroService;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,16 +18,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/images")
+@RequiredArgsConstructor
 public class ImageController {
 
-    @Autowired
-    ResourceLoader resourceLoader;
-
-    @Autowired
-    private LibroRepository libroRepository;
-
-    @Deprecated
-    private static final String UPLOAD_DIR = "backend/src/main/resources/static/images";
+    private final LibroRepository libroRepository;
+    private final ImageService imageService;
+    private final LibroService libroService;
 
     @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
     @PostMapping("/{productId}")
@@ -38,7 +34,7 @@ public class ImageController {
         }
 
         try {
-            String finalPath = UPLOAD_DIR + "/" + productId;
+            String finalPath = imageService.getCommonImagesPath(productId);
 
             Path dirPath = Paths.get(finalPath);
             if (!Files.exists(dirPath)) {
@@ -68,13 +64,12 @@ public class ImageController {
         if (optionalLibro.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        Libro libro = optionalLibro.get();
 
         try {
-            List<Path> paths = libro.getAllImages();
+            List<Path> paths = libroService.getBookAllImages(productId);
 
             if (paths.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.noContent().build();
             }
 
             return ResponseEntity.ok(paths.size());
@@ -86,17 +81,18 @@ public class ImageController {
 
     @GetMapping("/{productId}/first")
     public ResponseEntity<byte[]> getFirstImage(@PathVariable Long productId) {
-        Libro libro = libroRepository.findById(productId).orElseThrow();
-
-        return libro.getPictureResponse(0);
+        try {
+            return libroService.getPictureResponse(productId, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{productId}/index/{index}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long productId, @PathVariable int index) {
-        Libro libro = libroRepository.findById(productId).orElseThrow();
-
         try {
-            return libro.getPictureResponse(index);
+            return libroService.getPictureResponse(productId, index);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -105,8 +101,11 @@ public class ImageController {
 
     @DeleteMapping("/{productId}/index/{index}")
     public ResponseEntity<String> deleteImage(@PathVariable Long productId, @PathVariable int index) {
-        Libro libro = libroRepository.findById(productId).orElseThrow();
-        List<Path> paths = libro.getAllImages();
+        List<Path> paths = libroService.getBookAllImages(productId);
+
+        if (paths.isEmpty()) {
+            return ResponseEntity.badRequest().body("No images to delete");
+        }
 
         if (index < 0 || index >= paths.size()) {
             return ResponseEntity.badRequest().body("Invalid image index");

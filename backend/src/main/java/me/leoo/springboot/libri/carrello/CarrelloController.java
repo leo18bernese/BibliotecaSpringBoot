@@ -215,7 +215,7 @@ public class CarrelloController {
         }
     }
 
-    @GetMapping("/items/{libroId}")
+    /*@GetMapping("/items/{libroId}")
     public ResponseEntity<?> getLibro(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId) {
         try {
             System.out.println("Fetching item for libroId: " + libroId + " and user: " + utente.getUsername());
@@ -241,7 +241,7 @@ public class CarrelloController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-    }
+    }*/
 
     @GetMapping("/items/{libroId}/{varianteId}")
     public ResponseEntity<?> getLibroVariante(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {

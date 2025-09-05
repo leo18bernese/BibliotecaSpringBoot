@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 const Varianti = ({varianti, onSelect, selected}) => {
     const [alberoVarianti, setAlberoVarianti] = useState({});
     const [selectedPath, setSelectedPath] = useState("");
+    const [selectedVariantPath, setSelectedVariantPath] = useState("");
 
     const updateOrResetPath = (newPath) => {
         if (selectedPath === newPath) {
@@ -13,7 +14,6 @@ const Varianti = ({varianti, onSelect, selected}) => {
     };
 
     // Funzione per costruire l'albero delle varianti
-
     const costruisciAlbero = (varianti) => {
         const albero = {};
         varianti.forEach((variante) => {
@@ -42,9 +42,17 @@ const Varianti = ({varianti, onSelect, selected}) => {
         return albero;
     };
 
+    // Funzione per costruire il percorso della variante selezionata
+    const costruisciSelectedPath = (variante) => {
+        if (!variante || !variante.attributiSpecifici) return "";
+        const chiavi = Object.keys(variante.attributiSpecifici).sort();
+        return chiavi.map(chiave => variante.attributiSpecifici[chiave]).join('.');
+    };
+
     const renderVarianteCard = (variante) => (
-        <div key={variante.id} className={` p-2 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500
-            transition-colors shadow-sm hover:shadow-md ` + (variante.id === selected.id ? 'bg-blue-100 ' : 'bg-gray-100 ')}
+        <div key={variante.id} className={` p-2 border-2 rounded-lg cursor-pointer 
+            transition-colors shadow-sm ` +
+            (variante.id === selected.id ? 'bg-blue-100 border-blue-300' : 'bg-gray-100  border-gray-300  hover:border-blue-500 hover:shadow-md ' )}
              onClick={() => {
                  if (onSelect) onSelect(variante);
              }}>
@@ -72,15 +80,15 @@ const Varianti = ({varianti, onSelect, selected}) => {
     const renderNodoCard = (nodo, path) => (
         <div
             key={path}
-            className={`bg-white p-3 border-2 rounded-lg cursor-pointer transition-colors
-             ${selectedPath.startsWith(path) && (selectedPath.length > path.length) ? 'border-blue-500 shadow-md' : 'border-gray-300 hover:border-gray-400'}`}
+            className={` p-3 border-2 rounded-lg cursor-pointer transition-colors
+         ${selectedVariantPath.startsWith(path) ? ' bg-blue-100 shadow-md' : 'bg-white hover:border-gray-400'}
+            ${selectedPath === path ? 'border-blue-500 shadow-lg' : 'border-gray-300 '}
+          `}
             onClick={() => updateOrResetPath(path)}
         >
             <div className="flex justify-between items-center">
                 <div>
-                    {/*<span className="text-xs font-medium text-gray-500 capitalize">{nodo.tipo}</span>*/}
                     <h3 className="font-semibold capitalize text-lg mt-1">{nodo.nome}</h3>
-
                     <p className="text-xs text-gray-600 mt-1">
                         {Object.keys(nodo.figli).length} {Object.keys(nodo.figli).length === 1 ? 'opzione' : 'opzioni'}
                     </p>
@@ -141,6 +149,12 @@ const Varianti = ({varianti, onSelect, selected}) => {
         }
     }, [varianti]);
 
+    useEffect(() => {
+        if (selected) {
+            setSelectedVariantPath(costruisciSelectedPath(selected));
+        }
+    }, [selected]);
+
     if (!varianti || varianti.length <= 1) {
         return null;
     }
@@ -148,6 +162,11 @@ const Varianti = ({varianti, onSelect, selected}) => {
     return (
         <div className="my-2">
             <h2 className="text-lg font-semibold">Varianti disponibili</h2>
+            {selected && selected.nome && (
+                <p className="text-sm text-gray-600 mb-4">
+                    Variante selezionata: <strong className="font-medium">{selected.nome}</strong>
+                </p>
+            )}
             {renderAllLevels(alberoVarianti)}
         </div>
     );

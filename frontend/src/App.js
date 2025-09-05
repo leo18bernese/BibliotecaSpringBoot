@@ -44,6 +44,7 @@ import AdminBookImages from "./components/admin/book/AdminBookImages";
 import AdminBookInventory from "./components/admin/book/AdminBookInventory";
 import {WishlistProvider} from "./components/libri/wishlist/WishlistContext";
 import AdminBookVariant from "./components/admin/book/AdminBookVariant";
+import Security from "./components/user/pages/Security";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ function App() {
                                             <Route path="wishlist" element={<Wishlist/>}/>
                                             <Route path="shipping" element={<Shipping/>}/>
                                             <Route path="returns" element={<ReturnsHistory/>}/>
+                                            <Route path="security" element={<Security/>}/>
                                         </Route>
 
 

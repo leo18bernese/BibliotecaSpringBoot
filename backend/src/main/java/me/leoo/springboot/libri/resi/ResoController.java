@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
+import me.leoo.springboot.libri.resi.chat.MessaggioService;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.websocket.ChatWebSocketController;
@@ -26,6 +27,7 @@ public class ResoController {
     private final ResoService resoService;
     private final OrdineService ordineService;
     private final ChatWebSocketController chatWebSocketController;
+    private final MessaggioService messaggioService;
 
     public record CreaResoRequest(
             Long ordineId,
@@ -66,6 +68,7 @@ public class ResoController {
             if (!ordineService.existsOrdine(utente, request.ordineId)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + request.ordineId + " non trovato oppure non associato all'utente");
             }
+//todo aggiungere controllo per quanti di item gia resi
 
             Reso nuovoReso = resoService.creaReso(request);
             return ResponseEntity.ok(nuovoReso);
@@ -181,9 +184,9 @@ public class ResoController {
         return aggiungiAllegatiMessaggio(utente, id, messageId, Arrays.asList(allegato));
     }
 
-    @GetMapping("/{id}/chat/{messageId}/attachments/content")
+    @GetMapping("/{resoId}/chat/{messageId}/attachments/content")
     public ResponseEntity<?> getAllegatiMessaggioContent(@AuthenticationPrincipal Utente utente,
-                                                         @PathVariable Long id,
+                                                         @PathVariable Long resoId,
                                                          @PathVariable Long messageId) {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
@@ -191,16 +194,16 @@ public class ResoController {
 
         try {
             // Se l'utente non è admin, controlla l'associazione con il reso
-            if (!utente.isAdmin() && !resoService.isAssociatedWithUtente(id, utente)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + id + " non trovato oppure non associato all'utente");
+            if (!utente.isAdmin() && !resoService.isAssociatedWithUtente(resoId, utente)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine con ID " + resoId + " non trovato oppure non associato all'utente");
             }
 
             Messaggio messaggio = resoService.getMessaggioById(messageId);
             if (messaggio == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Messaggio con ID " + messageId + " non trovato nel reso " + resoId);
             }
 
-            List<Path> allegati = messaggio.getAllImages();
+            List<Path> allegati = messaggioService.getMessageAllImages(resoId);
 
             if (allegati.isEmpty()) {
                 return ResponseEntity.ok(List.of()); // Restituisci lista vuota

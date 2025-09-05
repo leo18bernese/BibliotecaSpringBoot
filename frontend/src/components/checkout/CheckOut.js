@@ -42,6 +42,8 @@ const CheckOut = () => {
     const [showSavedAddresses, setShowSavedAddresses] = useState(false);
     const [selectedSavedAddress, setSelectedSavedAddress] = useState(null);
 
+    const [orderId, setOrderId] = useState(null);
+
     const handleAddressChange = (e) => {
         const {name, value} = e.target;
         setShippingAddress(prev => ({...prev, [name]: value}));
@@ -94,8 +96,6 @@ const CheckOut = () => {
     }, [carrello, countdown, isLoadingCart, navigate]);
 
 
-
-
     const sendOrder = async () => {
 
         const addr = {
@@ -116,22 +116,39 @@ const CheckOut = () => {
             metodoPagamento: ""
         });
 
-        console.log("Order sent successfully:", data);
+        setOrderId(data.id);
+        return data;
     }
-
 
 
     const mutation = useMutation({
         mutationFn: sendOrder,
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast.success('Ordine inviato con successo!');
 
-            queryClient.invalidateQueries(['carrello', user?.id]);
-            queryClient.invalidateQueries(['cartItemsCount', user?.id]);
 
+            let secondsPassed = 0;
+            const interval = setInterval(() => {
+                secondsPassed++;
+
+                // se troviamo orderId, reindirizziamo e fermiamo il loop
+                if (data?.id) {
+                    clearInterval(interval);
+                    navigate(`/ordine/${data.id}`, { replace: true });
+                }
+
+                // se passano 5 secondi senza orderId, stop
+                if (secondsPassed >= 5) {
+                    clearInterval(interval);
+                    toast.error("Impossibile recuperare i dettagli dell'ordine. Controlla la tua email per la conferma dell'ordine.");
+                    navigate("/", { replace: true });
+                }
+            }, 1000);
         },
         onError: (error) => {
-            toast.error(`Errore nell'invio dell'ordine: ${error.response?.data?.message || error.message}`);
+            toast.error(
+                `Errore nell'invio dell'ordine: ${error.response?.data?.message || error.message}`
+            );
         },
     });
 
@@ -513,18 +530,20 @@ const CheckOut = () => {
                         </div>
 
                         <button
-                            className={`${disabled ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'} text-white px-4 py-2 rounded-xl mt-4 w-full`}
+                            className={`${disabled ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'} text-white px-4 py-2 rounded-xl mt-4 w-full 2 duration-200`}
                             onClick={() => {
 
                                 if (validate()) {
                                     mutation.mutate();
-                                    sendOrder();
 
                                     toast.success("Order placed successfully!");
                                 }
                             }}
-                            disabled={!shippingService || !courierType || !locationType}
-                        >Conferma Ordine
+                            disabled={!shippingService || !courierType || !locationType || mutation.isLoading}
+                        >
+                            {disabled ? "Insert all details to place order" : (
+                                mutation.isLoading ? 'Processing...' : 'Place Order')
+                            }
                         </button>
                     </div>
                 </div>

@@ -316,14 +316,16 @@ const BookInfo = () => {
                                                 {selectedVariant.prezzo.prezzo.toFixed(2)} €
                                             </p>
                                         )}
+
                                         <p className="text-2xl font-semibold mb-2">
                                             {selectedVariant.prezzo.prezzoTotale.toFixed(2)} €
                                         </p>
+
                                         <div className="group relative flex items-center">
-                      <span
-                          className="w-4 h-4 bg-gray-400 text-white text-xs rounded-full flex items-center justify-center cursor-help">
-                        i
-                      </span>
+                                              <span
+                                                  className="w-4 h-4 bg-gray-400 text-white text-xs rounded-full flex items-center justify-center cursor-help">
+                                                i
+                                              </span>
                                             <div
                                                 className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                                                 Prezzo comprensivo di IVA
@@ -332,6 +334,7 @@ const BookInfo = () => {
                                             </div>
                                         </div>
                                     </div>
+
                                     {hasSconto && (
                                         <div
                                             className="p-2 rounded-2xl font-semibold uppercase text-sm mb-5 inline-block"
@@ -343,6 +346,12 @@ const BookInfo = () => {
                                             )}
                                         </div>
                                     )}
+
+                                    <p className="mb-8">
+                                        Variante selezionata: <b>{selectedVariant.nome}</b>
+                                    </p>
+
+
                                     <p className="mt-1 mb-4">
                                         <b className="text-red-500 font-bold">
                                             {hasWishlisted ? (
@@ -378,6 +387,7 @@ const BookInfo = () => {
                                     ) : (
                                         <p className="mb-4"></p>
                                     )}
+
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-center gap-4 flex-row  ">
                                             <div className="flex gap-3">

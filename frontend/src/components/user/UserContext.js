@@ -36,7 +36,30 @@ export const UserProvider = ({children}) => {
         fetchAndSetUser(jwtToken);
     }, []);
 
-    const logout = () => {
+// Aggiungi un parametro 'token'
+    const sendLogoutRequest = async (token) => {
+        // Controlla se il token è null prima di inviare la richiesta
+        if (!token) {
+            console.log("Token is null, not sending logout request.");
+            return;
+        }
+
+        // Invia la richiesta con il token ricevuto
+        const {data} = await axios.post("/api/auth/logout", {
+            token: token,
+        });
+
+        return data;
+    };
+
+    // Rendi la funzione async e await la risposta
+    const logout = async () => {
+        const token = Cookies.get('jwt-token'); // Ottieni il token qui una volta
+
+        // Invia la richiesta di logout al backend
+        await sendLogoutRequest(token);
+
+        // Ora, e solo ora, pulisci i cookie e lo stato del frontend
         Cookies.remove('jwt-token');
         delete axios.defaults.headers.common['Authorization'];
         setUser(null);

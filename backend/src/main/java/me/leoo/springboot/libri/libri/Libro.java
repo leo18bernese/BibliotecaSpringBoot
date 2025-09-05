@@ -14,6 +14,7 @@ import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
+import me.leoo.springboot.libri.utils.LibriUtils;
 import org.springframework.http.ResponseEntity;
 
 import java.nio.file.Files;
@@ -57,8 +58,6 @@ public class Libro {
     private List<Variante> varianti = new ArrayList<>();
 
     private boolean hidden = false;
-
-    public static final String IMAGE_DIR = "backend/src/main/resources/static/images";
 
     // Costruttore con variante predefinita per compatibilità
     public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine,
@@ -204,39 +203,5 @@ public class Libro {
         return varianti.stream()
                 .flatMap(v -> v.getRecensioni().stream())
                 .toList();
-    }
-
-    public ResponseEntity<byte[]> getPictureResponse(int index) {
-        List<Path> paths = getAllImages();
-
-        if (index < 0 || index >= paths.size()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Path path = paths.get(index);
-
-        try {
-            return ImageUtils.getImageResponse(path);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @Transient
-    public List<Path> getAllImages() {
-        try {
-            String finalPath = IMAGE_DIR + "/" + id;
-            Path dirPath = Paths.get(finalPath);
-
-            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-                return List.of();
-            }
-
-            return Files.list(dirPath)
-                    .filter(Files::isRegularFile)
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("Error while getting all images for book with ID: " + id, e);
-        }
     }
 }

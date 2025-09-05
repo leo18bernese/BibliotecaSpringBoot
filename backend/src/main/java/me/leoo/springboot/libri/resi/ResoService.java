@@ -2,6 +2,7 @@ package me.leoo.springboot.libri.resi;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.image.ImageService;
 import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.ordini.OrdineItem;
 import me.leoo.springboot.libri.ordini.OrdineItemRepository;
@@ -9,6 +10,7 @@ import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.utente.Utente;
+import me.leoo.springboot.libri.utils.LibriUtils;
 import org.hibernate.Hibernate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,9 +33,7 @@ public class ResoService {
     private final ResoRepository resoRepository;
     private final OrdineRepository ordineRepository; // Da creare se non esiste
     private final OrdineItemRepository ordineItemRepository; // Da creare se non esiste
-
-    private static final String UPLOAD_DIR = "backend/src/main/resources/static/images/ordini";
-
+    private final ImageService imageService;
 
     @Transactional
     public Reso creaReso(ResoController.CreaResoRequest request) {
@@ -88,7 +88,7 @@ public class ResoService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Messaggio non trovato con ID: " + idMessaggio));
 
-        String finalPath = UPLOAD_DIR + "/" + resoId;
+        String finalPath = imageService.getOrdersImagesPath(resoId);
 
         Path dirPath = Paths.get(finalPath);
         if (!Files.exists(dirPath)) {

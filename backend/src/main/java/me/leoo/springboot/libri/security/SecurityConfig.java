@@ -36,7 +36,7 @@ public class SecurityConfig {
                         // Endpoints pubblici
                         .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**", "/api/home/**", "/api/autori", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione
-                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/buono/**", "/api/ordini/**", "api/resi/**", "/api/wishlist/**").authenticated()
+                        .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/buono/**", "/api/ordini/**", "/api/resi/**", "/api/wishlist/**").authenticated()
                         // Endpoints per gli amministratori
                         .requestMatchers("/api/admin/**", "/api/rifornimento").hasRole("ADMIN")
                         // Proteggi tutti gli altri endpoint per default
