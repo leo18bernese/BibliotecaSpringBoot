@@ -46,8 +46,8 @@ public class Utente implements UserDetails {
     @JsonIgnore
     private Set<Libro> wishlist = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "utente_indirizzi", joinColumns = @JoinColumn(name = "utente_id"))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "utente_id") // Foreign key nella tabella spedizione_indirizzo
     private Set<SpedizioneIndirizzo> indirizzi = new HashSet<>();
 
     public Utente(String username, String password, String nome, String cognome, String email) {

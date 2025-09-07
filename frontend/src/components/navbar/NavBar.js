@@ -43,14 +43,9 @@ const NavBar = () => {
             <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                 {/* Left side - Navigation links */}
                 <ul className="flex space-x-2 list-none m-0 p-0">
-                              <li>
+                    <li>
                         <Link to="/" className="text-white hover:text-gray-300 font-medium">
                             Home
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/search" className="text-white hover:text-gray-300 font-medium">
-                            Search
                         </Link>
                     </li>
                 </ul>
@@ -76,7 +71,7 @@ const NavBar = () => {
                             {user.username}
                         </Link>
                     ) : (
-                        <Link to="/login" state={{ from: location }} className="text-white hover:text-gray-300">
+                        <Link to="/login" state={{from: location}} className="text-white hover:text-gray-300">
                             Login
                         </Link>
                     )}

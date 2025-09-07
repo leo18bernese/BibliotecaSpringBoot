@@ -126,26 +126,31 @@ const CarrelloItem = ({item}) => {
                             il: {new Date(item.dataAggiunta).toLocaleString()}</p>
 
                         {item.varianteNome && item.varianteNome.length > 0 && (
-                        <p className="text-gray-500 text-sm">Variante: {item.varianteNome}</p>
+                            <p className="text-gray-500 text-sm">Variante: {item.varianteNome}</p>
                         )}
 
                         <div className="inline-flex space-x-2 ">
                             <div className="border-2 text-gray-600 border-gray-600 rounded-md inline-flex p-1">
-                                <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md" onClick={() => removeItem(item.libroId, 1)}>-
+                                <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md"
+                                        onClick={() => removeItem(item.libroId, item.varianteId, 1)}>-
                                 </button>
 
-                                <div className="sm:mx-4 md:mx-2 lg:mx-2">{item.quantita}</div>
+                                <input type="number"
+                                       value={item.quantita}
+                                       className="w-12 text-center border-0 focus:ring-0 sm:mx-2 md:mx-1 lg:mx-1"
+                                ></input>
 
-                                <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md" onClick={() => addItem(item.libroId, 1)}>+
+                                <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md"
+                                        onClick={() => addItem(item.libroId, item.varianteId, 1)}>+
                                 </button>
                             </div>
 
-                            <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md" onClick={() => removeItem(item.libroId, item.quantita)}>
+                            <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md"
+                                    onClick={() => removeItem(item.libroId, item.varianteId, item.quantita)}>
                                 <i className='bx bx-trash text-2xl text-gray-600'></i>
                             </button>
 
                         </div>
-
 
 
                     </div>
@@ -199,7 +204,8 @@ const CarrelloItem = ({item}) => {
                                 <br/>
 
                                 <span className=" text-gray-500">Prezzo:
-                                    <span className="line-through">{item.prezzoAggiunta}</span> € → <span className="font-bold">{item.prezzo} €</span>
+                                    <span className="line-through">{item.prezzoAggiunta}</span> € → <span
+                                        className="font-bold">{item.prezzo} €</span>
                                 </span>
 
                                 <br/>
@@ -227,7 +233,8 @@ const CarrelloItem = ({item}) => {
                                 <br/>
 
                                 <span className=" text-gray-500">Prezzo:
-                                    <span className="line-through">{item.prezzoAggiunta}</span> € → <span className="font-bold">{item.prezzo} €</span>
+                                    <span className="line-through">{item.prezzoAggiunta}</span> € → <span
+                                        className="font-bold">{item.prezzo} €</span>
                                 </span>
 
                                 <br/>

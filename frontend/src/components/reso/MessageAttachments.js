@@ -102,7 +102,8 @@ const AttachmentFile = memo(({file, index}) => {
         }
 
         return (
-            <div className="p-3 bg-gray-100 rounded border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors">
+            <div
+                className="p-3 bg-gray-100 rounded border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors">
                 <div className="">
                     <p>We could not display this file directly or give a preview, but you can download it:</p>
                     <div className="flex-1">
@@ -120,7 +121,8 @@ const AttachmentFile = memo(({file, index}) => {
     };
 
     return (
-        <div className="text-sm text-gray-700 p-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+        <div
+            className="text-sm text-gray-700 p-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
             <div className="flex justify-between items-start mb-1">
                 <div className="flex items-center gap-1">
                     <i className={`bx bx-${getFileIcon(file.contentType)} text-2xl`}></i>
@@ -176,7 +178,12 @@ const MessageAttachments = memo(({resoId, messageId}) => {
         </div>;
     }
 
-    if (!attachments || attachments.length === 0) return null;
+    if (!attachments || attachments.length === 0) {
+        return <div className="mt-2 text-sm text-gray-500">
+            Non siamo riusciti a caricare gli allegati o non sono presenti.
+        </div>;
+
+    }
 
     return (
         <div className="mt-2 flex flex-row flex-wrap gap-2">

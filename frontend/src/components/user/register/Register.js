@@ -1,19 +1,36 @@
 import React, {useContext, useState} from "react";
 import {UserContext} from "../UserContext";
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import axios from "axios";
 import toast, {Toaster} from "react-hot-toast";
+import {useMutation} from "@tanstack/react-query";
 
 const Register = () => {
 
     const {user, fetchAndSetUser} = useContext(UserContext);
     const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false);
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
 
-    if (user) {
-        navigate("/");
-        return null; // Prevent rendering the login component
-    }
+    const [showPassword, setShowPassword] = useState(false);
+    const [emailError, setEmailError] = useState(''); // Nuovo stato per l'errore email
+
+    const registerMutation = useMutation({
+        mutationFn: async ({username, password, nome, cognome, email}) => {
+            return axios.post("/api/auth/register", {username, password, nome, cognome, email});
+        },
+        onSuccess: async (data) => {
+            toast.success("Registration successful!");
+            navigate(from, {replace: true});
+        },
+        onError: (error) => {
+            console.error("Errore durante la registrazione:", error.response?.data.errore || error.message);
+            toast.error(error.response?.data?.errore || "Registration failed");
+        }
+    });
+
+    // Regex per la validazione dell'email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -24,23 +41,19 @@ const Register = () => {
         const cognome = e.target.cognome.value;
         const email = e.target.email.value;
 
-        try {
-            const registerResponse = await axios.post("/api/auth/register", {
-                nome: nome,
-                cognome: cognome,
-                username: username,
-                email: email,
-                password: password
-            });
-
-            console.log(registerResponse);
-            toast.success("Registration successful!");
-
-
-        } catch (error) {
-            console.error("Errore durante la registrazione:", error.response?.data.errore || error.message);
-            toast.error(error.response?.data?.errore || "Registration failed");
+        // Validazione del formato dell'email
+        if (!emailRegex.test(email)) {
+            setEmailError('Please enter a valid email address.');
+            return;
         }
+
+        setEmailError(''); // Pulisci l'errore se la validazione ha successo
+        registerMutation.mutate({username, password, nome, cognome, email});
+    }
+
+    if (user) {
+        navigate("/");
+        return null;
     }
 
     return (
@@ -49,13 +62,9 @@ const Register = () => {
 
             <h2 className="text-2xl font-bold mb-4">Register</h2>
 
-            <p className="text-gray-600">Have already an account? Please <Link to="/login"
-                                                                               className="text-gray-700 underline">click
-                here</Link> to login.</p>
-
+            <p className="text-gray-600">Have already an account? Please <Link to="/login" className="text-gray-700 underline">click here</Link> to login.</p>
 
             <form className="mt-10" onSubmit={handleRegister}>
-
                 <div>
                     <label htmlFor="nome" className="block text-gray-700 text-sm font-bold mb-2 ">
                         Name
@@ -104,8 +113,11 @@ const Register = () => {
                         id="email"
                         name="email"
                         placeholder="Enter your email"
-                        className="shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                        className={`shadow appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline ${emailError ? 'border-red-500' : ''}`} // Aggiunge classe di errore
                         required/>
+                    {emailError && ( // Mostra il messaggio di errore se lo stato non è vuoto
+                        <p className="text-red-500 text-xs italic mt-1">{emailError}</p>
+                    )}
                 </div>
 
                 <div className="relative ">
@@ -132,8 +144,9 @@ const Register = () => {
                     <button
                         type="submit"
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        disabled={registerMutation.isLoading}
                     >
-                        Register
+                        {registerMutation.isLoading ? "Registering..." : "Register"}
                     </button>
                 </div>
             </form>

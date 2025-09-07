@@ -5,8 +5,10 @@ import toast, {Toaster} from "react-hot-toast";
 import axios from "axios";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import PaymentTabs from "./PaymentTabs";
-import AddressForm from "./AddressForm";
+import AddressForm from "./section/AddressForm";
 import {useCarrello} from "../hook/useCarrello";
+import Coupon from "./section/Coupon";
+import Spedizione from "./section/Spedizione";
 
 const fetchPlaces = async () => {
     const {data} = await axios.get(`/api/spedizione/places`);
@@ -39,8 +41,17 @@ const CheckOut = () => {
         country: ''
     });
 
-    const [showSavedAddresses, setShowSavedAddresses] = useState(false);
     const [selectedSavedAddress, setSelectedSavedAddress] = useState(null);
+
+    // Stati per il popup del nuovo indirizzo
+    const [showAddAddressPopup, setShowAddAddressPopup] = useState(false);
+    const [newAddress, setNewAddress] = useState({
+        name: '',
+        address: '',
+        city: '',
+        postalCode: '',
+        country: ''
+    });
 
     const [orderId, setOrderId] = useState(null);
 
@@ -50,6 +61,55 @@ const CheckOut = () => {
         if (errors[name]) {
             setErrors(prev => ({...prev, [name]: null}));
         }
+    };
+
+    const handleNewAddressChange = (e) => {
+        const {name, value} = e.target;
+        setNewAddress(prev => ({...prev, [name]: value}));
+        if (errors[name]) {
+            setErrors(prev => ({...prev, [name]: null}));
+        }
+    };
+
+    const handleSavedAddressSelect = (addr) => {
+        console.log("selecting addr", addr);
+        setShippingAddress({
+            name: addr.nome,
+            address: addr.indirizzo,
+            city: addr.citta,
+            postalCode: addr.cap,
+            country: addr.provincia
+        });
+        setSelectedSavedAddress(addr.id);
+    };
+
+    const handleAddNewAddress = () => {
+        // Validation for new address
+        const newErrors = {};
+        if (!newAddress.name) newErrors.name = 'Name is required.';
+        if (!newAddress.address) newErrors.address = 'Address is required.';
+        if (!newAddress.city) newErrors.city = 'City is required.';
+        if (!newAddress.postalCode) newErrors.postalCode = 'Postal code is required.';
+        if (!newAddress.country) newErrors.country = 'Country is required.';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        // Set as shipping address and close popup
+        setShippingAddress({...newAddress});
+        setSelectedSavedAddress(null);
+        setShowAddAddressPopup(false);
+        setNewAddress({
+            name: '',
+            address: '',
+            city: '',
+            postalCode: '',
+            country: ''
+        });
+        setErrors({});
+        toast.success("Nuovo indirizzo aggiunto come indirizzo di spedizione!");
     };
 
     useEffect(() => {
@@ -111,7 +171,8 @@ const CheckOut = () => {
             luogoSpedizione: locationType,
             corriereId: courierType,
             tipoSpedizioneId: shippingService,
-            indirizzoSpedizione: addr,
+            //indirizzoSpedizione: addr,
+            selectedId: selectedSavedAddress,
             speseSpedizione: spedizione,
             metodoPagamento: ""
         });
@@ -134,14 +195,14 @@ const CheckOut = () => {
                 // se troviamo orderId, reindirizziamo e fermiamo il loop
                 if (data?.id) {
                     clearInterval(interval);
-                    navigate(`/ordine/${data.id}`, { replace: true });
+                    navigate(`/ordine/${data.id}`, {replace: true});
                 }
 
                 // se passano 5 secondi senza orderId, stop
                 if (secondsPassed >= 5) {
                     clearInterval(interval);
                     toast.error("Impossibile recuperare i dettagli dell'ordine. Controlla la tua email per la conferma dell'ordine.");
-                    navigate("/", { replace: true });
+                    navigate("/", {replace: true});
                 }
             }, 1000);
         },
@@ -179,8 +240,8 @@ const CheckOut = () => {
         </div>;
     }
 
-    const sommaProdotti = carrello.totale;
-    const spedizione = (courierType && shippingService) ? couriers.find(c => c.id === courierType)?.offerte.find(o => o.tipo === shippingService)?.costo : 0;
+    const sommaProdotti = parseFloat(carrello.totale).toFixed(2);
+    const spedizione = parseFloat((courierType && shippingService) ? couriers.find(c => c.id === courierType)?.offerte.find(o => o.tipo === shippingService)?.costo : 0).toFixed(2);
     const prezzoFinale = (parseFloat(carrello.finale) + parseFloat(spedizione)).toFixed(2);
 
     const disabled = !shippingService || !courierType || !locationType;
@@ -300,7 +361,7 @@ const CheckOut = () => {
                                                 onClick={() => setShippingService(offerta.tipo)}
                                             >
                                                 {offerta.nome} ({(min === max) ? min : `${min}-${max}`} giorni)
-                                                - {offerta.costo}€
+                                                - {parseFloat(offerta.costo).toFixed(2)} €
                                             </button>
                                         );
                                     })
@@ -313,117 +374,11 @@ const CheckOut = () => {
                              style={{boxShadow: '0 4px 7px rgba(0, 0, 0, 0.1)'}}>
                             <h2 className="text-lg font-semibold my-4">Indirizzo di Spedizione</h2>
 
-                            {locationType === "" && (
-                                <p className="text-sm text-gray-600 mb-4">Seleziona un luogo di spedizione per poter
-                                    scegliere l'indirizzo di spedizione.</p>
-                            )}
-
-                            {locationType === "HOME" ? (
-                                <div>
-                                    <p className="text-sm text-gray-600 mb-4">Inserisci i dettagli dell'indirizzo che
-                                        desideri utilizzare per questa spedizione.</p>
-                                    <p className="text-sm text-gray-600 mb-4">È possibile modificare l'indirizzo scelta
-                                        PRIMA che l'ordine venga impacchettato. <br/>
-                                        Se commetti un errore correggilo il prima possibile essendo che l'ordine viene
-                                        poi gestito dal corriere e non da noi.</p>
-
-                                    {user.indirizzi.length > 0 && (
-                                        <div className="mb-8">
-                                            <div className="mt-5">
-                                                {showSavedAddresses ? (
-                                                    <button
-                                                        className="bg-gray-200 hover:bg-gray-300 text-gray-700  rounded p-3 transition"
-                                                        onClick={() => setShowSavedAddresses(false)}>
-                                                        Nascondi Indirizzi Salvati
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        className="bg-gray-200 hover:bg-gray-300 text-gray-700  rounded p-3 transition"
-                                                        onClick={() => setShowSavedAddresses(true)}>
-                                                        Mostra Indirizzi Salvati ({user.indirizzi.length})
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {showSavedAddresses &&
-                                                <div className="ml-6 mt-4">
-
-                                                    <div
-                                                        className="border px-3 py-3 mb-2 rounded hover:bg-gray-50 cursor-pointer flex items-center"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            // Implement edit functionality if needed
-                                                            toast("Add new address functionality not implemented yet.");
-                                                        }}>
-
-                                                        <i className='bxr bxs-plus-square text-2xl'
-                                                           style={{color: '#00c90b'}}></i>
-                                                        <span className="ml-2 font-semibold underline">Aggiungi Nuovo Indirizzo</span>
-                                                    </div>
-
-                                                    {user.indirizzi.map((addr) => (
-                                                        console.log("addr", addr) ||
-
-
-                                                        <div key={addr.id}
-                                                             className="border px-3 py-3 mb-2 rounded hover:bg-gray-50 cursor-pointer"
-                                                             onClick={() => setShippingAddress({
-                                                                 name: addr.nome,
-                                                                 address: addr.indirizzo,
-                                                                 city: addr.citta,
-                                                                 postalCode: addr.cap,
-                                                                 country: addr.provincia
-                                                             })}>
-
-                                                            <div className="flex flex-row justify-between">
-                                                                <div>
-                                                                    <p className="font-semibold">{addr.nome}</p>
-                                                                    <p>{addr.indirizzo}, {addr.citta}, {addr.provincia}, {addr.cap}</p>
-                                                                </div>
-
-                                                                <div>
-                                                                    <button className="ml-4 text-2xl hover:underline"
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                // Implement edit functionality if needed
-                                                                                toast("Edit functionality not implemented yet.");
-                                                                            }}>
-                                                                        <i className="bxr bx-edit"></i>
-                                                                    </button>
-
-                                                                    <button className="ml-2 text-2xl hover:underline"
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                // Implement delete functionality if needed
-                                                                                toast("Delete functionality not implemented yet.");
-                                                                            }}>
-                                                                        <i className="bxr bx-trash"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            }
-                                        </div>
-                                    )}
-
-
-                                    <AddressForm
-                                        addressData={shippingAddress}
-                                        handleChange={handleAddressChange}
-                                        errors={errors}
-                                        errorRef={errorRef}
-                                    />
-
-                                </div>
-                            ) : (
-                                <div>
-                                    <h3 className="text-md font-semibold mb-2">Seleziona un punto di ritiro</h3>
-                                </div>
-                            )}
-
+                            <Spedizione locationType={locationType}
+                                        shippingAddress={shippingAddress}
+                                        setShowAddAddressPopup={setShowAddAddressPopup}
+                                        handleSavedAddressSelect={handleSavedAddressSelect}
+                                        selectedSavedAddress={selectedSavedAddress}/>
 
                         </div>
 
@@ -440,50 +395,7 @@ const CheckOut = () => {
 
                             <h2 className="text-lg font-semibold my-4">Buoni Sconto</h2>
 
-                            {carrello.couponCodes && carrello.couponCodes.map((couponCode) => {
-                                console.log("couponCode", couponCode);
-                                return (
-                                    <div key={couponCode.id}
-                                         className="flex items-center mb-4 border-2 border-gray-200 p-2 rounded-md shadow-sm w-full">
-                                        <button className="mr-3" title="Remove coupon">✖</button>
-
-                                        <span className=" font-semibold">{couponCode.codice}</span>
-
-                                        {couponCode.percentuale > 0 && (
-                                            <span
-                                                className="ml-2 text-sm text-gray-600">- {couponCode.percentuale}%</span>
-                                        )}
-
-                                        {couponCode.valore > 0 && (
-                                            <span className="ml-2 text-sm text-gray-600">- {couponCode.valore}€</span>
-                                        )}
-                                    </div>
-                                );
-                            })}
-
-                            <p className="text-sm text-gray-600 mb-4">Se hai un buono sconto, inseriscilo qui:</p>
-
-
-                            <div className="flex flex-grow ">
-                                <div className=" w-4/6 mr-4">
-                                    <input
-                                        type="text"
-                                        id="discountCode"
-                                        placeholder="Inserisci codice sconto"
-                                        className="border border-gray-300 rounded-md w-full p-2"
-                                    />
-
-                                    {errors.coupon && <p className="text-red-500 text-sm  mb-2">{errors.coupon}</p>}
-                                </div>
-
-
-                                <button
-                                    className="bg-blue-500 hover:bg-blue-600 text-white rounded p-1 w-2/6 font-semibold "
-                                    onClick={() => validateDiscountCode(document.getElementById("discountCode").value)}
-                                > Applica Buono Sconto
-                                </button>
-
-                            </div>
+                            <Coupon onChange={validateDiscountCode} errors={errors}/>
 
                         </div>
 
@@ -535,8 +447,6 @@ const CheckOut = () => {
 
                                 if (validate()) {
                                     mutation.mutate();
-
-                                    toast.success("Order placed successfully!");
                                 }
                             }}
                             disabled={!shippingService || !courierType || !locationType || mutation.isLoading}
@@ -547,6 +457,65 @@ const CheckOut = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Popup per aggiungere nuovo indirizzo */}
+                {showAddAddressPopup && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold">Aggiungi Nuovo Indirizzo</h3>
+                                <button
+                                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                                    onClick={() => {
+                                        setShowAddAddressPopup(false);
+                                        setNewAddress({
+                                            name: '',
+                                            address: '',
+                                            city: '',
+                                            postalCode: '',
+                                            country: ''
+                                        });
+                                        setErrors({});
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            <AddressForm
+                                addressData={newAddress}
+                                handleChange={handleNewAddressChange}
+                                errors={errors}
+                                errorRef={errorRef}
+                            />
+
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded transition-colors"
+                                    onClick={() => {
+                                        setShowAddAddressPopup(false);
+                                        setNewAddress({
+                                            name: '',
+                                            address: '',
+                                            city: '',
+                                            postalCode: '',
+                                            country: ''
+                                        });
+                                        setErrors({});
+                                    }}
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors"
+                                    onClick={handleAddNewAddress}
+                                >
+                                    Aggiungi Indirizzo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         ) : (
             toast.error("Please log in to proceed with checkout.") &&

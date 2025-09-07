@@ -3,7 +3,6 @@ import React, {useContext} from 'react';
 import './App.css';
 import NavBar from "./components/navbar/NavBar";
 import {BrowserRouter as Router, Navigate, Route, Routes, useParams} from "react-router-dom";
-import SearchBooks from "./components/libri/search/SearchBooks";
 import BookInfo from "./components/libri/details/BookInfo";
 import {UserContext, UserProvider} from './components/user/UserContext';
 import Carrello from "./components/carrello/Carrello";
@@ -63,7 +62,6 @@ function App() {
                                 <NavBar/>
                                 <Routes>
                                     <Route path="/" element={<Home/>}/>
-                                    <Route path="/search" element={<SearchBooks/>}/>
                                     <Route path="/ricerca" element={<SearchPage/>}/>
 
                                     <Route path="/book/:id" element={<BookInfo/>}/>

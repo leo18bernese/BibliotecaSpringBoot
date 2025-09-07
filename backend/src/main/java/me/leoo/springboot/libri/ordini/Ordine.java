@@ -63,6 +63,8 @@ public class Ordine {
     @JsonIgnore
     private String tipoSpedizioneId;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "indirizzo_spedizione_id")
     private SpedizioneIndirizzo indirizzoSpedizione;
 
     //pagamento

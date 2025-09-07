@@ -74,16 +74,11 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
 
     return (
         <div className="space-y-4">
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Nome</label>
-                <input ref={node => { nameRef.current = node; if (errors.name) errorRef.current = node; }} type="text" name="name" value={addressData.name} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.name ? 'border-red-500' : ''}`} />
-
-                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-            </div>
-
-            <div className="relative">
+            <div className="relative mb-10">
                 <label className="block text-sm font-medium text-gray-700">Cerca Indirizzo</label>
-                <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} autoComplete="off" className="mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2" placeholder="Es. Via Roma 1, Milano" />
+                <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} autoComplete="off"
+                       className="mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2"
+                       placeholder="Seleziona un indirizzo tra i suggerimenti..." />
 
                 {addressSuggestions.length > 0 && (
                     <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
@@ -95,6 +90,14 @@ const AddressForm = ({ addressData, handleChange, errors, errorRef }) => {
                     </ul>
                 )}
             </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Nome</label>
+                <input ref={node => { nameRef.current = node; if (errors.name) errorRef.current = node; }} type="text" name="name" value={addressData.name} className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.name ? 'border-red-500' : ''}`} />
+
+                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">

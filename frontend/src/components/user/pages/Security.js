@@ -30,16 +30,17 @@ const Security = () => {
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-            <h2 className="text-2xl font-bold mb-4">Order History</h2>
+            <h2 className="text-2xl font-bold mb-4">Security & Access Logs</h2>
 
             {accesses.length === 0 ? (
                 <div className="text-center text-gray-500">
-                    <p>You have not saved any addresses yet.</p>
+                    <p>No access records found.</p>
                 </div>
             ) : (
                 <div>
-                    <p>These are the addresses you have saved.</p>
-                    <p>You will be able to use them during checkout.</p>
+                    <p>Below is a list of your recent access logs. If you notice any unfamiliar activity, please
+                        contact support immediately.</p>
+                    <p>You are able to take action for certain activities, such as logging out from other devices.</p>
 
                     <table className="min-w-full divide-y divide-gray-200 mt-8">
                         <thead className="bg-gray-200">
@@ -47,7 +48,7 @@ const Security = () => {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ip address</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Login time</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Logout time</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User Agent</th>
+                            {/*<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User Agent</th>*/}
                         </tr>
                         </thead>
 
@@ -59,7 +60,7 @@ const Security = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">{indirizzo.ipAddress}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">{new Date(indirizzo.loginTime).toLocaleString()}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">{indirizzo.logoutTime ? new Date(indirizzo.logoutTime).toLocaleString() : 'N/A'}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">{indirizzo.userAgent}</td>
+                                {/*<td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">{indirizzo.userAgent}</td>*/}
                             </tr>
                         ))}
                         </tbody>

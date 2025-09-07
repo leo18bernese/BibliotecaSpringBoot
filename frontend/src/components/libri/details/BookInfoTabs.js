@@ -76,6 +76,7 @@ const BookInfoTabs = ({ book }) => {
                         <label htmlFor="variant" className="block text-sm font-medium text-gray-700 mb-2">
                             Seleziona variante:
                         </label>
+
                         <select
                             id="variant"
                             value={selectedVariant?.id || ''}
@@ -83,7 +84,7 @@ const BookInfoTabs = ({ book }) => {
                                 const variant = book.varianti.find((v) => v.id === Number(e.target.value));
                                 setSelectedVariant(variant);
                             }}
-                            className="block w-full p-2 border border-gray-300 rounded-lg"
+                            className="block w-1/4 p-2 border border-gray-300 rounded-lg"
                         >
                             {book.varianti && book.varianti.length > 0 ? (
                                 book.varianti.map((variant) => (

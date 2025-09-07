@@ -1,21 +1,21 @@
 package me.leoo.springboot.libri.carrello;
 
 import jakarta.transaction.NotSupportedException;
+import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.buono.BuonoService;
 import me.leoo.springboot.libri.carrello.item.CarrelloItem;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.autore.Autore;
-import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.ordini.Ordine;
 import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
+import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzoRepository;
 import me.leoo.springboot.libri.spedizione.SpedizioneLuogo;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,32 +29,22 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/carrello")
+@RequiredArgsConstructor
 public class CarrelloController {
 
-    @Autowired
-    private UtenteRepository utenteRepository;
-
-    @Autowired
-    private LibroRepository libroRepository;
-
-    @Autowired
-    private CarrelloRepository carrelloRepository;
-
-    @Autowired
-    private CarrelloService carrelloService;
-
-    @Autowired
-    private BuonoService buonoService;
-
-    @Autowired
-    private OrdineRepository ordineRepository;
-    @Autowired
-    private OrdineService ordineService;
+    private final UtenteRepository utenteRepository;
+    private final LibroRepository libroRepository;
+    private final CarrelloRepository carrelloRepository;
+    private final CarrelloService carrelloService;
+    private final BuonoService buonoService;
+    private final OrdineRepository ordineRepository;
+    private final OrdineService ordineService;
+    private final SpedizioneIndirizzoRepository spedizioneIndirizzoRepository;
 
     // DTO per le risposte
     public record CarrelloItemResponse(Long libroId, String titolo, Autore autore, int annoPubblicazione, int quantita,
                                        Date dataAggiunta, double prezzo, double prezzoAggiunta,
-                                       Rifornimento rifornimento, String varianteNome) {
+                                       Rifornimento rifornimento, Long varianteId, String varianteNome) {
     }
 
     public record CouponResponse(String codice, double percentuale, double valore) {
@@ -68,7 +58,7 @@ public class CarrelloController {
     }
 
     public record InviaOrdineRequest(String luogoSpedizione, String corriereId, String tipoSpedizioneId,
-                                     SpedizioneIndirizzo indirizzoSpedizione, double speseSpedizione,
+                                     Long selectedId, double speseSpedizione,
                                      String metodoPagamento) {
     }
 
@@ -88,6 +78,7 @@ public class CarrelloController {
                             item.getVariante().getPrezzo().getPrezzoTotale(),
                             item.getPrezzoAggiunta(),
                             item.getVariante().getRifornimento(),
+                            item.getVariante().getId(),
                             item.getVariante().getNome()
                     );
                 })
@@ -171,7 +162,14 @@ public class CarrelloController {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
+
+        if (request.quantita() <= 0) {
+            return ResponseEntity.badRequest().body("Quantita non valida (" + request.quantita() + ")");
+        }
+
         try {
+
+
             System.out.println("request: " + request.libroId() + " variante: " + request.varianteId() + " quantita: " + request.quantita());
             Carrello carrello = carrelloService.addItemToCarrello(utente, request.libroId(), request.varianteId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
@@ -192,8 +190,12 @@ public class CarrelloController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
+        if (request.quantita() < 0) {
+            return ResponseEntity.badRequest().body("Quantita non valida (" + request.quantita() + ")");
+        }
+
         try {
-            Utente targetUtente = utenteRepository.findById(utenteId)
+              Utente targetUtente = utenteRepository.findById(utenteId)
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utenteId));
 
             Carrello carrello = carrelloService.setItemQuantity(targetUtente, request.libroId(), request.varianteId(), request.quantita());
@@ -207,6 +209,14 @@ public class CarrelloController {
     @DeleteMapping("/items")
     public ResponseEntity<?> removeLibro(@AuthenticationPrincipal Utente utente,
                                          @RequestBody ItemRequest request) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        if (request.quantita() <= 0) {
+            return ResponseEntity.badRequest().body("Quantita non valida (" + request.quantita() + ")");
+        }
+
         try {
             Carrello carrello = carrelloService.removeItemFromCarrello(utente, request.libroId(), request.varianteId(), request.quantita());
             return ResponseEntity.ok(mapToCarrelloResponse(carrello));
@@ -246,7 +256,7 @@ public class CarrelloController {
     @GetMapping("/items/{libroId}/{varianteId}")
     public ResponseEntity<?> getLibroVariante(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
         try {
-            CarrelloItem item = carrelloService.getCarrelloItemByVariante(utente,varianteId);
+            CarrelloItem item = carrelloService.getCarrelloItemByVariante(utente, varianteId);
             Libro libro = item.getLibro();
 
             CarrelloItemResponse response = new CarrelloItemResponse(
@@ -259,6 +269,7 @@ public class CarrelloController {
                     item.getVariante().getPrezzo().getPrezzoTotale(),
                     item.getPrezzoAggiunta(),
                     item.getVariante().getRifornimento(),
+                    item.getVariante().getId(),
                     item.getVariante().getNome()
             );
 
@@ -294,7 +305,7 @@ public class CarrelloController {
     }
 
     @PutMapping("/confirm-notices/{libroId}/{varianteId}")
-    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId ,@PathVariable Long varianteId) {
+    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
@@ -330,7 +341,13 @@ public class CarrelloController {
 
             SpedizioneLuogo spedizioneLuogo = SpedizioneLuogo.valueOf(request.luogoSpedizione().toUpperCase());
 
-            Ordine ordine = new Ordine(carrello, spedizioneLuogo, request.corriereId(), request.tipoSpedizioneId(), request.indirizzoSpedizione(), request.speseSpedizione(), request.metodoPagamento());
+            SpedizioneIndirizzo indirizzoSpedizione = null;
+            if (request.selectedId() != null) {
+                indirizzoSpedizione = spedizioneIndirizzoRepository.findById(request.selectedId())
+                        .orElseThrow(() -> new RuntimeException("Indirizzo di spedizione non trovato con ID: " + request.selectedId()));
+            }
+
+            Ordine ordine = new Ordine(carrello, spedizioneLuogo, request.corriereId(), request.tipoSpedizioneId(), indirizzoSpedizione, request.speseSpedizione(), request.metodoPagamento());
 
             return ResponseEntity.ok(ordineService.inviaOrdine(ordine));
         } catch (Exception e) {

@@ -206,7 +206,7 @@ public class ResoController {
             List<Path> allegati = messaggioService.getMessageAllImages(resoId);
 
             if (allegati.isEmpty()) {
-                return ResponseEntity.ok(List.of()); // Restituisci lista vuota
+                return ResponseEntity.noContent().build();
             }
 
             List<ImageUtils.FileResponse> allegatiResponse = allegati.stream()
