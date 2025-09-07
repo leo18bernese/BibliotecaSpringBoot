@@ -178,6 +178,25 @@ public class CarrelloController {
         }
     }
 
+    @PostMapping("/items/set")
+    public ResponseEntity<?> setQuantity(@AuthenticationPrincipal Utente utente,
+                                      @RequestBody ItemRequest request) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        if (request.quantita() <= 0) {
+            return ResponseEntity.badRequest().body("Quantita non valida (" + request.quantita() + ")");
+        }
+
+        try {
+            Carrello carrello = carrelloService.setItemQuantity(utente, request.libroId(), request.varianteId(), request.quantita());
+            return ResponseEntity.ok(mapToCarrelloResponse(carrello));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore nell'aggiunta del libro al carrello: " + e.getMessage());
+        }
+    }
+
     @PutMapping("/set-quantity/{utenteId}")
     public ResponseEntity<?> setLibroQuantity(@AuthenticationPrincipal Utente utente,
                                               @RequestBody ItemRequest request,

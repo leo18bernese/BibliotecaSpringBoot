@@ -126,7 +126,8 @@ public class Carrello {
 
         CarrelloItem item = getItemByVariante(variante);
         if (item == null) {
-            throw new IllegalArgumentException("Libro non trovato nel carrello");
+            addItem(variante, quantita);
+            return;
         }
 
         int available = rifornimento.getQuantita();
