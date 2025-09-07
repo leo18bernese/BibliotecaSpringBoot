@@ -16,8 +16,6 @@ export const CartProvider = ({children}) => {
             toast.error("Devi essere loggato per acquistare un elemento.");
             return;
         }
-
-
     }
 
     const addItem = async (itemId, varianteId, quantity) => {
@@ -46,7 +44,6 @@ export const CartProvider = ({children}) => {
             toast.error(error.response.data || "Errore durante l'aggiunta dell'elemento al carrello");
             console.log(error.response.data || "Errore durante l'aggiunta dell'elemento al carrello"); // You can keep this for debugging if needed
         }
-
     };
 
     const removeItem = async (itemId, varianteId, quantity) => {
@@ -63,7 +60,7 @@ export const CartProvider = ({children}) => {
         };
 
         try {
-            const response = await axios.delete(`/api/carrello/items`, { data: requestBody });
+            const response = await axios.delete(`/api/carrello/items`, {data: requestBody});
 
             if (response.status === 200) {
                 toast.success("Elemento rimosso dal carrello con successo!");
@@ -79,9 +76,38 @@ export const CartProvider = ({children}) => {
 
     };
 
+    const updateItem = async (itemId, varianteId, quantity) => {
+        if (!user) {
+            console.error("User not logged in");
+            toast.error("Devi essere loggato per aggiornare un elemento nel carrello.");
+            return;
+        }
+
+        const requestBody = {
+            libroId: itemId,
+            varianteId: varianteId,
+            quantita: quantity
+        };
+
+        try {
+            const response = await axios.post(`/api/carrello/items/set`, requestBody);
+
+            if (response.status === 200) {
+                toast.success("Elemento aggiornato con successo!");
+                await queryClient.invalidateQueries(['book', itemId]);
+            }
+
+            return response;
+        } catch (error) {
+            console.error("Error updating item in cart:", error);
+            toast.error(error.response.data || "Errore durante l'aggiornamento dell'elemento nel carrello");
+            throw error;
+        }
+    }
+
     return (
 
-        <CartContext.Provider value={{addItem, removeItem}}>
+        <CartContext.Provider value={{addItem, removeItem, updateItem}}>
             {children}
 
         </CartContext.Provider>

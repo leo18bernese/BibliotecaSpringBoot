@@ -70,7 +70,7 @@ const BookInfo = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const {addToCartMutation} = useCartMutations();
+    const {updateCartItemMutation} = useCartMutations();
 
     const bookId = Number.parseInt(id);
     const previousId = bookId - 1;
@@ -78,11 +78,12 @@ const BookInfo = () => {
 
     const [file, setFile] = useState(null);
     const [selectedVariant, setSelectedVariant] = useState(null); // State for selected variant
-    const [quantityForCart, setQuantity] = useState(1);
 
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const focusReview = params.get("focusReview");
+
+    const [quantityToAdd, setQuantityToAdd] = useState(1);
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['book', bookId],
@@ -128,6 +129,13 @@ const BookInfo = () => {
             setSelectedVariant(book.varianti[0]);
         }
     }, [book]);
+
+
+    useEffect(() => {
+        if (cartItem) {
+            setQuantityToAdd(cartItem.quantita);
+        }
+    }, [cartItem]);
 
     const handlePreviousBook = () => {
         if (previousBookExists) {
@@ -190,15 +198,7 @@ const BookInfo = () => {
         }
     };
 
-    const handleIncrement = () => {
-        setQuantity(prev => prev + 1);
-    };
-
-    const handleDecrement = () => {
-        setQuantity(prev => Math.max(1, prev - 1));
-    };
-
-    const handleAddToCart = () => {
+    const updateItem = (quantity) => {
         if (!user) {
             showLoginPrompt();
             return;
@@ -209,12 +209,12 @@ const BookInfo = () => {
             return;
         }
 
-        addToCartMutation.mutate({
+        updateCartItemMutation.mutate({
             bookId: book.id,
             varianteId: selectedVariant.id,
-            quantity: quantityForCart || 1,
+            quantity: quantity,
         });
-    };
+    }
 
     const isLoading = isBookLoading || areImagesLoading || areReviewsLoading;
 
@@ -259,8 +259,16 @@ const BookInfo = () => {
         );
     }
 
-    const isDisponibile = selectedVariant?.rifornimento?.quantita > 0 &&
-        (!cartItem || (cartItem && (selectedVariant.rifornimento.quantita - cartItem.quantita) >= quantityForCart));
+    const quantitaDisponibile = selectedVariant?.rifornimento?.quantita || 0;
+
+    const isDisponibile = quantitaDisponibile > 0 &&
+         ((quantitaDisponibile - quantityToAdd) >= 0);
+
+    const isUpdateButtonDisabled = !isDisponibile || updateCartItemMutation.isPending ||
+        (cartItem && cartItem.quantita === quantityToAdd);
+
+    const isMaxed = (cartItem && cartItem.quantita === quantityToAdd) && quantityToAdd >= quantitaDisponibile;
+
     const sconto = selectedVariant?.prezzo?.sconto || {};
     const hasSconto = sconto?.percentuale > 0 || sconto?.valore > 0;
 
@@ -378,7 +386,7 @@ const BookInfo = () => {
                                         </b>
                                     </p>
 
-                                    {cartItem && cartItem.quantita > 0 ? (
+                                    {/*cartItem && cartItem.quantita > 0 ? (
                                         <p className="mb-4">
                                             <b className="text-blue-500 font-bold">
                                                 Hai già {cartItem.quantita} unità nel carrello
@@ -386,46 +394,62 @@ const BookInfo = () => {
                                         </p>
                                     ) : (
                                         <p className="mb-4"></p>
-                                    )}
+                                    )*/}
 
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-center gap-4 flex-row  ">
                                             <div className="flex gap-3">
                                                 <button className="text-blue-500 font-black text-2xl"
-                                                        onClick={handleDecrement}>-
+                                                        onClick={() => {
+                                                            const newQuantity = Math.max(1, quantityToAdd - 1);
+                                                            setQuantityToAdd(newQuantity)
+                                                        }}>-
                                                 </button>
 
                                                 <input type="number"
                                                        className="w-16 text-center border-4 border-blue-500 p-1.5 rounded-lg text-blue-800"
-                                                       value={quantityForCart}
+                                                       value={quantityToAdd}
                                                        min={1}
-                                                       max={selectedVariant.rifornimento.quantita}
+                                                       max={quantitaDisponibile}
                                                        onChange={(e) => {
-                                                           const value = Math.max(1, Math.min(selectedVariant.rifornimento.quantita, Number.parseInt(e.target.value) || 1));
-                                                           setQuantity(value);
+                                                           const value = Math.max(1, Math.min(quantitaDisponibile, Number.parseInt(e.target.value) || 1));
+                                                           setQuantityToAdd(value)
                                                        }}
                                                 />
 
-                                                {/*
-                                                <div
-                                                    className="border-4 border-blue-500 p-1.5 rounded-lg text-blue-800">{quantityForCart}</div>
-                                                */}
-
                                                 <button className="text-blue-500 font-black text-2xl"
-                                                        onClick={handleIncrement}>+
+                                                        onClick={() => {
+                                                            const newQuantity = Math.min(quantitaDisponibile, quantityToAdd + 1);
+                                                            setQuantityToAdd(newQuantity)
+                                                        }}>+
                                                 </button>
                                             </div>
 
-                                            <button
-                                                className={`flex-grow ${!isDisponibile || addToCartMutation.isPending ?
-                                                    'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
+                                            {isMaxed ?
+                                                <button
+                                                    className={`flex-grow bg-blue-500 hover:bg-blue-600'} 
                                                     text-white font-semibold py-2 px-4 rounded-xl transition`}
-                                                onClick={handleAddToCart}
-                                                disabled={!isDisponibile || addToCartMutation.isPending}
-                                            >
-                                                {addToCartMutation.isPending ? 'Aggiungendo...' : 'Aggiungi al carrello'}
-                                            </button>
+                                                    onClick={() => navigate('/cart')}
+                                                >
+                                                    Vai al carrello
+                                                </button>
+                                                :
+
+                                                <button
+                                                    className={`flex-grow ${isUpdateButtonDisabled ?
+                                                        'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
+                                                    text-white font-semibold py-2 px-4 rounded-xl transition`}
+                                                    onClick={() => updateItem(quantityToAdd)}
+                                                    disabled={isUpdateButtonDisabled}
+                                                >
+                                                    {updateCartItemMutation.isPending ? 'Aggiungendo...' :
+                                                        (cartItem && cartItem.quantita > 0) ? 'Aggiorna quantità' :
+                                                            'Aggiungi al carrello'
+                                                    }
+                                                </button>
+                                            }
                                         </div>
+
                                         {isDisponibile && (
                                             <button
                                                 className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition">

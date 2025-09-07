@@ -4,7 +4,7 @@ import {CartContext} from "../carrello/CartContext";
 
 export const useCartMutations = () => {
     const queryClient = useQueryClient();
-    const { addItem, removeItem } = useContext(CartContext);
+    const { addItem, removeItem, updateItem } = useContext(CartContext);
 
     const addToCartMutation = useMutation({
         mutationFn: async ({ bookId, varianteId, quantity }) => {
@@ -32,8 +32,24 @@ export const useCartMutations = () => {
         }
     });
 
+    const updateCartItemMutation = useMutation({
+        mutationFn: async ({ bookId, varianteId, quantity }) => {
+            return await updateItem(bookId, varianteId, quantity);
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['cartItem', variables.bookId]);
+            queryClient.invalidateQueries(['cart']);
+        },
+        onError: (error) => {
+            console.error('Update cart item mutation error:', error);
+        }
+    });
+
+
+
     return {
         addToCartMutation,
-        removeFromCartMutation
+        removeFromCartMutation,
+        updateCartItemMutation
     };
 };

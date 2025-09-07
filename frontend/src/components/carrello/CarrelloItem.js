@@ -138,6 +138,17 @@ const CarrelloItem = ({item}) => {
                                 <input type="number"
                                        value={item.quantita}
                                        className="w-12 text-center border-0 focus:ring-0 sm:mx-2 md:mx-1 lg:mx-1"
+                                       onChange={(e) => {
+                                           const newQuantity = parseInt(e.target.value, 10);
+                                           if (!isNaN(newQuantity) && newQuantity >= 0) {
+                                               const delta = newQuantity - item.quantita;
+                                               if (delta > 0) {
+                                                   addItem(item.libroId, item.varianteId, delta);
+                                               } else if (delta < 0) {
+                                                   removeItem(item.libroId, item.varianteId, -delta);
+                                               }
+                                           }
+                                       }}
                                 ></input>
 
                                 <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md"
