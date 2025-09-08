@@ -242,7 +242,7 @@ const BookInfo = () => {
         return <div className="flex justify-center items-center min-h-screen">Errore: {bookError.message}</div>;
     }
 
-    if (!book) {
+    if (!book || book.hidden) {
         return (
             <div className="p-4">
                 Non siamo riusciti a trovare il libro che stavi cercando.

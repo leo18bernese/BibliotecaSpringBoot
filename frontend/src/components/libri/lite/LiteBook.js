@@ -54,7 +54,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
         return <div>Error loading book details.</div>;
     }
 
-    if (!book) {
+    if (!book || book.hidden) {
         return <div>Book not found.</div>;
     }
 

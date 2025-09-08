@@ -19,7 +19,6 @@ public class LibroRecommendationService {
     public List<Libro> getHomepage(int limit) {
         Set<Libro> libri = new HashSet<>();
 
-
         List<Libro> newArrivals = libroRepository.findTop10ByOrderByDataAggiuntaDesc();
         addRandomBooks(libri, newArrivals, 5); // Aggiungiamo 5 nuovi arrivi
 

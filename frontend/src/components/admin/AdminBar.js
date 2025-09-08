@@ -4,24 +4,37 @@ import React from "react";
 const AdminBar = () => {
 
     return (
-        <>
-            <div className="admin-bar bg-red-400 text-red-100 p-4 flex justify-between">
+        <div className="flex flex-row ">
+            <div className="admin-bar bg-red-400 text-red-100 pl-2 pt-4 pr-20">
 
-                <h1 className="text-4xl font-semibold ">ADMIN PANEL</h1>
+                <h3 className="text-2xl font-semibold ">Admin Panel</h3>
 
-                <nav className=" flex justify-between items-center">
-                    <ul className="flex space-x-4 text-xl">
-                        <li><a href="/admin/users">Manage Users</a></li>
-                        <li><a href="/admin/settings">Settings</a></li>
-                        <li><a href="/admin/reports">Reports</a></li>
-                    </ul>
-                </nav>
+                <ul className="text-xl">
+                    <li className="hover:underline"><a href="/admin">Dashboard</a></li>
+
+                    <li className="hover:underline">
+                        <i className='bxr bxs-book'></i> <a href="/admin/books">Manage Books</a>
+                    </li>
+
+                    <li className="hover:underline">
+                        <i className='bxr bxs-cart'></i> <a href="/admin/orders">Manage Orders</a>
+                    </li>
+
+                    <li className="hover:underline">
+                        <i className='bxr bxs-package'></i> <a href="/admin/returns">Manage Returns</a>
+                    </li>
+
+                    <li className="hover:underline">
+                        <i className='bxr bxs-user'></i> <a href="/admin/users">Manage Users</a>
+                    </li>
+
+                </ul>
             </div>
 
-            <div className="text-gray-700">
+            <div className="w-3/4 mx-auto">
                 <Outlet/>
             </div>
-        </>
+        </div>
     );
 };
 

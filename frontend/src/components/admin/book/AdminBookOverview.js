@@ -3,6 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import React from "react";
 import {usePageTitle} from "../../utils/usePageTitle";
+import ButtonField from "./fields/ButtonField";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -28,6 +29,18 @@ const fetchImageIds = async (id) => {
 
         throw error; // Rethrow other errors
     }
+}
+
+const getButtonClass = (text, color, hoverColor, icon, action) => {
+    return <button
+        className={`p-2 text-white font-semibold rounded-md transition-colors ${color} hover:${hoverColor} ml-2 mb-4`}
+        onClick={action}
+    >
+        <div className="flex items-center gap-2">
+            <i className={`bxr ${icon} text-xl`}></i>
+            {text}
+        </div>
+    </button>
 }
 
 const AdminBookOverview = () => {
@@ -67,48 +80,53 @@ const AdminBookOverview = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-lg font-semibold">Manage Book #{id}</h1>
-            <p className="text-sm text-gray-500">
-                Choose what you want to edit for this book.
-                You're able to edit the book details or manage other aspects like inventory and suppliers.
-            </p>
+        <div className="container mx-auto p-4 ">
+            <div className="flex  justify-between">
+                <div>
+                    <h1 className="text-lg font-semibold">Manage Book #{id}</h1>
+                    <p className="text-sm text-gray-500">
+                        Choose what you want to edit for this book. <br/>
+                        You're able to edit the book details or manage other aspects like inventory and suppliers.
+                    </p>
 
-            <div className="mt-8">
+                    <div>
+                        <ul className="list-none list-inside text-lg">
+                            <li><strong>Title:</strong> {book.titolo}</li>
+                            <li><strong>Author:</strong> {book.autore?.nome}</li>
+                            <li><strong>ISBN:</strong> {book.isbn}</li>
+                        </ul>
+                    </div>
 
-                <button
-                    className="p-3 bg-blue-400 text-white font-semibold rounded-md hover:bg-blue-500 transition-colors"
-                    onClick={() => navigate(`/admin/book/${id}/edit`)}
-                >
-                    Edit Book Details
-                </button>
+                    <div className="mt-8">
 
-                <button
-                    className="p-3 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 transition-colors ml-4 mb-3"
-                    onClick={() => navigate(`/admin/book/${id}/images`)}
-                >
-                    Manage Images
-                </button>
+                        {getButtonClass("Edit Book Details", "bg-blue-400", "bg-blue-500", "bxs-pencil",
+                            () => navigate(`/admin/book/${id}/edit`))}
 
-                <br/>
+                        {getButtonClass("Manage Images", "bg-yellow-500", "bg-yellow-600", "bxs-image",
+                            () => navigate(`/admin/book/${id}/images`))}
 
-                <button
-                    className="p-3 bg-green-500 text-white font-semibold  rounded-md hover:bg-green-600 transition-colors mb-8 "
-                    onClick={() => navigate(`/admin/book/${id}/inventory`)}
-                >
-                    Manage Inventory and Suppliers
-                </button>
+                        {getButtonClass("Manage Inventory and Suppliers", "bg-green-500", "bg-green-600", "bxs-shopping-bag-alt",
+                            () => navigate(`/admin/book/${id}/inventory`))}
 
-                <br/>
+                        <br/>
+                        <hr className="my-4" style={{borderTop: '2px solid #ccc'}}/>
+                        {getButtonClass("Delete Book", "bg-red-500", "bg-red-600", "bxs-trash",
+                            () => navigate(`/admin/book/${id}/delete`))}
 
-                <button
-                    className="p-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors"
-                    onClick={() => navigate(`/admin/book/${id}/delete`)}
-                >
-                    Delete Book
-                </button>
+                    </div>
 
 
+                </div>
+
+                <div>
+                    <button
+                        className="p-3 bg-gray-400 text-gray-100 font-semibold rounded-md hover:bg-gray-500 transition"
+                        onClick={() => window.open(`/book/${id}`, '_blank')}
+                    >
+                        View Book Page ->
+                    </button>
+
+                </div>
             </div>
         </div>
     );

@@ -156,9 +156,9 @@ const AdminBookImages = () => {
     }
 
     return (
-        <div className="container mx-auto p-4 max-w-6xl">
+        <div className="container mx-auto p-4 ">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">Book Images Manager</h1>
+                <h1 className="text-lg font-semibold">Book #{id} - Manage Images</h1>
                 <p className="text-sm text-gray-600">
                     Gestisci le immagini del libro. Puoi caricare nuove immagini trascinandole qui sotto o cliccando sul
                     pulsante di caricamento.

@@ -37,18 +37,19 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
     Page<Libro> findAll(@NonNull Pageable pageable);
 
     // Query aggiornate per le varianti
-    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita > 0 AND l.id NOT IN (:excludeIds)")
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita > 0 AND l.id NOT IN (:excludeIds) AND l.hidden = false ORDER BY FUNCTION('RAND')")
     List<Libro> findRandomAvailableBooksExcluding(Pageable pageable, @Param("excludeIds") Set<Long> excludeIds);
 
     // Libri più recenti (non cambia)
+    @Query("SELECT l FROM Libro l WHERE l.hidden = false ORDER BY l.dataAggiunta DESC")
     List<Libro> findTop10ByOrderByDataAggiuntaDesc();
 
     // Libri in offerta - ora basato sulle varianti
-    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.prezzo.sconto IS NOT NULL")
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.prezzo.sconto IS NOT NULL AND l.hidden = false")
     List<Libro> findByInOffertaTrue();
 
     // Libri con scorte basse - ora basato sulle varianti
-    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita BETWEEN :min AND :max ORDER BY v.rifornimento.quantita ASC")
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE   l.hidden = false AND v.rifornimento.quantita BETWEEN :min AND :max ORDER BY v.rifornimento.quantita ASC")
     List<Libro> findTop5ByVariantiRifornimentoQuantitaBetween(@Param("min") int min, @Param("max") int max);
 
     // Nuove query utili per le varianti
