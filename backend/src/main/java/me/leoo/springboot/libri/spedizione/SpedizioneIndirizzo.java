@@ -32,6 +32,7 @@ public class SpedizioneIndirizzo {
     private String cap;
 
     private String telefono;
+
     // Costruttori
     public SpedizioneIndirizzo(String nome, String indirizzo, String citta, String provincia, String cap, String telefono) {
         this.nome = nome;

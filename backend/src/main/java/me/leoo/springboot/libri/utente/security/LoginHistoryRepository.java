@@ -11,6 +11,7 @@ public interface LoginHistoryRepository extends JpaRepository<LoginHistory, Long
 
     /**
      * Finds a list of LoginHistory records by the username of the associated Utente.
+     *
      * @param userId The ID of the Utente.
      * @return A list of LoginHistory records.
      */
@@ -18,6 +19,7 @@ public interface LoginHistoryRepository extends JpaRepository<LoginHistory, Long
 
     /**
      * Finds the latest LoginHistory record for a given user.
+     *
      * @param username The username of the Utente.
      * @return The latest LoginHistory record, or empty if not found.
      */

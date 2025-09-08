@@ -22,7 +22,7 @@ public class MessaggioService {
      * <p>
      * attachment_4_1.jpg for for the first attachment of the fourth message
      */
-    public List<Path> getMessageAllImages(Long resoId){
+    public List<Path> getMessageAllImages(Long resoId) {
 
         try {
             String finalPath = imageService.getOrdersImagesPath(resoId);

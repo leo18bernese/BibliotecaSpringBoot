@@ -180,7 +180,7 @@ public class CarrelloController {
 
     @PostMapping("/items/set")
     public ResponseEntity<?> setQuantity(@AuthenticationPrincipal Utente utente,
-                                      @RequestBody ItemRequest request) {
+                                         @RequestBody ItemRequest request) {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
@@ -214,7 +214,7 @@ public class CarrelloController {
         }
 
         try {
-              Utente targetUtente = utenteRepository.findById(utenteId)
+            Utente targetUtente = utenteRepository.findById(utenteId)
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utenteId));
 
             Carrello carrello = carrelloService.setItemQuantity(targetUtente, request.libroId(), request.varianteId(), request.quantita());

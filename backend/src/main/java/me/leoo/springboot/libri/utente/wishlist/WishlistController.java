@@ -29,7 +29,7 @@ public class WishlistController {
     @GetMapping("/has/{id}")
     public ResponseEntity<Boolean> hasWishlistItem(@AuthenticationPrincipal Utente user,
                                                    @PathVariable Long id) {
-        if(user == null) {
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

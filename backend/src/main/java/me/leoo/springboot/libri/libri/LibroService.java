@@ -2,7 +2,6 @@ package me.leoo.springboot.libri.libri;
 
 import me.leoo.springboot.libri.image.ImageService;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
-import me.leoo.springboot.libri.utils.LibriUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ public class LibroService {
     @Autowired
     private ImageService imageService;
 
-    public List<Path> getBookAllImages(Long id){
+    public List<Path> getBookAllImages(Long id) {
         try {
             String finalPath = imageService.getCommonImagesPath(id);
             Path dirPath = Paths.get(finalPath);

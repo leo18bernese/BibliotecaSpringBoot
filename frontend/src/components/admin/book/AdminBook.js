@@ -41,7 +41,12 @@ const fetchAutoriList = async () => {
 }
 
 const updateBook = async ({id, bookData}) => {
-    const {data} = await axios.put(`/api/libri/${id}`, bookData);
+    const {data} = await axios.patch(`/api/libri/${id}`, bookData);
+    return data;
+}
+
+const updateVisibility = async (id, hidden) => {
+    const {data} = await axios.patch(`/api/libri/${id}/visibility/${!hidden}`);
     return data;
 }
 
@@ -110,6 +115,8 @@ const AdminBook = () => {
         mutationFn: updateBook,
         onSuccess: () => {
             toast.success('Libro aggiornato con successo!');
+
+            updateVisibility(id, book.hidden)
 
             navigate("/admin/book/" + id);
 
@@ -381,7 +388,7 @@ const AdminBook = () => {
 
                 <CheckableField key="hidden"
                                 id="hidden" label="Hidden" icon="badge-info"
-                                value={book?.hidden ? 'Yes' : 'No'}
+                                value={book?.hidden || false}
                                 placeholder="Is this book hidden?"
                                 minChars={1} maxChars={3}
                                 type="checkbox"

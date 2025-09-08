@@ -17,7 +17,8 @@ public class ImageUtils {
             String contentType,
             String base64Content,
             long size
-    ) {}
+    ) {
+    }
 
     // Metodi esistenti mantenuti per compatibilità
     public ResponseEntity<byte[]> getImageResponse(Path path) throws IOException {

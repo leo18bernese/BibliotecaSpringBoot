@@ -1,7 +1,6 @@
 package me.leoo.springboot.libri.utente.security;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

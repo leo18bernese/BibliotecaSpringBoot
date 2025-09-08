@@ -20,7 +20,8 @@ public class AutoreController {
     private AutoreService autoreService;
 
     // DTO per le richieste di creazione/modifica
-    public record AutoreRequest(String nome, String descrizione) {}
+    public record AutoreRequest(String nome, String descrizione) {
+    }
 
     // DTO per le risposte
     public record AutoreResponse(Long id, String nome, String descrizione) {

@@ -44,7 +44,7 @@ public class Variante {
     private List<Long> recensioni = List.of(); // Recensioni specifiche per questa variante
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private Map<String, String> attributiSpecifici =  new HashMap<>();
+    private Map<String, String> attributiSpecifici = new HashMap<>();
 
     public Variante(Libro libro, String nome, Prezzo prezzo, Rifornimento rifornimento, LibroDimension dimensioni) {
         this.libro = libro;

@@ -11,12 +11,7 @@ import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.resi.stato.StatoReso;
 import me.leoo.springboot.libri.resi.stato.StatoResoStorico;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Builder

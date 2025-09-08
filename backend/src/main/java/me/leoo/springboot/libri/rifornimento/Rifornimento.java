@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.leoo.springboot.libri.libri.LibroController;
 import me.leoo.springboot.libri.utils.LibriUtils;
-import me.leoo.springboot.libri.utils.Sconto;
 import me.leoo.utils.common.random.RandomUtil;
 import me.leoo.utils.common.time.TimeUtil;
 
@@ -86,7 +84,7 @@ public class Rifornimento {
             return "⚠ In esaurimento. Disponibili solo " + disponibili + " pezzi";
         }
 
-        if(disponibili == Integer.MAX_VALUE) {
+        if (disponibili == Integer.MAX_VALUE) {
             return "Disponibilità illimitata";
         }
 

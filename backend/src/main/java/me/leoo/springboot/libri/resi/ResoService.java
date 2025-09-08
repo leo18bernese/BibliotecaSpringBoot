@@ -10,9 +10,7 @@ import me.leoo.springboot.libri.ordini.OrdineRepository;
 import me.leoo.springboot.libri.resi.chat.Messaggio;
 import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.utente.Utente;
-import me.leoo.springboot.libri.utils.LibriUtils;
 import org.hibernate.Hibernate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Service

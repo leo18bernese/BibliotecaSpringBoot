@@ -16,7 +16,7 @@ public class LibroRecommendationService {
     @Autowired
     private LibroRepository libroRepository;
 
-    public List<Libro>  getHomepage(int limit) {
+    public List<Libro> getHomepage(int limit) {
         Set<Libro> libri = new HashSet<>();
 
 

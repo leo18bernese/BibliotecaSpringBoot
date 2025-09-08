@@ -1,4 +1,3 @@
-
 package me.leoo.springboot.libri.websocket;
 
 import me.leoo.springboot.libri.resi.chat.Messaggio;

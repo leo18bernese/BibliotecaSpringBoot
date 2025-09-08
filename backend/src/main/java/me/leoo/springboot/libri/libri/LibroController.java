@@ -12,7 +12,6 @@ import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -143,7 +142,7 @@ public class LibroController {
     }
 
     // Modifica libro
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public Libro updateLibro(@PathVariable Long id, @RequestBody UpdateLibroRequest request) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
@@ -180,29 +179,20 @@ public class LibroController {
         return libroRepository.save(libroToUpdate);
     }
 
-    // hide book
-    @PutMapping("/{id}/hide")
-    public ResponseEntity<Libro> hideLibro(@PathVariable Long id) {
+    // hide/show book
+    @PatchMapping("/{id}/visibility/{state}")
+    public ResponseEntity<Libro> hideLibro(@PathVariable Long id,
+                                           @PathVariable boolean state) {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
-
-        libro.setHidden(true);
+        System.out.println("Setting hidden state of libro ID " + id + " to " + state);
+        libro.setHidden(state);
         libroRepository.save(libro);
 
+        System.out.println("Libro ID " + id + " hidden state set to " + state);
         return ResponseEntity.ok(libro);
     }
 
-    // show book
-    @PutMapping("/{id}/show")
-    public ResponseEntity<Libro> showLibro(@PathVariable Long id) {
-        Libro libro = libroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
-
-        libro.setHidden(false);
-        libroRepository.save(libro);
-
-        return ResponseEntity.ok(libro);
-    }
 
     // Cancella libro
     @DeleteMapping("/{id}")

@@ -1,6 +1,5 @@
 package me.leoo.springboot.libri.admin;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.resi.Reso;
@@ -30,7 +29,8 @@ public class AdminResoController {
     private final OrdineService ordineService;
     private final ChatWebSocketController chatWebSocketController;
 
-    public record UpdateStatoRequest(StatoReso stato, String messaggio) {}
+    public record UpdateStatoRequest(StatoReso stato, String messaggio) {
+    }
 
     @GetMapping("/{id}/exists")
     public ResponseEntity<?> existsReso(@AuthenticationPrincipal Utente utente,
@@ -64,7 +64,7 @@ public class AdminResoController {
     }
 
     // set new stato
-    @PatchMapping ("/{id}/stato")
+    @PatchMapping("/{id}/stato")
     public ResponseEntity<?> setStatoReso(@AuthenticationPrincipal Utente utente,
                                           @PathVariable Long id,
                                           @RequestBody UpdateStatoRequest request) {
@@ -136,7 +136,7 @@ public class AdminResoController {
         }
 
         try {
-          if (allegati == null || allegati.isEmpty()) {
+            if (allegati == null || allegati.isEmpty()) {
                 return ResponseEntity.badRequest().body("Nessun allegato fornito");
             }
 

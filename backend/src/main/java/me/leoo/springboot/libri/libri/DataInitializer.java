@@ -40,7 +40,7 @@ public class DataInitializer implements CommandLineRunner {
         blu.setMetadata(Map.of("tipo", "colore", "valore", "#0000FF"));
 
         caratteristicaOpzioneRepository.saveAll(List.of(nero, bianco, blu));
-        
+
         System.out.println("Metadati caratteristiche inizializzati.");
     }
 }

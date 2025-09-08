@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.leoo.springboot.libri.carrello.Carrello;
-import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.utils.Sconto;
 

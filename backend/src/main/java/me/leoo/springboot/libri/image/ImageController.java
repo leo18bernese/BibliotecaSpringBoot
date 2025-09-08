@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.LibroService;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

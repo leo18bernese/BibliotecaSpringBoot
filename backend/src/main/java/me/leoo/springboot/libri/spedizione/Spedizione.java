@@ -26,7 +26,7 @@ public class Spedizione {
                         new TipoSpedizione(TipoSpedizione.Tipo.STANDARD, 4, 3, 5),
                         new TipoSpedizione(TipoSpedizione.Tipo.EXPRESS, 8, 1, 2)
                         //new TipoSpedizione(TipoSpedizione.Tipo.PRIORITY, 12, 1, 1)
-                        ),
+                ),
                 List.of(DeliveryPackage.SMALL, DeliveryPackage.MEDIUM),
                 true, false, true, false));
 

@@ -1,6 +1,5 @@
 package me.leoo.springboot.libri.libri.search;
 
-import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroController;
 import org.springframework.data.domain.Page;
 

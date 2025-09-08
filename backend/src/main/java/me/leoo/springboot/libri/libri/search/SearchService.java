@@ -10,7 +10,6 @@ import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzione;
 import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzioneRepository;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
-import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +46,7 @@ public class SearchService {
     }
 
     private Specification<Libro> buildLibroSpecificationMultiple(String q, Double prezzoMin, Double prezzoMax,
-                                                                Map<String, List<String>> filtriMultipli) {
+                                                                 Map<String, List<String>> filtriMultipli) {
         Specification<Libro> spec = Specification.where(null);
 
         if (q != null && !q.isEmpty()) {

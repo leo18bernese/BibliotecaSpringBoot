@@ -10,16 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
-import me.leoo.springboot.libri.libri.images.ImageUtils;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
-import me.leoo.springboot.libri.utils.LibriUtils;
-import org.springframework.http.ResponseEntity;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Slf4j
@@ -87,7 +81,7 @@ public class Libro {
 
         // Crea variante base (nome vuoto indica variante standard)
 
-       // aggiungiVariante("", quantita, prezzo, dimension, Map.of());
+        // aggiungiVariante("", quantita, prezzo, dimension, Map.of());
 
         aggiungiVariante("rosso flex", quantita, prezzo, dimension, Map.of("colore", "rosso", "materiale", "flex"));
         aggiungiVariante("rosso rigido", quantita, prezzo + 5, dimension, Map.of("colore", "rosso", "materiale", "rigido"));

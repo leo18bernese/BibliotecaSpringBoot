@@ -81,7 +81,7 @@ public class CarrelloService {
     }
 
     @Transactional(readOnly = false)
-    public CarrelloItem getCarrelloItemByVariante(Utente utente,  Long varianteId) {
+    public CarrelloItem getCarrelloItemByVariante(Utente utente, Long varianteId) {
         Carrello carrello = getCarrelloByUtente(utente);
 
         return carrello.getItemByVariante(varianteId);

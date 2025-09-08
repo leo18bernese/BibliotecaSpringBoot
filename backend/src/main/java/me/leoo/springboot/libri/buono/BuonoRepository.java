@@ -1,6 +1,5 @@
 package me.leoo.springboot.libri.buono;
 
-import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.data.jpa.repository.JpaRepository;
 
