@@ -5,7 +5,7 @@ import {Toaster} from "react-hot-toast";
 
 const linkItem = (emoji, text, to) => (
     <NavLink to={to}
-             className={({ isActive }) =>
+             className={({isActive}) =>
                  `p-2 rounded flex items-center gap-2.5 ${isActive ? "bg-blue-200 hover:bg-blue-300  font-semibold" : "hover:bg-gray-100"}`
              }>
 
@@ -13,7 +13,6 @@ const linkItem = (emoji, text, to) => (
         {text}
     </NavLink>
 );
-
 
 
 const AccountInfo = () => {
@@ -36,7 +35,7 @@ const AccountInfo = () => {
                             <h3 className="text-lg mb-4">My Account</h3>
                         </div>
 
-                        <div >
+                        <div>
                             {linkItem('user', 'Personal Details', '/account/personal-details')}
                             {linkItem('lock-keyhole-open', 'Security Settings', '/account/security')}
                             {linkItem('package', 'Order History', '/account/orders')}
@@ -53,7 +52,7 @@ const AccountInfo = () => {
                     </div>
 
                     <div className="text-gray-700">
-                        <Outlet />
+                        <Outlet/>
                     </div>
                 </div>
 

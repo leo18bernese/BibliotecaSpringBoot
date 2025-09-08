@@ -98,7 +98,6 @@ const Reso = () => {
                 </div>
 
 
-
                 <div className="mt-4 mb-10">
                 <span className={`p-2 rounded-2xl font-semibold uppercase text-sm mb ${colorClass}`}>
                     <span className="">{reso.statoName}</span>
@@ -118,7 +117,8 @@ const Reso = () => {
                             <p><b>Motivo fornito dal servizio clienti: </b>
                                 {reso.statoMessaggio}.</p>
 
-                            <p>Puoi scrivere nella chat relativa a questo reso per ottenere maggiori informazioni, per fare
+                            <p>Puoi scrivere nella chat relativa a questo reso per ottenere maggiori informazioni, per
+                                fare
                                 domande e per
                                 fornire ulteriori dettagli per sbloccare la richiesta.</p>
 

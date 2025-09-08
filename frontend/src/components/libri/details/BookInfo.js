@@ -262,7 +262,7 @@ const BookInfo = () => {
     const quantitaDisponibile = selectedVariant?.rifornimento?.quantita || 0;
 
     const isDisponibile = quantitaDisponibile > 0 &&
-         ((quantitaDisponibile - quantityToAdd) >= 0);
+        ((quantitaDisponibile - quantityToAdd) >= 0);
 
     const isUpdateButtonDisabled = !isDisponibile || updateCartItemMutation.isPending ||
         (cartItem && cartItem.quantita === quantityToAdd);

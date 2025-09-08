@@ -41,7 +41,7 @@ const Spedizione = ({
                                 <Indirizzo addr={addr}
                                            handleSavedAddressSelect={handleSavedAddressSelect}
                                            selectedSavedAddress={selectedSavedAddress}
-                                           />
+                                />
 
                             ))}
                         </div>

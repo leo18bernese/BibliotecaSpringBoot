@@ -9,7 +9,7 @@ const Carrello = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
 
-    const { carrello, isLoadingCart, errorCart, isErrorCart } = useCarrello();
+    const {carrello, isLoadingCart, errorCart, isErrorCart} = useCarrello();
 
     if (isLoadingCart) {
         return (

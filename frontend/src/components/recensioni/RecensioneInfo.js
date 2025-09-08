@@ -1,6 +1,6 @@
 import React from "react";
 
-const RecensioneInfo = ({ recensione, username}) => {
+const RecensioneInfo = ({recensione, username}) => {
 
     return (
         <div className="border-b border-gray-200 pb-4 last:border-0" key={recensione.id}

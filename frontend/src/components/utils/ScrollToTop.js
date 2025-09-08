@@ -1,12 +1,12 @@
 // src/components/utils/ScrollToTop.js
 
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import {useEffect} from 'react';
+import {useLocation} from 'react-router-dom';
 
 function ScrollToTop() {
     // Estrae il 'pathname' dall'oggetto location.
     // Il pathname è la parte dell'URL dopo il dominio (es. "/libri/12")
-    const { pathname } = useLocation();
+    const {pathname} = useLocation();
 
     // Usa l'hook useEffect per eseguire un'azione quando il 'pathname' cambia.
     useEffect(() => {

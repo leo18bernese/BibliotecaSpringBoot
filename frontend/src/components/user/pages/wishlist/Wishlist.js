@@ -45,12 +45,14 @@ const Wishlist = () => {
                         <thead className="bg-gray-200">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cover</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book
+                                Title
+                            </th>
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                         {wishlist.map((item) => (
-                            <WishlistItem key={item.id} book={item} />
+                            <WishlistItem key={item.id} book={item}/>
                         ))}
                         </tbody>
                     </table>

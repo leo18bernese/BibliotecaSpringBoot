@@ -84,9 +84,9 @@ const Timeline = ({current, stati}) => {
             current={currentStepIndex}
             labelPlacement="vertical"
         >
-            {allSteps.map((step, index) =>  {
+            {allSteps.map((step, index) => {
                 const statusKey = step.apiStatus[0];
-                const date = stati[statusKey] ;
+                const date = stati[statusKey];
                 const description = date ? new Date(date).toLocaleString() : null;
 
                 return (<Step
@@ -94,7 +94,7 @@ const Timeline = ({current, stati}) => {
                     title={step.title}
                     icon={step.icon}
                     status={getStatusForStep(index)}
-                description={description}
+                    description={description}
                 />);
             })}
         </Steps>

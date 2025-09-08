@@ -52,7 +52,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
     const renderVarianteCard = (variante) => (
         <div key={variante.id} className={` p-2 border-2 rounded-lg cursor-pointer 
             transition-colors shadow-sm ` +
-            (variante.id === selected.id ? 'bg-blue-100 border-blue-300' : 'bg-gray-100  border-gray-300  hover:border-blue-500 hover:shadow-md ' )}
+            (variante.id === selected.id ? 'bg-blue-100 border-blue-300' : 'bg-gray-100  border-gray-300  hover:border-blue-500 hover:shadow-md ')}
              onClick={() => {
                  if (onSelect) onSelect(variante);
              }}>

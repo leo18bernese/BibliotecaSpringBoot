@@ -31,35 +31,35 @@ const AdminHome = () => {
             <table className="min-w-full bg-white border text-left border-gray-200">
 
                 <thead>
-                    <tr>
-                        <th className="py-2 px-4 border-b border-gray-200">ID</th>
-                        <th className="py-2 px-4 border-b border-gray-200">Title</th>
-                        <th className="py-2 px-4 border-b border-gray-200">Author</th>
-                        <th className="py-2 px-4 border-b border-gray-200">Isbn</th>
-                        <th className="py-2 px-4 border-b border-gray-200">Variants</th>
-                        <th className="py-2 px-4 border-b border-gray-200">Actions</th>
-                    </tr>
+                <tr>
+                    <th className="py-2 px-4 border-b border-gray-200">ID</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Title</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Author</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Isbn</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Variants</th>
+                    <th className="py-2 px-4 border-b border-gray-200">Actions</th>
+                </tr>
                 </thead>
 
                 <tbody>
-                    {books.map((book) => (
-                        <tr key={book.id} className="hover:bg-gray-100">
-                            <td className="py-2 px-4 border-b border-gray-200">{book.id}</td>
-                            <td className="py-2 px-4 border-b border-gray-200">{book.name}</td>
-                            <td className="py-2 px-4 border-b border-gray-200">{book.author}</td>
-                            <td className="py-2 px-4 border-b border-gray-200">{book.isbn}</td>
-                            <td className="py-2 px-4 border-b border-gray-200">{book.variants}</td>
+                {books.map((book) => (
+                    <tr key={book.id} className="hover:bg-gray-100">
+                        <td className="py-2 px-4 border-b border-gray-200">{book.id}</td>
+                        <td className="py-2 px-4 border-b border-gray-200">{book.name}</td>
+                        <td className="py-2 px-4 border-b border-gray-200">{book.author}</td>
+                        <td className="py-2 px-4 border-b border-gray-200">{book.isbn}</td>
+                        <td className="py-2 px-4 border-b border-gray-200">{book.variants}</td>
 
-                            <td className="py-2 px-4 border-b border-gray-200">
-                                <Link
-                                    to={`/admin/book/${book.id}`}
-                                    className="text-blue-500 hover:underline"
-                                >
-                                    Manage Inventory
-                                </Link>
-                            </td>
-                        </tr>
-                    ))}
+                        <td className="py-2 px-4 border-b border-gray-200">
+                            <Link
+                                to={`/admin/book/${book.id}`}
+                                className="text-blue-500 hover:underline"
+                            >
+                                Manage Inventory
+                            </Link>
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
         </div>

@@ -30,7 +30,7 @@ const uploadImages = async (bookId, files) => {
         formData.append('files', file);
     });
 
-    const { data } = await axios.post(`/api/images/${bookId}`, formData, {
+    const {data} = await axios.post(`/api/images/${bookId}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -58,12 +58,12 @@ const AdminBookImages = () => {
     });
 
     const deleteImage = async (bookId, imageIndex) => {
-        const { data } = await axios.delete(`/api/images/${bookId}/index/${imageIndex}`);
+        const {data} = await axios.delete(`/api/images/${bookId}/index/${imageIndex}`);
         return data;
     };
 
     const deleteMutation = useMutation({
-        mutationFn: ({ bookId, imageIndex }) => deleteImage(bookId, imageIndex),
+        mutationFn: ({bookId, imageIndex}) => deleteImage(bookId, imageIndex),
         onSuccess: () => {
             queryClient.invalidateQueries(['images', id]);
 
@@ -87,7 +87,7 @@ const AdminBookImages = () => {
 
     const handleDeleteImage = (imageIndex) => {
         if (window.confirm('Sei sicuro di voler eliminare questa immagine?')) {
-            deleteMutation.mutate({ bookId: id, imageIndex });
+            deleteMutation.mutate({bookId: id, imageIndex});
         }
     };
 
@@ -160,7 +160,8 @@ const AdminBookImages = () => {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">Book Images Manager</h1>
                 <p className="text-sm text-gray-600">
-                    Gestisci le immagini del libro. Puoi caricare nuove immagini trascinandole qui sotto o cliccando sul pulsante di caricamento.
+                    Gestisci le immagini del libro. Puoi caricare nuove immagini trascinandole qui sotto o cliccando sul
+                    pulsante di caricamento.
                 </p>
             </div>
 
@@ -217,16 +218,19 @@ const AdminBookImages = () => {
 
                 {images === -1 || images === 0 ? (
                     <div className="text-center py-12">
-                        <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         <p className="text-gray-500 text-lg">Nessuna immagine trovata</p>
                         <p className="text-gray-400 text-sm">Carica la prima immagine per questo libro</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {Array.from({ length: images }, (_, index) => (
-                            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                        {Array.from({length: images}, (_, index) => (
+                            <div key={index}
+                                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                                 <div className="relative">
                                     <img
                                         src={`${API_URL}/${id}/index/${index}`}

@@ -6,21 +6,21 @@ import toast, {Toaster} from "react-hot-toast";
 import SockJS from "sockjs-client";
 import MessageAttachments from "../../../reso/MessageAttachments";
 import {Button} from "antd";
-import { Client } from '@stomp/stompjs';
+import {Client} from '@stomp/stompjs';
 
 const ChatTemplate = ({
-    id,
-    fetchMessagesArray,
-    fetchEntityExists,
-    getPostUrl,
-    getUploadUrl,
-    getSocketDestination,
-    getNotFoundComponent,
-    getHeaderComponent,
-    getOwnType,
-    getSenderDisplay,
-    getBackDestination
-}) => {
+                          id,
+                          fetchMessagesArray,
+                          fetchEntityExists,
+                          getPostUrl,
+                          getUploadUrl,
+                          getSocketDestination,
+                          getNotFoundComponent,
+                          getHeaderComponent,
+                          getOwnType,
+                          getSenderDisplay,
+                          getBackDestination
+                      }) => {
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -60,18 +60,18 @@ const ChatTemplate = ({
         scrollToBottom();
     }, [messages]);
 
-    const { mutate: sendMessage, isLoading: isSendingMessage } = useMutation({
+    const {mutate: sendMessage, isLoading: isSendingMessage} = useMutation({
         mutationFn: async (messageText) => {
-            const request = { testo: messageText, allegati: [] };
+            const request = {testo: messageText, allegati: []};
 
             // L'API restituisce il messaggio appena creato
-            const { data: newMessage } = await axios.post(getPostUrl(), request);
+            const {data: newMessage} = await axios.post(getPostUrl(), request);
 
             if (attachments.length > 0) {
                 await handleAttachmentsUpload(newMessage.id);
 
-                await queryClient.invalidateQueries({ queryKey: ['hasAttachments', id, newMessage.id] });
-                await queryClient.invalidateQueries({ queryKey: ['messageAttachments', id, newMessage.id] });
+                await queryClient.invalidateQueries({queryKey: ['hasAttachments', id, newMessage.id]});
+                await queryClient.invalidateQueries({queryKey: ['messageAttachments', id, newMessage.id]});
             }
         },
         onSuccess: () => {
@@ -128,8 +128,8 @@ const ChatTemplate = ({
         try {
             console.log(`Caricando ${attachments.length} allegati per il messaggio ${messageId}`);
 
-            await axios.post(getUploadUrl( messageId), formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            await axios.post(getUploadUrl(messageId), formData, {
+                headers: {'Content-Type': 'multipart/form-data'},
                 timeout: 60000 // 60 secondi timeout
             });
 
@@ -166,7 +166,7 @@ const ChatTemplate = ({
         <div className="container mx-auto px-4 py-8 max-w-5xl">
             <Toaster/>
 
-            <div id="tracking" className="bg-white shadow-md rounded-lg flex flex-col h-[calc(85vh-70px)]" >
+            <div id="tracking" className="bg-white shadow-md rounded-lg flex flex-col h-[calc(85vh-70px)]">
 
                 <div className="flex justify-between items-start p-8 flex-shrink-0">
 
@@ -209,10 +209,11 @@ const ChatTemplate = ({
                                     }
 
                                     <div className={`mx-auto ${mine ? 'justify-end' : 'justify-start'} flex`}>
-                                        <div className={`inline-block ${mine ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} p-3 rounded-lg`}>
+                                        <div
+                                            className={`inline-block ${mine ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} p-3 rounded-lg`}>
                                             {msg.testo}
 
-                                            <MessageAttachments resoId={id} messageId={msg.id} />
+                                            <MessageAttachments resoId={id} messageId={msg.id}/>
                                         </div>
                                     </div>
 
@@ -281,7 +282,8 @@ const ChatTemplate = ({
                                 className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 disabled={isSendingMessage}
                             />
-                            <label className={`p-1.5 mx-2 border cursor-pointer hover:bg-gray-100 ${isSendingMessage ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <label
+                                className={`p-1.5 mx-2 border cursor-pointer hover:bg-gray-100 ${isSendingMessage ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -309,9 +311,9 @@ const ChatTemplate = ({
 
                                             if (validFiles.length !== files.length) {
                                                 alert('Alcuni file non sono supportati');
-                                            }else {
+                                            } else {
                                                 setAttachments(prev => [...prev, ...validFiles]);
-                                                if(fileInputRef.current) fileInputRef.current.value = '';
+                                                if (fileInputRef.current) fileInputRef.current.value = '';
                                             }
                                         }
                                     }}

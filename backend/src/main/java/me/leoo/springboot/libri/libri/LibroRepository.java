@@ -1,10 +1,12 @@
 package me.leoo.springboot.libri.libri;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Set;
@@ -29,6 +31,10 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
     Iterable<Libro> advanceSearch(@Param("titolo") String titolo,
                                   @Param("genere") String genere,
                                   @Param("autore") String autore);
+
+    @Override
+    @NonNull
+    Page<Libro> findAll(@NonNull Pageable pageable);
 
     // Query aggiornate per le varianti
     @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita > 0 AND l.id NOT IN (:excludeIds)")

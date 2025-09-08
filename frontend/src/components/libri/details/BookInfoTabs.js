@@ -1,7 +1,7 @@
 // src/components/BookInfoTabs.js
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
-const TabPanel = ({ children, value, index }) => {
+const TabPanel = ({children, value, index}) => {
     return (
         <div
             role="tabpanel"
@@ -14,7 +14,7 @@ const TabPanel = ({ children, value, index }) => {
     );
 };
 
-const BookInfoTabs = ({ book }) => {
+const BookInfoTabs = ({book}) => {
     const [activeTab, setActiveTab] = useState(0);
     const [selectedVariant, setSelectedVariant] = useState(null);
 
@@ -30,9 +30,9 @@ const BookInfoTabs = ({ book }) => {
     }, [book, selectedVariant]);
 
     const tabs = [
-        { label: 'Info Produttore' },
-        { label: 'Specifiche Tecniche' },
-        { label: 'Prodotti Correlati' },
+        {label: 'Info Produttore'},
+        {label: 'Specifiche Tecniche'},
+        {label: 'Prodotti Correlati'},
     ];
 
     const tableContent = (key, value) => {
@@ -63,7 +63,7 @@ const BookInfoTabs = ({ book }) => {
                 <div>
                     <h3 className="text-lg font-semibold mb-2">Informazioni sull'Autore: {book.autore.nome}</h3>
                     <div
-                        dangerouslySetInnerHTML={{ __html: book.autore.descrizione || 'Nessuna descrizione disponibile.' }}
+                        dangerouslySetInnerHTML={{__html: book.autore.descrizione || 'Nessuna descrizione disponibile.'}}
                         className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-blockquote:border-l-4 prose-blockquote:border-gray-500 prose-blockquote:bg-gray-100 prose-blockquote:p-2"
                     />
                 </div>

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 const ImageGallery = ({id, images, API_URL}) => {
     const [selectedImage, setSelectedImage] = useState(images === -1 ? -1 : 0);
-       const [showPopup, setShowPopup] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
 
     const handleImageClick = () => {
         setShowPopup(true);
@@ -15,7 +15,7 @@ const ImageGallery = ({id, images, API_URL}) => {
     return (
         <div className="relative">
 
-            <div className="bg-white p-4 rounded-lg shadow-md" >
+            <div className="bg-white p-4 rounded-lg shadow-md">
                 {selectedImage >= 0 && (
                     <img
                         src={`${API_URL}/${id}/index/${selectedImage}`}
@@ -27,7 +27,7 @@ const ImageGallery = ({id, images, API_URL}) => {
                 )}
 
                 <div className="mt-4 w-full text-center text-gray-500 text-sm italic">
-                    {selectedImage === -1 ?  'Nessuna immagine disponibile':'Clicca sull\'immagine per ingrandirla'}
+                    {selectedImage === -1 ? 'Nessuna immagine disponibile' : 'Clicca sull\'immagine per ingrandirla'}
                 </div>
             </div>
 
@@ -35,7 +35,7 @@ const ImageGallery = ({id, images, API_URL}) => {
             {images > 0 && (
                 <div className="mt-4 flex flex-wrap justify-center items-center">
 
-                    {Array.from({ length: Math.min(images, 10) }, (_, image) => (
+                    {Array.from({length: Math.min(images, 10)}, (_, image) => (
                         <div key={image} className="relative cursor-pointer " onMouseEnter={() => {
                             setSelectedImage(image);
                         }}>

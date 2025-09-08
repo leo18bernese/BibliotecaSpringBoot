@@ -40,7 +40,7 @@ const Ordine = () => {
         select: (data) => {
             if (data && data.items && Array.isArray(data.items)) {
                 const sortedItems = [...data.items].sort((a, b) => a.dataAggiunta.localeCompare(b.dataAggiunta));
-                return { ...data, items: sortedItems };
+                return {...data, items: sortedItems};
             }
             return data;
         },
@@ -82,7 +82,7 @@ const Ordine = () => {
                             </span>
                 </div>
 
-                <Timeline current={ordine.stato} stati={ordine.stati} />
+                <Timeline current={ordine.stato} stati={ordine.stati}/>
 
                 <p className="text-center mt-8">{ordine.statoDescrizione}</p>
                 <p className="text-center">{ordine.statoNext}</p>
@@ -137,10 +137,10 @@ const Ordine = () => {
 
                                     {ordine.couponCodes.length === 0 && (
                                         <span className="p-2 rounded-2xl font-semibold uppercase text-sm"
-                                                style={{backgroundColor: '#fef3c7', color: '#92400e'}}>
+                                              style={{backgroundColor: '#fef3c7', color: '#92400e'}}>
                                             Nessun coupon applicato
                                         </span>
-                                    ) }
+                                    )}
 
                                     {ordine.couponCodes.map((code, index) => (
                                         <span key={index}

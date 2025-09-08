@@ -27,12 +27,12 @@ const ProtectedRoute = ({children, requiredRole}) => {
 
     if (!user) {
         return (
-            getDeniedContainer( 'bxs-no-entry',
+            getDeniedContainer('bxs-no-entry',
                 'Accesso Negato',
                 'Devi essere loggato per visualizzare questa pagina.',
                 'Clicca qui per accedere',
                 '/login',
-                { from: location }
+                {from: location}
             )
         );
     }
@@ -44,7 +44,7 @@ const ProtectedRoute = ({children, requiredRole}) => {
                 'Non hai i permessi necessari per visualizzare questa pagina.',
                 'Torna alla Home',
                 '/',
-                { from: location }
+                {from: location}
             )
         );
     }

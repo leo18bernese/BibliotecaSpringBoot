@@ -293,12 +293,12 @@ const AdminBook = () => {
                                             }));
                                         }}
                                         onRemove={() => {
-                            setCharacteristics(prev => {
-                                const newCharacteristics = {...prev};
-                                delete newCharacteristics[key];
-                                return newCharacteristics;
-                            });
-                        }}
+                                            setCharacteristics(prev => {
+                                                const newCharacteristics = {...prev};
+                                                delete newCharacteristics[key];
+                                                return newCharacteristics;
+                                            });
+                                        }}
                         />
                     ))}
 
@@ -400,7 +400,7 @@ const AdminBook = () => {
 
                 <button
                     onClick={() => {
-                        if(window.confirm("Are you sure you want to discard changes?")) {
+                        if (window.confirm("Are you sure you want to discard changes?")) {
                             navigate("/admin/book/" + id);
                         }
                     }}
@@ -416,7 +416,7 @@ const AdminBook = () => {
                             return;
                         }
 
-                        if(window.confirm("Are you sure you want to save changes?")) {
+                        if (window.confirm("Are you sure you want to save changes?")) {
                             handleSave();
                         }
                     }}

@@ -62,7 +62,9 @@ const Register = () => {
 
             <h2 className="text-2xl font-bold mb-4">Register</h2>
 
-            <p className="text-gray-600">Have already an account? Please <Link to="/login" className="text-gray-700 underline">click here</Link> to login.</p>
+            <p className="text-gray-600">Have already an account? Please <Link to="/login"
+                                                                               className="text-gray-700 underline">click
+                here</Link> to login.</p>
 
             <form className="mt-10" onSubmit={handleRegister}>
                 <div>

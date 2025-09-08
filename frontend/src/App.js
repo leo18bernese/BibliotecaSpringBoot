@@ -107,7 +107,8 @@ function App() {
                                             <Route path="/admin/book/:id/edit" element={<AdminBook/>}/>
                                             <Route path="/admin/book/:id/images" element={<AdminBookImages/>}/>
                                             <Route path="/admin/book/:id/inventory" element={<AdminBookInventory/>}/>
-                                            <Route path="/admin/book/:id/inventory/variante/:varianteId" element={<AdminBookVariant />} />
+                                            <Route path="/admin/book/:id/inventory/variante/:varianteId"
+                                                   element={<AdminBookVariant/>}/>
 
 
                                         </Route>

@@ -1,13 +1,13 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useContext } from 'react';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {useContext} from 'react';
 import {CartContext} from "../carrello/CartContext";
 
 export const useCartMutations = () => {
     const queryClient = useQueryClient();
-    const { addItem, removeItem, updateItem } = useContext(CartContext);
+    const {addItem, removeItem, updateItem} = useContext(CartContext);
 
     const addToCartMutation = useMutation({
-        mutationFn: async ({ bookId, varianteId, quantity }) => {
+        mutationFn: async ({bookId, varianteId, quantity}) => {
             return await addItem(bookId, varianteId, quantity);
         },
         onSuccess: (data, variables) => {
@@ -20,8 +20,8 @@ export const useCartMutations = () => {
     });
 
     const removeFromCartMutation = useMutation({
-        mutationFn: async ({ bookId,varianteId, quantity }) => {
-            return await removeItem(bookId, varianteId,quantity);
+        mutationFn: async ({bookId, varianteId, quantity}) => {
+            return await removeItem(bookId, varianteId, quantity);
         },
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries(['cartItem', variables.bookId]);
@@ -33,7 +33,7 @@ export const useCartMutations = () => {
     });
 
     const updateCartItemMutation = useMutation({
-        mutationFn: async ({ bookId, varianteId, quantity }) => {
+        mutationFn: async ({bookId, varianteId, quantity}) => {
             return await updateItem(bookId, varianteId, quantity);
         },
         onSuccess: (data, variables) => {
@@ -44,7 +44,6 @@ export const useCartMutations = () => {
             console.error('Update cart item mutation error:', error);
         }
     });
-
 
 
     return {

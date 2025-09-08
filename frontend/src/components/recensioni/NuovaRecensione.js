@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import {useNavigate, useParams} from "react-router-dom";
+import toast, {Toaster} from "react-hot-toast";
 
 const NuovaRecensione = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
 
     // The state is a single object 'response' which holds all form data.
@@ -21,7 +21,7 @@ const NuovaRecensione = () => {
 
     // Generic handler to update the 'response' state object.
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const {name, value, type, checked} = e.target;
         setResponse(prevResponse => ({
             ...prevResponse,
             [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
@@ -67,7 +67,7 @@ const NuovaRecensione = () => {
     return (
         <>
             <div>
-                <Toaster />
+                <Toaster/>
                 <form onSubmit={handleSubmit} className="max-w-lg mx-auto py-6">
                     <div className="mb-4">
                         <h1 className="text-3xl font-semibold mb-4 text-gray-800">Dacci la tua opinione!</h1>

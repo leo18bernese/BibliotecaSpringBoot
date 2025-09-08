@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
 
 const Logout = () => {
-    const { user, logout } = useContext(UserContext);
+    const {user, logout} = useContext(UserContext);
     const navigate = useNavigate();
 
     useEffect(() => {

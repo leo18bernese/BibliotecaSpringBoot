@@ -42,7 +42,8 @@ const ReturnsHistory = () => {
             ) : (
                 <div>
                     <p>Questi sono i resi che hai richiesto. </p>
-                    <p>Clicca su un reso per vederne i dettagli, inclusi gli articoli restituiti e l'ordine di riferimento.</p>
+                    <p>Clicca su un reso per vederne i dettagli, inclusi gli articoli restituiti e l'ordine di
+                        riferimento.</p>
 
                     <table className="min-w-full divide-y divide-gray-200 mt-8">
                         <thead className="bg-gray-200">

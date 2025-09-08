@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {UserContext} from "../UserContext"; // Recommended for prop type validation
 
 const PersonalDetails = () => {
-   const { user } = useContext(UserContext);
+    const {user} = useContext(UserContext);
 
     if (!user) {
         return (
@@ -40,7 +40,8 @@ const PersonalDetails = () => {
             <div className="mt-6 border-t pt-4">
                 <h3 className="text-xl font-semibold mb-3">Security</h3>
                 <p className="text-gray-700">
-                    Your password was last updated on: <span className="font-medium">{user.lastPasswordUpdate || 'N/A'}</span>
+                    Your password was last updated on: <span
+                    className="font-medium">{user.lastPasswordUpdate || 'N/A'}</span>
                 </p>
 
                 <button

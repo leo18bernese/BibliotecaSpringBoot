@@ -18,11 +18,11 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const WishlistItem = ({ book }) => {
+const WishlistItem = ({book}) => {
     const navigate = useNavigate();
     const bookId = book.id;
 
-    const { data: bookImage, isLoading: isImageLoading } = useQuery({
+    const {data: bookImage, isLoading: isImageLoading} = useQuery({
         queryKey: ['bookFirst', book.id],
         queryFn: () => fetchBookImage(book.id),
         enabled: !!book.id,

@@ -46,7 +46,8 @@ const PaymentTabs = () => {
             <PaymentPanel value={activeTab} index={0}>
                 <div className="text-gray-700">
                     <h2 className="text-lg font-semibold mb-4">Pagamento con Paypal</h2>
-                    <p>Verrai reindirizzato a Paypal nel momento in cui premi il pulsante di pagamento a fine pagina.</p>
+                    <p>Verrai reindirizzato a Paypal nel momento in cui premi il pulsante di pagamento a fine
+                        pagina.</p>
                 </div>
             </PaymentPanel>
 
@@ -55,7 +56,7 @@ const PaymentTabs = () => {
                     <h2 className="text-lg font-semibold mb-4">Pagamento con Carta di Credito</h2>
                     <p>Inserisci i dettagli della tua carta di credito.</p>
 
-                    <PaymentForm />
+                    <PaymentForm/>
                 </div>
             </PaymentPanel>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 // Importa useIMask
 import {IMask, useIMask} from 'react-imask';
 
@@ -11,15 +11,15 @@ const PaymentForm = () => {
     const [errors, setErrors] = useState({});
 
     // --- Per Numero Carta ---
-    const { ref: cardNumberRef, maskRef: cardNumberMaskRef } = useIMask({
+    const {ref: cardNumberRef, maskRef: cardNumberMaskRef} = useIMask({
         mask: '0000 0000 0000 0000',
         // Puoi aggiungere logic per il type di carta se vuoi
     }, {
-        onAccept: (value) => setFormData(prev => ({ ...prev, cardNumber: value }))
+        onAccept: (value) => setFormData(prev => ({...prev, cardNumber: value}))
     });
 
     // --- Per Scadenza ---
-    const { ref: expiryRef, maskRef: expiryMaskRef } = useIMask({
+    const {ref: expiryRef, maskRef: expiryMaskRef} = useIMask({
         mask: 'MM/YY',
         blocks: {
             MM: {
@@ -36,13 +36,13 @@ const PaymentForm = () => {
             },
         },
     }, {
-        onAccept: (value) => setFormData(prev => ({ ...prev, expiry: value }))
+        onAccept: (value) => setFormData(prev => ({...prev, expiry: value}))
     });
 
-    const { ref: cvvRef } = useIMask({
+    const {ref: cvvRef} = useIMask({
         mask: '000', // CVV può essere 3 o 4 cifre, ma qui lo limitiamo a 4 per semplicità
     }, {
-        onAccept: (value) => setFormData(prev => ({ ...prev, cvv: value }))
+        onAccept: (value) => setFormData(prev => ({...prev, cvv: value}))
     });
 
     const validate = () => {

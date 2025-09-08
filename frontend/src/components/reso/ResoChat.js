@@ -55,7 +55,8 @@ const ResoChat = () => {
             <div>
                 <h1 className="text-2xl font-semibold">Chat del Reso #{id}</h1>
                 <p className="text-gray-500">Chat con l'utente per il reso.</p>
-                <p className="text-gray-500">Si consiglia di usare i comandi predefiniti per comunicare con il cliente se possibile.</p>
+                <p className="text-gray-500">Si consiglia di usare i comandi predefiniti per comunicare con il cliente
+                    se possibile.</p>
             </div>
         );
     }

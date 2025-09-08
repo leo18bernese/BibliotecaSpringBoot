@@ -235,22 +235,20 @@ const AdminBookInventory = () => {
                 <h2 className="text-md font-semibold rounded-md">Seleziona una variante qui sotto</h2>
 
                 {book.varianti.map((variante) => (
-                    console.log(variante)||
+                    console.log(variante) ||
                     <div key={variante.id} className="mt-4 p-4 border rounded-md bg-white">
                         <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
                         <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
 
                         <ButtonField key={variante.id}
                                      id={`var-${variante.id}-quantity`}
-                                        icon={"book"}
-                                        actionText={`Variante ${variante.nome} (global #${variante.id}) `}
+                                     icon={"book"}
+                                     actionText={`Variante ${variante.nome} (global #${variante.id}) `}
                         />
                     </div>
-                    ))}
+                ))}
 
 
-
-               
             </div>
 
             <div className="fixed bottom-4 right-4">

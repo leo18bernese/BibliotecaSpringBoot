@@ -47,7 +47,7 @@ const AdminResoItem = ({item, resoId}) => {
                     <p className="text-gray-700">Quantità di reso: {item.quantita} di {ordineItem.quantita}</p>
 
                     <div className="font-semibold text-lg  text-gray-500">
-                     € {ordineItem.prezzo} {item.quantita > 1 && "cad."}
+                        € {ordineItem.prezzo} {item.quantita > 1 && "cad."}
                     </div>
                 </div>
 

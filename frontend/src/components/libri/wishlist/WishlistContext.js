@@ -1,19 +1,19 @@
-import { createContext, useContext, useMemo } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {createContext, useContext, useMemo} from "react";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import axios from "axios";
-import { UserContext } from "../../user/UserContext";
+import {UserContext} from "../../user/UserContext";
 import {useAuth} from "../../user/AuthContext";
 
 const fetchHasWishlisted = async (bookId) => {
-    const { data } = await axios.get(`/api/wishlist/has/${bookId}`);
+    const {data} = await axios.get(`/api/wishlist/has/${bookId}`);
     return data;
 };
 
 // Crea il contesto con un valore iniziale di default
 export const WishlistContext = createContext();
 
-export const WishlistProvider = ({ children }) => {
-    const { user } = useContext(UserContext);
+export const WishlistProvider = ({children}) => {
+    const {user} = useContext(UserContext);
     const {showLoginPrompt} = useAuth();
     const queryClient = useQueryClient();
 
@@ -26,7 +26,7 @@ export const WishlistProvider = ({ children }) => {
         }
 
         try {
-            const { data } = await axios.post(`/api/wishlist/${bookId}`);
+            const {data} = await axios.post(`/api/wishlist/${bookId}`);
             await queryClient.invalidateQueries({
                 queryKey: ["hasWishlisted", bookId],
             });
@@ -43,7 +43,7 @@ export const WishlistProvider = ({ children }) => {
             return;
         }
         try {
-            const { data } = await axios.delete(`/api/wishlist/${bookId}`);
+            const {data} = await axios.delete(`/api/wishlist/${bookId}`);
             await queryClient.invalidateQueries({
                 queryKey: ["hasWishlisted", bookId],
             });
@@ -73,7 +73,7 @@ export const WishlistProvider = ({ children }) => {
 // Hook personalizzato per un facile accesso al contesto
 export const useWishlist = (bookId) => {
     const context = useContext(WishlistContext);
-    const { user } = useContext(UserContext);
+    const {user} = useContext(UserContext);
 
     if (context === undefined) {
         throw new Error("useWishlist must be used within a WishlistProvider");
@@ -89,7 +89,7 @@ export const useWishlist = (bookId) => {
         enabled: !!user,
     });
 
-    const { addToWishlist, removeFromWishlist } = context;
+    const {addToWishlist, removeFromWishlist} = context;
 
     return {
         hasWishlisted,

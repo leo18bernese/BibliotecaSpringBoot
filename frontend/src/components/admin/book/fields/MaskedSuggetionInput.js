@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
 const MaskedSuggestionInput = ({
                                    id,
@@ -9,7 +9,7 @@ const MaskedSuggestionInput = ({
                                    type = 'text',
                                    maskOptions,
                                    fetchSuggestions,
-                                      description,
+                                   description,
                                    onChange,
                                    minChars = 0,
                                    maxChars = 10000

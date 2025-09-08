@@ -248,9 +248,10 @@ const NuovoReso = () => {
                         ))}
                     </div>
 
-                    <div     className="border rounded-lg border-gray-400 p-4 bg-gray-200 transition-colors mt-8">
+                    <div className="border rounded-lg border-gray-400 p-4 bg-gray-200 transition-colors mt-8">
 
-                        <label htmlFor={`metodo-rimborso`} className="block text-sm font-medium text-gray-700 ">Metodo di
+                        <label htmlFor={`metodo-rimborso`} className="block text-sm font-medium text-gray-700 ">Metodo
+                            di
                             Rimborso</label>
                         <select
                             id={`metodo-rimborso`}

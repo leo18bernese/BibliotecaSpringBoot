@@ -14,7 +14,7 @@ const fetchBookByIdAndVariante = async (id, varianteId) => {
     return data;
 };
 
-const fetchVarianteExists = async ( varianteId) => {
+const fetchVarianteExists = async (varianteId) => {
     if (!varianteId || varianteId <= 0) return false;
     const {data} = await axios.get(`/api/libri/exists/variante/${varianteId}`);
     return data;
