@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.libri;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.carrello.CarrelloService;
 import me.leoo.springboot.libri.libri.autore.Autore;
@@ -24,22 +25,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/api/libri")
+@RequiredArgsConstructor
 public class LibroController {
 
-    @Autowired
-    private LibroRepository libroRepository;
-
-    @Autowired
-    private SearchService searchService;
-
-    @Autowired
-    private AutoreRepository autoreRepository;
-
-    @Autowired
-    private AutoreService autoreService;
-
-    @Autowired
-    private CarrelloService carrelloService;
+    private final LibroRepository libroRepository;
+    private final SearchService searchService;
+    private final AutoreRepository autoreRepository;
+    private final AutoreService autoreService;
+    private final CarrelloService carrelloService;
 
     // DTO per le risposte
     public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione,

@@ -19,7 +19,7 @@ export const WishlistProvider = ({ children }) => {
 
     // Ho inserito `bookId` come prop in `WishlistProvider`
     const addToWishlist = async (bookId) => {
-        console.log("used:", user);
+        console.log("user:", user);
         if (!user) {
             showLoginPrompt();
             return;

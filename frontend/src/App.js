@@ -44,6 +44,7 @@ import AdminBookInventory from "./components/admin/book/AdminBookInventory";
 import {WishlistProvider} from "./components/libri/wishlist/WishlistContext";
 import AdminBookVariant from "./components/admin/book/AdminBookVariant";
 import Security from "./components/user/pages/Security";
+import AdminHome from "./components/admin/AdminHome";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,9 @@ function App() {
 
                                     <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN"/>}>
                                         <Route element={<AdminBar/>}>
+
+                                            <Route path="/admin" element={<AdminHome/>}/>
+
                                             <Route path="/admin/reso/:id" element={<AdminReso/>}/>
                                             <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
 

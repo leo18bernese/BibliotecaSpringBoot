@@ -47,6 +47,17 @@ const NavBar = () => {
                         <Link to="/" className="text-white hover:text-gray-300 font-medium">
                             Home
                         </Link>
+
+                        {
+                            user && user.ruoli.includes('ROLE_ADMIN') && (
+                                <>
+                                    <span className="mx-2">|</span>
+                                    <Link to="/admin" className="text-white hover:text-gray-300 font-medium">
+                                        Admin
+                                    </Link>
+                                </>
+                            )
+                        }
                     </li>
                 </ul>
 
