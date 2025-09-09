@@ -58,7 +58,7 @@ public class Prezzo {
     }
 
     // Update price and discount
-    public Prezzo updatePrice(LibroController.PriceRequest request) {
+    public Prezzo updatePrice(LibroController.VarianteRequest request) {
         this.prezzo = request.prezzo();
         this.sconto = request.sconto();
 

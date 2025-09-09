@@ -59,7 +59,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
     }
 
     const sconto = book.sconto;
-    const hasSconto = sconto.percentuale > 0 || sconto.valore > 0;
+    const hasSconto = sconto && (sconto.percentuale > 0 || sconto.valore > 0);
     console.log(book);
 
     return (

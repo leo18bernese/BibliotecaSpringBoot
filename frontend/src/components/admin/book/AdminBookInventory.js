@@ -5,6 +5,7 @@ import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import ButtonField from "./fields/ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
+import CreateVariant from "./variant/CreateVariant";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -28,6 +29,8 @@ const AdminBookInventory = () => {
     const {id} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    const [showAddVariantPopup, setShowAddVariantPopup] = useState(false);
 
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -115,10 +118,13 @@ const AdminBookInventory = () => {
 
             <button
                 className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
-                 bg-green-100 hover:bg-green-200 w-1/3 transition">
+                 bg-green-100 hover:bg-green-200 w-1/3 transition"
+                onClick={() => setShowAddVariantPopup(true)}
+            >
 
                 <i className='bx bx-plus-circle text-2xl text-green-600'></i>
-                <span className="ml-2 font-semibold text-green-700">Aggiungi Nuova Variante</span>
+                <span className="ml-2 font-semibold text-green-700">
+                    Aggiungi Nuova Variante</span>
 
             </button>
 
@@ -127,7 +133,6 @@ const AdminBookInventory = () => {
 
 
                 {book.varianti.map((variante) => (
-                    console.log(variante) ||
                     <div key={variante.id} className="mt-4 p-4 border rounded-md bg-white">
 
                         <div className="flex items-center justify-between">
@@ -162,6 +167,10 @@ const AdminBookInventory = () => {
                 ))}
             </div>
 
+            <CreateVariant bookId={id}
+                           setShowAddVariantPopup={setShowAddVariantPopup}
+                           showAddVariantPopup={showAddVariantPopup}
+            />
 
             <div className="fixed bottom-4 right-4">
                 <button

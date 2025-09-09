@@ -7,9 +7,11 @@ import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.autore.AutoreRepository;
 import me.leoo.springboot.libri.libri.autore.AutoreService;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
+import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
 import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.libri.variante.Variante;
+import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,10 @@ public class LibroController {
     private final CarrelloService carrelloService;
 
     // DTO per le risposte
+    public record GoogleResponse(Long libroId, String titolo, String autore, double prezzo, String valuta,
+                                 int recensioneMedia, int numeroRecensioni) {
+    }
+
     public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione,
                                    double prezzoOriginale, double prezzo,
                                    Sconto sconto) {
@@ -42,13 +48,14 @@ public class LibroController {
     // DTO per update
     public record UpdateLibroRequest(String titolo, String autore, String genere, int annoPubblicazione,
                                      int numeroPagine, String editore, String lingua, String isbn,
-                                     LibroDimension dimensioni,
                                      String descrizione,
                                      Map<String, String> caratteristiche) {
     }
 
     // DTO per rifornimento
-    public record PriceRequest(double prezzo, Sconto sconto, Map<Long, Integer> prenotatiMap) {
+    public record VarianteRequest(String nome, LibroDimension dimensioni,
+                                  double prezzo, Sconto sconto,
+                                  Map<Long, Integer> prenotatiMap) {
     }
 
     public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna,
@@ -61,6 +68,42 @@ public class LibroController {
     public Iterable<Libro> getLibri() {
         return libroRepository.findAll();
     }
+
+    @GetMapping("/google")
+    public List<GoogleResponse> getLibriForGoogle() {
+        List<Libro> libri = libroRepository.findAll();
+
+        return libri.stream()
+                .map(libro -> {
+                    // Trova la variante con il prezzo più basso
+                    Optional<Variante> variantePiuEconomica = libro.getVarianti().stream()
+                            .min(Comparator.comparingDouble(v -> v.getPrezzo().getPrezzoTotale()));
+
+                    if (variantePiuEconomica.isEmpty()) {
+                        return null; // Salta i libri senza varianti
+                    }
+
+                    Variante variante = variantePiuEconomica.get();
+                    Prezzo prezzo = variante.getPrezzo();
+
+                    // Simula dati di recensione
+                    int recensioneMedia = new Random().nextInt(1, 6); // Da 1 a 5
+                    int numeroRecensioni = new Random().nextInt(0, 1000); // Fino a 1000 recensioni
+
+                    return new GoogleResponse(
+                            libro.getId(),
+                            libro.getTitolo(),
+                            libro.getAutore().getNome(),
+                            prezzo.getPrezzoTotale(),
+                            prezzo.getValuta().name(),
+                            recensioneMedia,
+                            numeroRecensioni
+                    );
+                })
+                .filter(Objects::nonNull) // Rimuovi i libri nulli
+                .collect(Collectors.toList());
+    }
+
 
     // ID
     @GetMapping("/{id}")
@@ -162,15 +205,34 @@ public class LibroController {
         return libroRepository.save(libroToUpdate);
     }
 
+    // update rifornimento variante pruc
+    @PostMapping("/{id}/variante")
+    public Variante createVariante(@PathVariable Long id,
+                                   @RequestBody VarianteRequest request) {
+        Libro libro = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        Variante variante = new Variante(libro, request.nome(),
+                new Prezzo(request.prezzo()),
+                new Rifornimento(10),
+                request.dimensioni());
+
+        libro.getVarianti().add(variante);
+
+        libroRepository.save(libro);
+
+        return variante;
+    }
+
     @PutMapping("/{id}/{varianteId}/rifornimento")
     public Libro updateRifornimento(@PathVariable Long id,
                                     @PathVariable Long varianteId,
-                                    @RequestBody PriceRequest request) {
+                                    @RequestBody VarianteRequest request) {
         Libro libroToUpdate = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
         libroToUpdate.getVariante(varianteId)
-                .ifPresentOrElse(v -> v.getPrezzo().updatePrice(request),
+                .ifPresentOrElse(v -> v.updateFromRequest(request),
                         () -> {
                             throw new RuntimeException("Variante non trovata");
                         }

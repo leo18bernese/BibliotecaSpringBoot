@@ -181,7 +181,6 @@ public class Libro {
     }
 
     public Optional<Variante> getVariante(Long id) {
-        System.out.println("Searching for variante with ID: " + id);
         return varianti.stream()
                 .filter(v -> v.getId().equals(id))
                 .findFirst();

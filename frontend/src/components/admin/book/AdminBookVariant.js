@@ -54,9 +54,12 @@ const AdminBookVariant = () => {
     const [quantity, setQuantity] = useState(0);
     const [prenotatiList, setPrenotatiList] = useState([]);
 
+    const [nome, setNome] = useState('');
     const [prezzo, setPrezzo] = useState(0);
     const [sconto, setSconto] = useState({});
     const [scontoType, setScontoType] = useState('percentage');
+
+    const [dimensioni, setDimensioni] = useState({});
 
     const [giorniConsegna, setGiorniConsegna] = useState(0);
 
@@ -81,6 +84,8 @@ const AdminBookVariant = () => {
                 setScontoType('none');
             }
 
+            setNome(variante.nome || '');
+            setDimensioni(variante.dimensioni || {});
             setGiorniConsegna(rifornimento.giorniConsegna || 0);
         }
     }, [variante]);
@@ -145,6 +150,8 @@ const AdminBookVariant = () => {
             : {percentuale: 0, valore: sconto.valore || 0};
 
         const varianteData = {
+            nome: nome,
+            dimensioni: dimensioni,
             prezzo: prezzo,
             sconto: scontoFormatted
             // prenotatiMap rimosso
@@ -152,7 +159,7 @@ const AdminBookVariant = () => {
 
         priceMutation.mutate({id, varianteData});
         setHasUnsavedChanges(false);
-        navigate("/admin/book/" + id+"/inventory");
+        navigate("/admin/book/" + id + "/inventory");
     };
 
     const handleFieldChange = (setterFunction) => (value) => {
@@ -235,7 +242,7 @@ const AdminBookVariant = () => {
             </p>
 
             <div className="flex-col mt-4">
-                <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
+                <div className="grid grid-cols-1 lg:grid-cols-[30%_30%_40%] gap-4 mt-8" style={{alignItems: 'start'}}>
                     <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h2 className="text-md font-semibold rounded-md">Stock information</h2>
                         <ViewableField key="quantity"
@@ -263,6 +270,75 @@ const AdminBookVariant = () => {
                         />
                         */}
                     </div>
+
+                    <div className="flex flex-col">
+                        <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                            <h2 className="text-md font-semibold rounded-md">Information</h2>
+
+                            <EditableField key="nome"
+                                           id="nome"
+                                           label="Variant Name"
+                                           icon="text"
+                                           value={nome}
+                                           onChange={handleFieldChange(setNome)}
+                                           description="The name of the variante, e.g., Hardcover, Paperback, Special Edition."
+                            />
+                        </div>
+
+                        <div className="mt-4 p-4 bg-gray-50 rounded-md">
+
+                            <h2 className="text-md font-semibold">Book dimensions</h2>
+
+                            <EditableField key='length'
+                                           id="length" label="Length (cm)" icon="ruler"
+                                           value={dimensioni.length || ''}
+                                           placeholder="Enter length in cm"
+                                           minChars={1}
+                                           type="number"
+                                           onChange={(newLength) => {
+                                               setDimensioni(prev => ({...prev, length: newLength}));
+                                               setHasUnsavedChanges(true);
+                                           }}
+                            />
+
+                            <EditableField key='width'
+                                           id="width" label="Width (cm)" icon="ruler"
+                                           value={dimensioni.width || ''}
+                                           placeholder="Enter width in cm"
+                                           minChars={1}
+                                           type="number"
+                                           onChange={(newWidth) => {
+                                               setDimensioni(prev => ({...prev, width: newWidth}));
+                                                  setHasUnsavedChanges(true);
+                                           }}
+                            />
+
+                            <EditableField key='height'
+                                           id="height" label="Height (cm)" icon="ruler"
+                                           value={dimensioni.height || ''}
+                                           placeholder="Enter height in cm"
+                                           minChars={1}
+                                           type="number"
+                                           onChange={(newHeight) => {
+                                               setDimensioni(prev => ({...prev, height: newHeight}));
+                                                  setHasUnsavedChanges(true);
+                                           }}
+                            />
+
+                            <EditableField key='weight'
+                                           id="weight" label="Weight (kg)" icon="dumbbell"
+                                           value={dimensioni.weight || ''}
+                                           placeholder="Enter weight in kg"
+                                           minChars={1}
+                                           type="number"
+                                           onChange={(newWeight) => {
+                                               setDimensioni(prev => ({...prev, weight: newWeight}));
+                                                    setHasUnsavedChanges(true);
+                                           }}
+                            />
+                        </div>
+                    </div>
+
                     <div className="mt-8 p-4 bg-gray-50 rounded-md">
                         <h3 className="font-semibold">Prices and Discounts</h3>
                         <EditableField key="prezzo"

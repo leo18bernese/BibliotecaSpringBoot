@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.LibroController;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
@@ -70,6 +71,14 @@ public class Variante {
 
     public DeliveryPackage getDeliveryPackage() {
         return DeliveryPackage.getMostSuitable(dimensioni);
+    }
+
+    public Variante updateFromRequest(LibroController.VarianteRequest request) {
+        this.nome = request.nome();
+        this.prezzo.updatePrice(request);
+        this.dimensioni = request.dimensioni();
+
+        return this;
     }
 
 }

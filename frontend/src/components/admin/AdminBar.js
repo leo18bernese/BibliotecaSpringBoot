@@ -19,7 +19,7 @@ const AdminBar = () => {
 
     return (
         <div className="flex flex-row">
-            <div className="admin-bar bg-red-400 text-red-100 pl-2 pt-4 pr-20">
+            <div className="admin-bar bg-red-500 text-red-100 pl-2 pt-4 pr-20">
                 <h3 className="text-2xl font-semibold">Admin Panel</h3>
                 <div className="border-t border-red-200 my-2"></div>
                 <ul className="text-xl">

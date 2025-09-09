@@ -84,7 +84,6 @@ const AdminBook = () => {
     const [editore, setEditore] = useState('');
     const [lingua, setLingua] = useState('');
     const [isbn, setIsbn] = useState('');
-    const [dimensioni, setDimensioni] = useState({});
     const [description, setDescription] = useState("");
     const [characteristics, setCharacteristics] = useState({});
 
@@ -99,7 +98,6 @@ const AdminBook = () => {
             setEditore(book.editore || '');
             setLingua(book.lingua || '');
             setIsbn(book.isbn || '');
-            setDimensioni(book.dimensioni || {});
             setDescription(book.descrizione?.descrizioneHtml || '');
             setCharacteristics(book.descrizione?.caratteristiche || {});
         }
@@ -138,7 +136,6 @@ const AdminBook = () => {
             editore,
             lingua,
             isbn,
-            dimensioni,
             descrizione: description,
             caratteristiche: characteristics,
         };
@@ -183,7 +180,6 @@ const AdminBook = () => {
         return <div className="p-4">Book not found or does not exist.</div>;
     }
 
-    console.log("dimensioni", dimensioni);
 
     return (
         <div className="container mx-auto p-4">
@@ -333,54 +329,6 @@ const AdminBook = () => {
                                     removable={false}
                     />
                 </div>
-            </div>
-
-            <div className="mt-8 border-t-2  border-gray-600 p-4">
-                <h2 className="text-md font-semibold">Book dimensions</h2>
-
-                <EditableField key='length'
-                               id="length" label="Length (cm)" icon="ruler"
-                               value={dimensioni.length || ''}
-                               placeholder="Enter length in cm"
-                               minChars={1}
-                               type="number"
-                               onChange={(newLength) => {
-                                   setDimensioni(prev => ({...prev, length: newLength}));
-                               }}
-                />
-
-                <EditableField key='width'
-                               id="width" label="Width (cm)" icon="ruler"
-                               value={dimensioni.width || ''}
-                               placeholder="Enter width in cm"
-                               minChars={1}
-                               type="number"
-                               onChange={(newWidth) => {
-                                   setDimensioni(prev => ({...prev, width: newWidth}));
-                               }}
-                />
-
-                <EditableField key='height'
-                               id="height" label="Height (cm)" icon="ruler"
-                               value={dimensioni.height || ''}
-                               placeholder="Enter height in cm"
-                               minChars={1}
-                               type="number"
-                               onChange={(newHeight) => {
-                                   setDimensioni(prev => ({...prev, height: newHeight}));
-                               }}
-                />
-
-                <EditableField key='weight'
-                               id="weight" label="Weight (kg)" icon="dumbbell"
-                               value={dimensioni.weight || ''}
-                               placeholder="Enter weight in kg"
-                               minChars={1}
-                               type="number"
-                               onChange={(newWeight) => {
-                                   setDimensioni(prev => ({...prev, weight: newWeight}));
-                               }}
-                />
             </div>
 
             <div className="mt-8 border-t-2  border-gray-600 p-4">

@@ -232,6 +232,62 @@ const BookInfo = () => {
         }
     }, [areReviewsLoading, focusReview, isLoading]);
 
+    const {pathname} = useLocation();
+    useEffect(() => {
+        if (book && book.varianti && book.varianti.length > 0 && !selectedVariant) {
+            setSelectedVariant(book.varianti[0]);
+        }
+    }, [book, pathname]);
+
+
+    // Modifica il tuo useEffect per i dati strutturati
+    useEffect(() => {
+        if (book && selectedVariant) {
+            const reviewsCount = reviews.length;
+            const averageRating = reviewsCount > 0
+                ? (reviews.reduce((sum, r) => sum + r.recensione.voto, 0) / reviewsCount)
+                : 0;
+
+            // Definisci lo Schema.org con i dati della variante selezionata
+            const productSchema = {
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": `${book.titolo} (${selectedVariant.nome})`, // Aggiungi il nome della variante al titolo
+                "image": '',
+                "description":  '',
+                "sku": selectedVariant.id, // Usa l'ID della variante come SKU
+                "offers": {
+                    "@type": "Offer",
+                    "priceCurrency": selectedVariant.prezzo.valuta,
+                    "price": selectedVariant.prezzo.prezzoTotale.toFixed(2),
+                    "availability": selectedVariant.rifornimento.quantita > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+                },
+                "aggregateRating": reviewsCount > 0 ? {
+                    "@type": "AggregateRating",
+                    "ratingValue": 0,//averageRating.toFixed(1),
+                    "reviewCount": reviewsCount,
+                } : undefined,
+                "bookEdition": selectedVariant.nome,
+                "author": {
+                    "@type": "Person",
+                    "name": book.autore.nome
+                },
+                "publisher": book.editore,
+                "isbn": book.isbn
+            };
+
+            console.log("Generated product schema:", productSchema);
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.innerHTML = JSON.stringify(productSchema);
+            document.head.appendChild(script);
+
+            return () => {
+                document.head.removeChild(script);
+            };
+        }
+    }, [book, reviews, selectedVariant]);
+
     usePageTitle(book?.titolo || 'Libro');
 
     if (isLoading) {

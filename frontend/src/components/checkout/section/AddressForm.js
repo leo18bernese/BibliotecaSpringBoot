@@ -47,7 +47,6 @@ const AddressForm = ({addressData, handleChange, errors, errorRef}) => {
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
-    // ✨ EFFETTO PER SINCRONIZZARE I CAMPI MASCHERATI CON LE PROPS
     useEffect(() => {
         setPostalCodeValue(addressData.postalCode || '');
         setNameValue(addressData.name || '');
