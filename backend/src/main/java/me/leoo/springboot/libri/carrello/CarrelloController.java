@@ -298,14 +298,11 @@ public class CarrelloController {
         }
     }
 
-    @PutMapping("/fix-quantity/{libroId}/{varianteId}")
-    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
+    @PutMapping("/fix-quantity/{varianteId}")
+    public ResponseEntity<?> fixQuantity(@AuthenticationPrincipal Utente utente, @PathVariable Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
-
-            Libro libro = libroRepository.findById(libroId)
-                    .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
 
             Carrello carrello = carrelloService.getCarrelloByUtente(user);
 
@@ -323,14 +320,11 @@ public class CarrelloController {
         }
     }
 
-    @PutMapping("/confirm-notices/{libroId}/{varianteId}")
-    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
+    @PutMapping("/confirm-notices/{varianteId}")
+    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente,@PathVariable Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));
-
-            Libro libro = libroRepository.findById(libroId)
-                    .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + libroId));
 
             Carrello carrello = carrelloService.getCarrelloByUtente(user);
 

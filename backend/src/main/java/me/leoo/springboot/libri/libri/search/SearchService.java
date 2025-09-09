@@ -50,12 +50,15 @@ public class SearchService {
         Specification<Libro> spec = Specification.where(null);
 
         if (q != null && !q.isEmpty()) {
-            spec = spec.and((root, query, cb) ->
-                    cb.or(
-                            cb.like(cb.lower(root.get("titolo")), "%" + q.toLowerCase() + "%")/*,
-                            cb.like(cb.lower(root.join("descrizione").get("autore")), "%" + q.toLowerCase() + "%")*/
-                    )
-            );
+            spec = spec.and((root, query, cb) -> {
+                Join<Libro, LibroInfo> descrizioneJoin = root.join("descrizione"); // Join con LibroInfo
+                return cb.or(
+                        cb.like(cb.lower(root.get("titolo")), "%" + q.toLowerCase() + "%"),
+                        cb.like(cb.lower(root.get("autore").get("nome")), "%" + q.toLowerCase() + "%"), // Ricerca nell'autore
+                        cb.like(cb.lower(root.get("editore")), "%" + q.toLowerCase() + "%"), // Ricerca nell'editore
+                        cb.like(cb.lower(root.get("isbn")), "%" + q.toLowerCase() + "%") // Ricerca nell'ISBN
+                );
+            });
         }
 
         if (prezzoMin != null) {
@@ -67,36 +70,68 @@ public class SearchService {
 
         // Gestione filtri multipli per caratteristica
         if (filtriMultipli != null && !filtriMultipli.isEmpty()) {
-            List<Predicate> filtriPredicates = new ArrayList<>();
-
             for (Map.Entry<String, List<String>> entry : filtriMultipli.entrySet()) {
-                String caratteristicaNome = entry.getKey();
+                String filtroNome = entry.getKey();
                 List<String> valoriSelezionati = entry.getValue();
 
                 if (valoriSelezionati != null && !valoriSelezionati.isEmpty()) {
+                    // Verifica se è un filtro diretto del Libro
+                    if (isDirectLibroField(filtroNome)) {
+                        spec = spec.and(buildDirectFieldSpecification(filtroNome, valoriSelezionati));
+                    } else {
+                        // Gestione per caratteristiche dinamiche
+                        spec = spec.and((root, query, cb) -> {
+                            Subquery<Long> subquery = query.subquery(Long.class);
+                            Root<Libro> subRoot = subquery.from(Libro.class);
+                            MapJoin<LibroInfo, String, String> caratteristicheJoin = subRoot.join("descrizione").joinMap("caratteristiche");
+                            subquery.select(subRoot.get("id"));
 
-                    spec = spec.and((root, query, cb) -> {
-                        // Usiamo una subquery per evitare join multipli che portano a risultati errati
-                        Subquery<Long> subquery = query.subquery(Long.class);
-                        Root<Libro> subRoot = subquery.from(Libro.class);
-                        MapJoin<LibroInfo, String, String> caratteristicheJoin = subRoot.join("descrizione").joinMap("caratteristiche");
-                        subquery.select(subRoot.get("id"));
+                            List<Predicate> orPredicates = new ArrayList<>();
+                            for (String valore : valoriSelezionati) {
+                                orPredicates.add(cb.and(
+                                        cb.equal(caratteristicheJoin.key(), filtroNome),
+                                        cb.equal(caratteristicheJoin.value(), valore)
+                                ));
+                            }
+                            subquery.where(cb.or(orPredicates.toArray(new Predicate[0])));
 
-                        List<Predicate> orPredicates = new ArrayList<>();
-                        for (String valore : valoriSelezionati) {
-                            orPredicates.add(cb.and(
-                                    cb.equal(caratteristicheJoin.key(), caratteristicaNome),
-                                    cb.equal(caratteristicheJoin.value(), valore)
-                            ));
-                        }
-                        subquery.where(cb.or(orPredicates.toArray(new Predicate[0])));
-
-                        return root.get("id").in(subquery);
-                    });
+                            return root.get("id").in(subquery);
+                        });
+                    }
                 }
             }
         }
         return spec;
+    }
+
+    private boolean isDirectLibroField(String fieldName) {
+        return Arrays.asList("genere", "annoPubblicazione", "numeroPagine", "lingua").contains(fieldName);
+    }
+
+    private Specification<Libro> buildDirectFieldSpecification(String fieldName, List<String> values) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            for (String value : values) {
+                switch (fieldName) {
+                    case "genere":
+                    case "lingua":
+                        predicates.add(cb.equal(root.get(fieldName), value));
+                        break;
+                    case "annoPubblicazione":
+                    case "numeroPagine":
+                        try {
+                            Integer intValue = Integer.valueOf(value);
+                            predicates.add(cb.equal(root.get(fieldName), intValue));
+                        } catch (NumberFormatException e) {
+                            // Ignora valori non numerici
+                        }
+                        break;
+                }
+            }
+
+            return predicates.isEmpty() ? null : cb.or(predicates.toArray(new Predicate[0]));
+        };
     }
 
     private Map<String, List<FiltroOpzione>> calcolaFiltriDinamici(Map<String, List<String>> filtriAttivi) {
@@ -108,8 +143,13 @@ public class SearchService {
                         Function.identity()
                 ));
 
+        System.out.println("got " + metadatiMap.size() + " metadati");
+
         // Prima ottieni tutte le caratteristiche disponibili dinamicamente
         Set<String> caratteristicheDisponibili = ottieniCaratteristicheDisponibili();
+
+        // Aggiungi i campi diretti del Libro
+        caratteristicheDisponibili.addAll(Arrays.asList("genere", "annoPubblicazione", "numeroPagine", "lingua"));
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
@@ -121,48 +161,13 @@ public class SearchService {
 
             Specification<Libro> specParziale = buildLibroSpecificationMultiple(null, null, null, filtriParziali);
 
-            CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-            Root<Libro> root = cq.from(Libro.class);
-            MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("caratteristiche");
+            List<FiltroOpzione> opzioni;
 
-            List<Predicate> predicates = new ArrayList<>();
-            Predicate basePredicate = specParziale.toPredicate(root, cq, cb);
-            if (basePredicate != null) {
-                predicates.add(basePredicate);
+            if (isDirectLibroField(caratteristicaNome)) {
+                opzioni = calcolaFiltriCampiDiretti(caratteristicaNome, specParziale, filtriAttivi, cb);
+            } else {
+                opzioni = calcolaFiltriCaratteristiche(caratteristicaNome, specParziale, filtriAttivi, metadatiMap, cb);
             }
-
-            cq.multiselect(caratteristicheJoin.value(), cb.count(root.get("id")))
-                    .groupBy(caratteristicheJoin.value())
-                    .orderBy(cb.asc(caratteristicheJoin.value()));
-
-            Predicate caratteristicaKeyPredicate = cb.equal(caratteristicheJoin.key(), caratteristicaNome);
-            predicates.add(caratteristicaKeyPredicate);
-            cq.where(cb.and(predicates.toArray(new Predicate[0])));
-
-            List<Tuple> results = entityManager.createQuery(cq).getResultList();
-
-            List<String> valoriSelezionati = filtriAttivi.getOrDefault(caratteristicaNome, new ArrayList<>());
-
-            List<FiltroOpzione> opzioni = results.stream()
-                    .map(tuple -> {
-                        String valore = tuple.get(0, String.class);
-                        Long conteggio = tuple.get(1, Long.class);
-                        boolean selezionato = valoriSelezionati.contains(valore);
-
-                        String metadataKey = caratteristicaNome + "::" + valore;
-                        CaratteristicaOpzione opzioneMetadata = metadatiMap.get(metadataKey);
-                        Map<String, Object> metadata = (opzioneMetadata != null) ? opzioneMetadata.getMetadata() : Collections.emptyMap();
-
-
-                        return new FiltroOpzione(valore, conteggio, selezionato, metadata);
-                    })
-                    .sorted((a, b) -> {
-                        // Prima i selezionati, poi per conteggio decrescente
-                        if (a.selezionato() && !b.selezionato()) return -1;
-                        if (!a.selezionato() && b.selezionato()) return 1;
-                        return Long.compare(b.conteggio(), a.conteggio());
-                    })
-                    .collect(Collectors.toList());
 
             if (!opzioni.isEmpty()) {
                 filtri.put(caratteristicaNome, opzioni);
@@ -170,6 +175,93 @@ public class SearchService {
         }
 
         return filtri;
+    }
+
+    private List<FiltroOpzione> calcolaFiltriCampiDiretti(String fieldName, Specification<Libro> specParziale,
+                                                          Map<String, List<String>> filtriAttivi, CriteriaBuilder cb) {
+        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+        Root<Libro> root = cq.from(Libro.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate basePredicate = specParziale.toPredicate(root, cq, cb);
+        if (basePredicate != null) {
+            predicates.add(basePredicate);
+        }
+
+        // Aggiungi filtro per non null
+        predicates.add(cb.isNotNull(root.get(fieldName)));
+
+        cq.multiselect(root.get(fieldName), cb.count(root.get("id")))
+                .groupBy(root.get(fieldName))
+                .orderBy(cb.asc(root.get(fieldName)));
+
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        List<Tuple> results = entityManager.createQuery(cq).getResultList();
+        List<String> valoriSelezionati = filtriAttivi.getOrDefault(fieldName, new ArrayList<>());
+
+        return results.stream()
+                .map(tuple -> {
+                    Object valueObj = tuple.get(0);
+                    String valore = valueObj != null ? valueObj.toString() : "";
+                    Long conteggio = tuple.get(1, Long.class);
+                    boolean selezionato = valoriSelezionati.contains(valore);
+
+                    return new FiltroOpzione(valore, conteggio, selezionato, Collections.emptyMap());
+                })
+                .sorted((a, b) -> {
+                    // Prima i selezionati, poi per conteggio decrescente
+                    if (a.selezionato() && !b.selezionato()) return -1;
+                    if (!a.selezionato() && b.selezionato()) return 1;
+                    return Long.compare(b.conteggio(), a.conteggio());
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<FiltroOpzione> calcolaFiltriCaratteristiche(String caratteristicaNome, Specification<Libro> specParziale,
+                                                             Map<String, List<String>> filtriAttivi,
+                                                             Map<String, CaratteristicaOpzione> metadatiMap,
+                                                             CriteriaBuilder cb) {
+        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+        Root<Libro> root = cq.from(Libro.class);
+        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("caratteristiche");
+
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate basePredicate = specParziale.toPredicate(root, cq, cb);
+        if (basePredicate != null) {
+            predicates.add(basePredicate);
+        }
+
+        cq.multiselect(caratteristicheJoin.value(), cb.count(root.get("id")))
+                .groupBy(caratteristicheJoin.value())
+                .orderBy(cb.asc(caratteristicheJoin.value()));
+
+        Predicate caratteristicaKeyPredicate = cb.equal(caratteristicheJoin.key(), caratteristicaNome);
+        predicates.add(caratteristicaKeyPredicate);
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        List<Tuple> results = entityManager.createQuery(cq).getResultList();
+        List<String> valoriSelezionati = filtriAttivi.getOrDefault(caratteristicaNome, new ArrayList<>());
+
+        return results.stream()
+                .map(tuple -> {
+                    String valore = tuple.get(0, String.class);
+                    Long conteggio = tuple.get(1, Long.class);
+                    boolean selezionato = valoriSelezionati.contains(valore);
+
+                    String metadataKey = caratteristicaNome + "::" + valore;
+                    CaratteristicaOpzione opzioneMetadata = metadatiMap.get(metadataKey);
+                    Map<String, Object> metadata = (opzioneMetadata != null) ? opzioneMetadata.getMetadata() : Collections.emptyMap();
+
+                    return new FiltroOpzione(valore, conteggio, selezionato, metadata);
+                })
+                .sorted((a, b) -> {
+                    // Prima i selezionati, poi per conteggio decrescente
+                    if (a.selezionato() && !b.selezionato()) return -1;
+                    if (!a.selezionato() && b.selezionato()) return 1;
+                    return Long.compare(b.conteggio(), a.conteggio());
+                })
+                .collect(Collectors.toList());
     }
 
     private Set<String> ottieniCaratteristicheDisponibili() {
