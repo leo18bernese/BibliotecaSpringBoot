@@ -41,136 +41,19 @@ const AdminBookInventory = () => {
         queryFn: () => fetchBookExists(id),
     });
 
-    // Nuova query per le prenotazioni
-    const {data: prenotazioni, isLoading: isPrenotazioniLoading, error: prenotazioniError} = useQuery({
-        queryKey: ['prenotazioni', id],
-        queryFn: () => fetchPrenotazioni(id),
-        enabled: !!id
-    });
-
-    const [quantity, setQuantity] = useState(0);
-    const [prenotatiList, setPrenotatiList] = useState([]);
-
-    const [prezzo, setPrezzo] = useState(0);
-    const [sconto, setSconto] = useState({});
-    const [scontoType, setScontoType] = useState('percentage');
-
-    const [giorniConsegna, setGiorniConsegna] = useState(0);
-
-    const [showPrenotati, setShowPrenotati] = useState(false);
-
     // Inizializza gli stati quando book è disponibile
     useEffect(() => {
         if (book) {
-            const rifornimento = book.rifornimento || {};
-            setQuantity(rifornimento.quantita || 0);
-            setPrezzo(rifornimento.prezzo || 0);
 
-            const scontoData = rifornimento.sconto || {};
-            if (scontoData.percentuale > 0) {
-                setSconto({percentuale: scontoData.percentuale});
-                setScontoType('percentage');
-            } else if (scontoData.valore > 0) {
-                setSconto({valore: scontoData.valore});
-                setScontoType('fixed');
-            } else {
-                setSconto({});
-                setScontoType('none');
-            }
-
-            setGiorniConsegna(rifornimento.giorniConsegna || 0);
         }
     }, [book]);
 
-    // Aggiorna la lista prenotazioni quando arrivano i dati
-    useEffect(() => {
-        if (prenotazioni) {
-            setPrenotatiList(prenotazioni.map(p => ({
-                userId: p.utenteId,
-                quantity: p.quantita
-            })));
-        }
-    }, [prenotazioni]);
-
-    // Calcola il prezzo scontato basandosi sul tipo di sconto
-    const calcolaPrezzoScontato = () => {
-        if (scontoType === 'percentage') {
-            const percentuale = sconto.percentuale || 0;
-            return (prezzo - (prezzo * percentuale / 100)).toFixed(2);
-        } else if (scontoType === 'fixed') {
-            const valore = sconto.valore || 0;
-            return Math.max(0, prezzo - valore).toFixed(2);
-        } else {
-            return prezzo.toFixed(2);
-        }
-    };
-
-    const updateRifornimento = async ({id, bookData}) => {
-
-        {
-            prenotatiList && prenotatiList.forEach(prenota => {
-
-                const requestBody = {
-                    libroId: id,
-                    quantita: prenota.quantity
-                };
-
-                const {data} = axios.put(`/api/carrello/set-quantity/${prenota.userId}`, requestBody);
-                return data;
-            })
-        }
-
-        const {data} = await axios.put(`/api/libri/${id}/rifornimento`, bookData);
-        return data;
-    };
-
-    const priceMutation = useMutation({
-        mutationFn: updateRifornimento,
-        onSuccess: () => {
-            toast.success('Libro aggiornato con successo!');
-            queryClient.invalidateQueries({queryKey: ['book', id]});
-        },
-        onError: (error) => {
-            toast.error(`Errore nell'aggiornamento del libro: ${error.response?.data?.message || error.message}`);
-        },
-    });
 
     const handleSave = () => {
-        const scontoFormatted = scontoType === 'percentage'
-            ? {percentuale: sconto.percentuale || 0, valore: 0}
-            : {percentuale: 0, valore: sconto.valore || 0};
-
-        const bookData = {
-            prezzo: prezzo,
-            sconto: scontoFormatted
-            // prenotatiMap rimosso
-        };
-
-        priceMutation.mutate({id, bookData});
         setHasUnsavedChanges(false);
         navigate("/admin/book/" + id);
     };
 
-    const handleFieldChange = (setterFunction) => (value) => {
-        setterFunction(value);
-        setHasUnsavedChanges(true);
-    };
-
-    const handleScontoTypeChange = (newType) => {
-        setScontoType(newType);
-        switch (newType) {
-            case 'percentage':
-                setSconto({percentuale: sconto.percentuale || 0});
-                break;
-            case 'fixed':
-                setSconto({valore: sconto.valore || 0});
-                break;
-            case 'none':
-                setSconto({});
-                break;
-        }
-        setHasUnsavedChanges(true);
-    };
 
     useEffect(() => {
         if (!hasUnsavedChanges) return;
@@ -209,11 +92,11 @@ const AdminBookInventory = () => {
 
     console.log(book);
 
-    if (isBookLoading || isBookExistsLoading || isPrenotazioniLoading) {
+    if (isBookLoading || isBookExistsLoading) {
         return <div>Loading...</div>;
     }
 
-    if (bookError || bookExistsError || prenotazioniError) {
+    if (bookError || bookExistsError) {
         return <div>Error loading book data.</div>;
     }
 
@@ -230,26 +113,55 @@ const AdminBookInventory = () => {
                 You can also edit the price, create discounts, and manage other inventory-related details.
             </p>
 
+            <button
+                className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
+                 bg-green-100 hover:bg-green-200 w-1/3 transition">
 
-            <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                <i className='bx bx-plus-circle text-2xl text-green-600'></i>
+                <span className="ml-2 font-semibold text-green-700">Aggiungi Nuova Variante</span>
+
+            </button>
+
+            <div className="mt-8 p-4 bg-gray-50 rounded-md w-1/3">
                 <h2 className="text-md font-semibold rounded-md">Seleziona una variante qui sotto</h2>
+
 
                 {book.varianti.map((variante) => (
                     console.log(variante) ||
                     <div key={variante.id} className="mt-4 p-4 border rounded-md bg-white">
-                        <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
-                        <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
 
-                        <ButtonField key={variante.id}
-                                     id={`var-${variante.id}-quantity`}
-                                     icon={"book"}
-                                     actionText={`Variante ${variante.nome} (global #${variante.id}) `}
-                        />
+                        <div className="flex items-center justify-between">
+                            <div>
+
+                                <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
+                                <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
+                            </div>
+
+                            <div>
+
+                                <button className="ml-2 hover:text-blue-600"
+                                        onClick={(e) => {
+                                            navigate("/admin/book/" + id + "/inventory/variante/" + variante.id);
+                                        }}
+                                        title="Modifica indirizzo">
+                                    <i className="bx bx-edit text-2xl"></i>
+                                </button>
+
+                                <button className="ml-2 hover:text-red-600"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toast("Delete functionality not implemented yet.");
+                                        }}
+                                        title="Elimina indirizzo">
+                                    <i className="bx bx-trash text-2xl"></i>
+                                </button>
+
+                            </div>
+                        </div>
                     </div>
                 ))}
-
-
             </div>
+
 
             <div className="fixed bottom-4 right-4">
                 <button

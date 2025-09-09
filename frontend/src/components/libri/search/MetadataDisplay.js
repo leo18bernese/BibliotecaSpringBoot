@@ -15,12 +15,13 @@ function MetadataDisplay({tipo, metadata}) {
         return <span
             style={{
                 backgroundColor: metadata.valore,
-                width: '30px',
-                height: '30px',
+                width: '20px',
+                height: '20px',
                 borderRadius: '50%',
                 display: 'inline-block',
                 marginRight: '8px',
-                border: '1px solid ' + metadata.valore
+                border: '1px solid ' + metadata.valore,
+                boxShadow: '0 0 3px rgba(0,0,0,0.3)'
             }}
         ></span>
     }

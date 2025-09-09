@@ -24,23 +24,23 @@ const fetchImageByBookId = async (bookId) => {
     }
 };
 
-const confirmNotices = async (bookId) => {
+const confirmNotices = async (variantId) => {
     try {
-        const {data} = await axios.put(`/api/carrello/confirm-notices/${bookId}`);
+        const {data} = await axios.put(`/api/carrello/confirm-notices/${variantId}`);
         return data;
     } catch (error) {
-        console.error(`Error confirming notices for book ID ${bookId}:`, error);
+        console.error(`Error confirming notices for variant ID ${variantId}:`, error);
         toast.error('Errore durante la conferma degli avvisi di rifornimento.');
         throw error;
     }
 }
 
-const fixQuantity = async (bookId) => {
+const fixQuantity = async (variantId) => {
     try {
-        const {data} = await axios.put(`/api/carrello/fix-quantity/${bookId}`);
+        const {data} = await axios.put(`/api/carrello/fix-quantity/${variantId}`);
         return data;
     } catch (error) {
-        console.error(`Error fixing quantity for book ID ${bookId}:`, error);
+        console.error(`Error fixing quantity for book ID ${variantId}:`, error);
         toast.error('Errore durante la sistemazione della quantità.');
         throw error;
     }
@@ -149,6 +149,11 @@ const CarrelloItem = ({item}) => {
                                                }
                                            }
                                        }}
+                                       style={{
+                                           appearance: "textfield",
+                                           margin: "0",
+                                             padding: "0",
+                                       }}
                                 ></input>
 
                                 <button className="sm:mx-2 md:mx-1 lg:mx-1 hover:bg-gray-100 transition-all rounded-md"
@@ -186,7 +191,7 @@ const CarrelloItem = ({item}) => {
 
                         <button
                             className="font-bold underline hover:text-red-800"
-                            onClick={() => fixQuantityMutation.mutate(item.libroId)}
+                            onClick={() => fixQuantityMutation.mutate(item.varianteId)}
                             disabled={fixQuantityMutation.isPending}
                         >
                             {fixQuantityMutation.isPending ? 'Sistemando...' : 'Clicca qui'}
@@ -224,7 +229,7 @@ const CarrelloItem = ({item}) => {
 
                                 <button
                                     className="font-bold underline hover:text-green-800"
-                                    onClick={() => confirmNoticesMutation.mutate(item.libroId)}
+                                    onClick={() => confirmNoticesMutation.mutate(item.varianteId)}
                                     disabled={confirmNoticesMutation.isPending}
                                 >
                                     {confirmNoticesMutation.isPending ? 'Confermando...' : 'Clicca per rimuovere l\'avviso'}
@@ -253,7 +258,7 @@ const CarrelloItem = ({item}) => {
 
                                 <button
                                     className="font-bold underline hover:text-orange-800"
-                                    onClick={() => confirmNoticesMutation.mutate(item.libroId)}
+                                    onClick={() => confirmNoticesMutation.mutate(item.varianteId)}
                                     disabled={confirmNoticesMutation.isPending}
                                 >
                                     {confirmNoticesMutation.isPending ? 'Confermando...' : 'Clicca per rimuovere l\'avviso'}

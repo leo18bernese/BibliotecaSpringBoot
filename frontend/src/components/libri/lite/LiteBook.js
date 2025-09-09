@@ -90,7 +90,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
                             {hasSconto && (
                                 <div
-                                    className="absolute top-2 left-2 bg-red-500 text-white px-4 py-2 rounded-md font-semibold">
+                                    className="absolute top-2 left-2 bg-red-600 text-white px-4 py-2 rounded-md font-semibold">
                                     -{sconto.percentuale > 0 ? `${sconto.percentuale}%` : `${sconto.valore}€`}
                                 </div>
                             )}
@@ -104,7 +104,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                     }}
                                     className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md shadow-gray-500 hover:bg-gray-50 transition-colors"
                                 >
-                                    <i className={`${hasWishlisted ? 'bxs-heart text-red-500' : 'bx-heart text-gray-400'} bx text-lg`}></i>
+                                    <i className={`${hasWishlisted ? 'bxs-heart text-red-600' : 'bx-heart text-gray-500'} bx text-lg`}></i>
                                 </button>
                             )}
                         </div>

@@ -167,13 +167,17 @@ function SearchPage() {
                             <h3 className="text-lg font-semibold">Items per Pagina</h3>
                             <div className="flex flex-col space-y-2">
                                 <input
-                                    type="range" min="2" max="100"
+                                    id="itemsPerPageSlider"
+                                    type="range"
+                                    min="2" max="100"
                                     value={pagination.size}
                                     onChange={(e) => handleSizeChange(parseInt(e.target.value))}
                                     className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                                    aria-label="Items per page slider"
                                 />
-                                <span
-                                    className="text-gray-600">Attualmente: {pagination.size} elementi per pagina</span>
+                                <label htmlFor="itemsPerPageSlider"
+                                       className="text-gray-600">Attualmente: {pagination.size} elementi per
+                                    pagina</label>
                             </div>
                         </div>
 
@@ -191,25 +195,22 @@ function SearchPage() {
 
                         <h3 className="font-semibold text-xl text-gray-700">ALTRI FILTRI</h3>
                         {availableCharacteristicTypes.map(type => (
-                            <div key={type} className="border-t border-gray-200 py-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h4 className="text-lg font-semibold text-gray-500">{type.charAt(0).toUpperCase() + type.slice(1)}</h4>
+
+                            <div key={type} className="border-t border-gray-200 py-2">
+                                <div className="flex items-center justify-between">
+
+                                    <div
+                                        className="text-lg font-semibold text-gray-500">{type.charAt(0).toUpperCase() + type.slice(1)}</div>
                                     <button
                                         className="text-gray-700 focus:outline-none"
-                                        onClick={() => setShownFilters(prev => ({...prev, [type]: !prev[type]}))}>
-                                        {shownFilters[type] ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                      d="M18 12H6"/>
-                                            </svg>
-                                        ) : (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                      d="M12 6v12m6-6H6"/>
-                                            </svg>
-                                        )}
+                                        onClick={() => setShownFilters(prev => ({...prev, [type]: !prev[type]}))}
+                                        aria-label={shownFilters[type] ? "Collapse filter options" : "Expand filter options"}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                  d={shownFilters[type] ? "M18 12H6" : "M12 6v12m6-6H6"}/>
+                                        </svg>
                                     </button>
                                 </div>
 

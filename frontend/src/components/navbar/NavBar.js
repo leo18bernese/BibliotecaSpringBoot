@@ -91,7 +91,7 @@ const NavBar = () => {
 
                         {/* Optional: Add a badge for cart items count */}
                         <span
-                            className="absolute -top-2 -right-4 bg-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            className="absolute -top-2 -right-4 bg-red-600 text-xs rounded-full w-5 h-5 flex items-center justify-center">
                             {carrello}
                         </span>
                     </Link>

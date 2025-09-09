@@ -69,7 +69,7 @@ const AdminBookVariant = () => {
             setQuantity(rifornimento.quantita || 0);
             setPrezzo(variante.prezzo.prezzo || 0);
 
-            const scontoData = prezzo.sconto || {};
+            const scontoData = variante.prezzo.sconto || {};
             if (scontoData.percentuale > 0) {
                 setSconto({percentuale: scontoData.percentuale});
                 setScontoType('percentage');
@@ -152,7 +152,7 @@ const AdminBookVariant = () => {
 
         priceMutation.mutate({id, varianteData});
         setHasUnsavedChanges(false);
-        navigate("/admin/variante/" + id);
+        navigate("/admin/book/" + id+"/inventory");
     };
 
     const handleFieldChange = (setterFunction) => (value) => {
@@ -396,7 +396,7 @@ const AdminBookVariant = () => {
                                                              icon="minus-circle"
                                                              value={reservation.quantity}
                                                              actionText="Decrease"
-                                                             onChange={() => {
+                                                             onClick={() => {
                                                                  const updatedList = [...prenotatiList];
                                                                  if (updatedList[index].quantity > 0) {
                                                                      updatedList[index].quantity -= 1;
@@ -413,7 +413,7 @@ const AdminBookVariant = () => {
                                                              icon="plus-circle"
                                                              value={reservation.quantity}
                                                              actionText="Increase"
-                                                             onChange={() => {
+                                                             onClick={() => {
                                                                  const updatedList = [...prenotatiList];
 
                                                                  updatedList[index].quantity += 1;
@@ -427,7 +427,7 @@ const AdminBookVariant = () => {
                                                              icon="trash"
                                                              value={reservation.quantity}
                                                              actionText="Remove"
-                                                             onChange={() => {
+                                                             onClick={() => {
                                                                  const updatedList = prenotatiList.filter((_, i) => i !== index);
                                                                  setPrenotatiList(updatedList);
 
