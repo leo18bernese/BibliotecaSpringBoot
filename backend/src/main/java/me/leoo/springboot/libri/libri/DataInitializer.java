@@ -22,7 +22,7 @@ public class DataInitializer implements CommandLineRunner {
             return;
         }
 
-        System.out.println("Inizializzazione metadati caratteristiche...");
+        System.out.println("Inizializzazione metadati attributi...");
 
         CaratteristicaOpzione nero = new CaratteristicaOpzione();
         nero.setNomeCaratteristica("Colore");
@@ -41,6 +41,6 @@ public class DataInitializer implements CommandLineRunner {
 
         caratteristicaOpzioneRepository.saveAll(List.of(nero, bianco, blu));
 
-        System.out.println("Metadati caratteristiche inizializzati.");
+        System.out.println("Metadati attributi inizializzati.");
     }
 }

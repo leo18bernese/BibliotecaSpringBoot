@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import ViewableField from "./fields/ViewableField";
 import ButtonField from "./fields/ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
+import RemovableField from "./fields/RemovableField";
 
 const fetchBookByIdAndVariante = async (id, varianteId) => {
     const {data} = await axios.get(`/api/libri/${id}/variante/${varianteId}`);
@@ -64,6 +65,7 @@ const AdminBookVariant = () => {
     const [giorniConsegna, setGiorniConsegna] = useState(0);
 
     const [showPrenotati, setShowPrenotati] = useState(false);
+    const [attributi, setAttributi] = useState({});
 
     // Inizializza gli stati quando variante è disponibile
     useEffect(() => {
@@ -87,6 +89,7 @@ const AdminBookVariant = () => {
             setNome(variante.nome || '');
             setDimensioni(variante.dimensioni || {});
             setGiorniConsegna(rifornimento.giorniConsegna || 0);
+            setAttributi(variante.attributiSpecifici);
         }
     }, [variante]);
 
@@ -153,13 +156,16 @@ const AdminBookVariant = () => {
             nome: nome,
             dimensioni: dimensioni,
             prezzo: prezzo,
-            sconto: scontoFormatted
+            sconto: scontoFormatted,
             // prenotatiMap rimosso
+            attributi: attributi
+
         };
 
         priceMutation.mutate({id, varianteData});
         setHasUnsavedChanges(false);
         navigate("/admin/book/" + id + "/inventory");
+
     };
 
     const handleFieldChange = (setterFunction) => (value) => {
@@ -516,6 +522,66 @@ const AdminBookVariant = () => {
                                 )}
                             </>
                         )}
+                    </div>
+
+                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                        <h2 className="text-md font-semibold">Attributi</h2>
+                        <div className=" pl-5">
+
+                            {Object.entries(attributi).map(([key, value]) => (
+                                <RemovableField key={key} id={key} label={key}
+                                                value={value}
+                                                placeholder={`Enter ${key} value`}
+                                                minChars={2} maxChars={30}
+                                                onChange={(newValue) => {
+                                                    setAttributi(prev => ({
+                                                        ...prev,
+                                                        [key]: newValue
+                                                    }));
+
+                                                    setHasUnsavedChanges(true);
+                                                }}
+                                                onRemove={() => {
+                                                    setAttributi(prev => {
+
+                                                        const newAttributi = {...prev};
+                                                        delete newAttributi[key];
+                                                        return newAttributi;
+                                                    });
+
+                                                    setHasUnsavedChanges(true);
+                                                }}
+                                                spacing={"2/6"}
+                                />
+                            ))}
+
+                            {/* add new characteristic */}
+                            <RemovableField id="newCharacteristic" label=" New Characteristic"
+                                            icon="plus text-green-600 font-bold"
+                                            value=""
+                                            placeholder="Enter new characteristic"
+                                            minChars={2} maxChars={30}
+                                            onChange={(newValue) => {
+                                                if (newValue) {
+
+                                                    if (attributi[newValue]) {
+                                                        toast.error(`Characteristic "${newValue}" already exists.`);
+                                                        return;
+                                                    }
+
+                                                    setAttributi(prev => ({
+                                                        ...prev,
+                                                        [newValue]: ''
+                                                    }));
+
+                                                    setHasUnsavedChanges(true);
+
+                                                }
+                                            }}
+                                            removable={false}
+                                            spacing={"2/6"}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

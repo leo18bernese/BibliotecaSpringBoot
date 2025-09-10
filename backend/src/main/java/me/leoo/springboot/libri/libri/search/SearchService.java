@@ -79,11 +79,11 @@ public class SearchService {
                     if (isDirectLibroField(filtroNome)) {
                         spec = spec.and(buildDirectFieldSpecification(filtroNome, valoriSelezionati));
                     } else {
-                        // Gestione per caratteristiche dinamiche
+                        // Gestione per attributi dinamiche
                         spec = spec.and((root, query, cb) -> {
                             Subquery<Long> subquery = query.subquery(Long.class);
                             Root<Libro> subRoot = subquery.from(Libro.class);
-                            MapJoin<LibroInfo, String, String> caratteristicheJoin = subRoot.join("descrizione").joinMap("caratteristiche");
+                            MapJoin<LibroInfo, String, String> caratteristicheJoin = subRoot.join("descrizione").joinMap("attributi");
                             subquery.select(subRoot.get("id"));
 
                             List<Predicate> orPredicates = new ArrayList<>();
@@ -145,7 +145,7 @@ public class SearchService {
 
         System.out.println("got " + metadatiMap.size() + " metadati");
 
-        // Prima ottieni tutte le caratteristiche disponibili dinamicamente
+        // Prima ottieni tutte le attributi disponibili dinamicamente
         Set<String> caratteristicheDisponibili = ottieniCaratteristicheDisponibili();
 
         // Aggiungi i campi diretti del Libro
@@ -224,7 +224,7 @@ public class SearchService {
                                                              CriteriaBuilder cb) {
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
         Root<Libro> root = cq.from(Libro.class);
-        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("caratteristiche");
+        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("attributi");
 
         List<Predicate> predicates = new ArrayList<>();
         Predicate basePredicate = specParziale.toPredicate(root, cq, cb);
@@ -268,7 +268,7 @@ public class SearchService {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> cq = cb.createQuery(String.class);
         Root<Libro> root = cq.from(Libro.class);
-        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("caratteristiche");
+        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("attributi");
 
         cq.select(caratteristicheJoin.key()).distinct(true);
 

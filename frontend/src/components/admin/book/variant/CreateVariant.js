@@ -11,14 +11,15 @@ const CreateVariant = ({bookId, showAddVariantPopup, setShowAddVariantPopup}) =>
 
     const [newVariant, setNewVariant] = useState({
         nome: '',
+        dimensioni: {length: '', width: '', height: '', weight: ''},
         prezzo: '',
-        dimensioni: {larghezza: '', altezza: '', profondita: ''}
     });
     const [variantErrors, setVariantErrors] = useState({});
     const variantErrorRef = useRef(null);
 
     const handleNewVariantChange = (e) => {
         const {name, value} = e.target;
+
         if (name === "dimensioni") {
             setNewVariant(prev => ({
                 ...prev,
@@ -37,9 +38,11 @@ const CreateVariant = ({bookId, showAddVariantPopup, setShowAddVariantPopup}) =>
         const errors = {};
         if (!newVariant.nome) errors.nome = "Nome obbligatorio";
         if (!newVariant.prezzo) errors.prezzo = "Prezzo obbligatorio";
-        if (!newVariant.dimensioni.larghezza) errors.larghezza = "Larghezza obbligatoria";
-        if (!newVariant.dimensioni.altezza) errors.altezza = "Altezza obbligatoria";
-        if (!newVariant.dimensioni.profondita) errors.profondita = "Profondità obbligatoria";
+        if (!newVariant.dimensioni.length) errors.length = "Lunghezza obbligatoria";
+        if (!newVariant.dimensioni.width) errors.larghezza = "Larghezza obbligatoria";
+        if (!newVariant.dimensioni.height) errors.height = "Altezza obbligatoria";
+        if (!newVariant.dimensioni.weight) errors.weight = "Peso obbligatorio";
+
         if (Object.keys(errors).length > 0) {
             setVariantErrors(errors);
             return;
@@ -48,20 +51,23 @@ const CreateVariant = ({bookId, showAddVariantPopup, setShowAddVariantPopup}) =>
         try {
             await axios.post(`/api/libri/${bookId}/variante`, {
                 nome: newVariant.nome,
-                prezzo: parseFloat(newVariant.prezzo),
                 dimensioni: {
-                    larghezza: parseFloat(newVariant.dimensioni.larghezza),
-                    altezza: parseFloat(newVariant.dimensioni.altezza),
-                    profondita: parseFloat(newVariant.dimensioni.profondita)
-                }
+                    length: parseFloat(newVariant.dimensioni.length),
+                    width: parseFloat(newVariant.dimensioni.width),
+                    height: parseFloat(newVariant.dimensioni.height),
+                    weight: parseFloat(newVariant.dimensioni.weight)
+                },
+                prezzo: parseFloat(newVariant.prezzo)
             });
             toast.success("Variante aggiunta!");
             setShowAddVariantPopup(false);
+
             setNewVariant({
                 nome: '',
+                dimensioni: {length: '', width: '', height: '', weight: ''},
                 prezzo: '',
-                dimensioni: {larghezza: '', altezza: '', profondita: ''}
             });
+
             setVariantErrors({});
             queryClient.invalidateQueries(['book', bookId]);
         } catch (err) {
@@ -82,8 +88,8 @@ const CreateVariant = ({bookId, showAddVariantPopup, setShowAddVariantPopup}) =>
                                 setShowAddVariantPopup(false);
                                 setNewVariant({
                                     nome: '',
-                                    prezzo: '',
-                                    dimensioni: {larghezza: '', altezza: '', profondita: ''}
+                                    dimensioni: {length: '', width: '', height: '', weight: ''},
+                                    prezzo: ''
                                 });
                                 setVariantErrors({});
                             }}
@@ -107,8 +113,8 @@ const CreateVariant = ({bookId, showAddVariantPopup, setShowAddVariantPopup}) =>
                                 setShowAddVariantPopup(false);
                                 setNewVariant({
                                     nome: '',
-                                    prezzo: '',
-                                    dimensioni: {larghezza: '', altezza: '', profondita: ''}
+                                    dimensioni: {length: '', width: '', height: '', weight: ''},
+                                    prezzo: ''
                                 });
                                 setVariantErrors({});
                             }}

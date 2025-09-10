@@ -39,6 +39,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 }
             });
         });
+        console.log("Albero delle varianti:", albero);
         return albero;
     };
 
@@ -49,13 +50,15 @@ const Varianti = ({varianti, onSelect, selected}) => {
         return chiavi.map(chiave => variante.attributiSpecifici[chiave]).join('.');
     };
 
-    const renderVarianteCard = (variante) => (
-        <div key={variante.id} className={` p-2 border-2 rounded-lg cursor-pointer 
+    const renderVarianteCard = (variante) => {
+        console.log("variante", variante.nome);
+
+        return <div key={variante.id} className={` p-2 border-2 rounded-lg cursor-pointer 
             transition-colors shadow-sm ` +
             (variante.id === selected.id ? 'bg-blue-100 border-blue-300' : 'bg-gray-100  border-gray-300  hover:border-blue-500 hover:shadow-md ')}
-             onClick={() => {
-                 if (onSelect) onSelect(variante);
-             }}>
+                    onClick={() => {
+                        if (onSelect) onSelect(variante);
+                    }}>
 
             <h4 className="font-semibold text-sm mb-2">{variante.nome}</h4>
 
@@ -75,10 +78,14 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 <p className="text-xs text-green-600">{variante.rifornimento.status}</p>
             </div>
         </div>
-    );
+    };
 
-    const renderNodoCard = (nodo, path) => (
-        <div
+    const renderNodoCard = (nodo, path) => {
+
+        const figliLength = Object.keys(nodo.figli).length + nodo.varianti.length;
+
+
+        return <div
             key={path}
             className={` p-3 border-2 rounded-lg cursor-pointer transition-colors
          ${selectedVariantPath.startsWith(path) ? ' bg-blue-100 shadow-md' : 'bg-white hover:border-gray-400'}
@@ -90,22 +97,22 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 <div>
                     <h3 className="font-semibold capitalize text-lg mt-1">{nodo.nome}</h3>
                     <p className="text-xs text-gray-600 mt-1">
-                        {Object.keys(nodo.figli).length} {Object.keys(nodo.figli).length === 1 ? 'opzione' : 'opzioni'}
+                        {figliLength} {figliLength === 1 ? 'opzione' : 'opzioni'}
                     </p>
                 </div>
             </div>
         </div>
-    );
+    };
 
-    const renderAllLevels = (nodi, currentPath = "", depth = 0) => {
+    const renderAllLevels = (nodi, currentPath = "", depth = 0, isSubVar = false) => {
         if (!nodi || Object.keys(nodi).length === 0) return null;
 
         const firstNodeType = Object.keys(nodi).length > 0 ? nodi[Object.keys(nodi)[0]].tipo : null;
-        const currentLevelTitle = firstNodeType ? `Seleziona ${firstNodeType}:` : "Seleziona opzione:";
+        const currentLevelTitle = isSubVar ? "Altre opzioni" : firstNodeType ? `Seleziona ${firstNodeType}:` : "Seleziona opzione:";
 
         return (
             <div key={currentPath} className="mt-4">
-                {depth > 0 && (
+                {/*depth > 0 &&*/ (
                     <h3 className="text-sm font-semibold text-gray-700 mb-2 capitalize">
                         {currentLevelTitle}
                     </h3>
@@ -114,31 +121,53 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
                     {Object.entries(nodi).map(([chiave, nodo]) => {
                         const nuovoPath = currentPath ? `${currentPath}.${chiave}` : chiave;
-                        const isLeaf = Object.keys(nodo.figli).length === 0;
+                        const isLeaf = !isSubVar ? (Object.keys(nodo.figli).length) === 0 : true;
+                        const isOnlyVariant = !isSubVar ? (Object.keys(nodo.figli).length === 0 && nodo.varianti.length > 1) : true;
+
+                        console.log("Rendering node:", nodo);
+
+                        if (isSubVar) {
+                            return renderVarianteCard(nodo);
+                        }
+
+                        if (isOnlyVariant) {
+                            return renderNodoCard(nodo, nuovoPath);
+                        }
 
                         if (isLeaf) {
                             return (
                                 <div key={nuovoPath} className="contents">
-                                    {nodo.varianti.map((variante) => renderVarianteCard(variante))}
+                                    {nodo.varianti.map((variante) => {
+                                            return renderVarianteCard(variante);
+                                        }
+                                    )}
                                 </div>
                             );
                         } else {
+                            console.log("node", nodo);
                             return renderNodoCard(nodo, nuovoPath);
                         }
                     })}
                 </div>
 
-                {Object.entries(nodi).map(([chiave, nodo]) => {
-                    const nuovoPath = currentPath ? `${currentPath}.${chiave}` : chiave;
-                    if (selectedPath.startsWith(nuovoPath) && Object.keys(nodo.figli).length > 0) {
-                        return (
-                            <div key={`figli-${nuovoPath}`}>
-                                {renderAllLevels(nodo.figli, nuovoPath, depth + 1)}
-                            </div>
-                        );
-                    }
-                    return null;
-                })}
+                {!isSubVar && (
+                    Object.entries(nodi).map(([chiave, nodo]) => {
+                        const nuovoPath = currentPath ? `${currentPath}.${chiave}` : chiave;
+
+                        console.log("selectedPath", selectedPath);
+
+                        if (selectedPath.startsWith(nuovoPath)) {
+                            return (
+                                <div key={`figli-${nuovoPath}`}>
+                                    {renderAllLevels(nodo.figli, nuovoPath, depth + 1)}
+
+                                    {renderAllLevels(nodo.varianti, nuovoPath, depth + 1, isSubVar = true)}
+                                </div>
+                            );
+                        }
+                        return null;
+                    })
+                )}
             </div>
         );
     };

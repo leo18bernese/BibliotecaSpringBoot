@@ -55,7 +55,8 @@ public class LibroController {
     // DTO per rifornimento
     public record VarianteRequest(String nome, LibroDimension dimensioni,
                                   double prezzo, Sconto sconto,
-                                  Map<Long, Integer> prenotatiMap) {
+                                  Map<Long, Integer> prenotatiMap,
+                                  Map<String, String> attributi) {
     }
 
     public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna,
@@ -212,14 +213,22 @@ public class LibroController {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
+        System.out.println("received request: " + request);
+
+        System.out.println("Creating variante for libro ID: " + id);
         Variante variante = new Variante(libro, request.nome(),
                 new Prezzo(request.prezzo()),
                 new Rifornimento(10),
                 request.dimensioni());
+        System.out.println("Created variante: " + variante.getPrezzo());
 
+        variante.setLibro(libro);
         libro.getVarianti().add(variante);
 
+        System.out.println("Added variante to libro. Total varianti now: " + libro.getVarianti().size());
         libroRepository.save(libro);
+
+        System.out.println("Saved variante: " + variante.getPrezzo());
 
         return variante;
     }

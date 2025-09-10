@@ -128,43 +128,44 @@ const AdminBookInventory = () => {
 
             </button>
 
-            <div className="mt-8 p-4 bg-gray-50 rounded-md w-1/3">
+            <div className="mt-8 p-4 bg-gray-50 rounded-md">
                 <h2 className="text-md font-semibold rounded-md">Seleziona una variante qui sotto</h2>
 
 
-                {book.varianti.map((variante) => (
-                    <div key={variante.id} className="mt-4 p-4 border rounded-md bg-white">
+                <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4">
+                    {book.varianti.map((variante) => (
+                        <div key={variante.id} className="mt-4 p-4 border-2 border-gray-400 rounded-md bg-white">
 
-                        <div className="flex items-center justify-between">
-                            <div>
+                            <div className="flex items-center justify-between">
+                                <div>
 
-                                <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
-                                <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
-                            </div>
+                                    <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
+                                    <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
+                                </div>
 
-                            <div>
+                                <div>
 
-                                <button className="ml-2 hover:text-blue-600"
-                                        onClick={(e) => {
-                                            navigate("/admin/book/" + id + "/inventory/variante/" + variante.id);
-                                        }}
-                                        title="Modifica indirizzo">
-                                    <i className="bx bx-edit text-2xl"></i>
-                                </button>
+                                    <button className="ml-2 hover:text-blue-600"
+                                            onClick={(e) => {
+                                                navigate("/admin/book/" + id + "/inventory/variante/" + variante.id);
+                                            }}
+                                            title="Modifica indirizzo">
+                                        <i className="bx bx-edit text-2xl"></i>
+                                    </button>
 
-                                <button className="ml-2 hover:text-red-600"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toast("Delete functionality not implemented yet.");
-                                        }}
-                                        title="Elimina indirizzo">
-                                    <i className="bx bx-trash text-2xl"></i>
-                                </button>
+                                    <button className="ml-2 hover:text-red-600"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toast("Delete functionality not implemented yet.");
+                                            }}
+                                            title="Elimina indirizzo">
+                                        <i className="bx bx-trash text-2xl"></i>
+                                    </button>
 
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}</div>
             </div>
 
             <CreateVariant bookId={id}

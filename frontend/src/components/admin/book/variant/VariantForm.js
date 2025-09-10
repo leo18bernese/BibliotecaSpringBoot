@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
-const VariantForm = ({ variantData, handleChange, errors, errorRef }) => {
+const VariantForm = ({variantData, handleChange, errors, errorRef}) => {
     const [dimension, setDimension] = useState({
-        larghezza: '',
-        altezza: '',
-        profondita: ''
+        length: '',
+        width: '',
+        height: '',
+        weight: ''
     });
 
     useEffect(() => {
-        setDimension(variantData.dimensioni || { larghezza: '', altezza: '', profondita: '' });
+        setDimension(variantData.dimensioni || {length: '', width: '', height: '', weight: ''});
     }, [variantData]);
 
     const handleDimensionChange = (e) => {
-        const { name, value } = e.target;
-        const updated = { ...dimension, [name]: value };
+        const {name, value} = e.target;
+        const updated = {...dimension, [name]: value};
         setDimension(updated);
-        handleChange({ target: { name: 'dimensioni', value: updated } });
+        handleChange({target: {name: 'dimensioni', value: updated}});
     };
 
     return (
@@ -28,7 +29,9 @@ const VariantForm = ({ variantData, handleChange, errors, errorRef }) => {
                     value={variantData.nome}
                     onChange={handleChange}
                     className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors.nome ? 'border-red-500' : ''}`}
-                    ref={node => { if (errors.nome) errorRef.current = node; }}
+                    ref={node => {
+                        if (errors.nome) errorRef.current = node;
+                    }}
                 />
                 {errors.nome && <p className="text-red-500 text-sm">{errors.nome}</p>}
             </div>
@@ -38,27 +41,35 @@ const VariantForm = ({ variantData, handleChange, errors, errorRef }) => {
                 <div className="grid grid-cols-3 gap-2">
                     <input
                         type="number"
-                        name="larghezza"
-                        value={dimension.larghezza}
+                        name="length"
+                        value={dimension.length}
                         onChange={handleDimensionChange}
                         placeholder="Larghezza"
                         className="mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2"
                     />
                     <input
                         type="number"
-                        name="altezza"
-                        value={dimension.altezza}
+                        name="height"
+                        value={dimension.height}
                         onChange={handleDimensionChange}
                         placeholder="Altezza"
                         className="mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2"
                     />
                     <input
                         type="number"
-                        name="profondita"
-                        value={dimension.profondita}
+                        name="width"
+                        value={dimension.width}
                         onChange={handleDimensionChange}
                         placeholder="Profondità"
                         className="mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2"
+                    />
+                    <input
+                        type="number"
+                        name="weight"
+                        value={dimension.weight}
+                        onChange={handleDimensionChange}
+                        placeholder="Peso (kg)"
+                        className="mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 col-span-3"
                     />
                 </div>
             </div>

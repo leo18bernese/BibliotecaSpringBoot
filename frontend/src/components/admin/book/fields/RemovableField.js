@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 const EditableField = ({
                            id, label, icon, value, placeholder, minChars, maxChars, type,
                            onChange, onRemove,
-                           removable = true
+                           removable = true, spacing = "1/6"
                        }) => {
     const [editing, setEditing] = useState(false);
     const [inputValue, setInputValue] = useState(value || '');
@@ -42,8 +42,7 @@ const EditableField = ({
 
             <div className={"flex items-center transition-all "}>
 
-
-                <label className="w-1/6 " htmlFor={id}>{label}:</label>
+                <label className={`w-${spacing}`} htmlFor={id}>{label}:</label>
 
                 <span className={"border-b-4 " + borderColor}>
 

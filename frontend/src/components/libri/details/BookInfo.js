@@ -276,7 +276,7 @@ const BookInfo = () => {
                 "isbn": book.isbn
             };
 
-            console.log("Generated product schema:", productSchema);
+           // console.log("Generated product schema:", productSchema);
             const script = document.createElement('script');
             script.type = 'application/ld+json';
             script.innerHTML = JSON.stringify(productSchema);

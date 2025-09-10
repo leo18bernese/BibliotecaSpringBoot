@@ -33,10 +33,10 @@ public class Variante {
 
     private String nome;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private Prezzo prezzo;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private Rifornimento rifornimento;
 
     private LibroDimension dimensioni;
@@ -77,6 +77,8 @@ public class Variante {
         this.nome = request.nome();
         this.prezzo.updatePrice(request);
         this.dimensioni = request.dimensioni();
+
+        this.attributiSpecifici = request.attributi();
 
         return this;
     }
