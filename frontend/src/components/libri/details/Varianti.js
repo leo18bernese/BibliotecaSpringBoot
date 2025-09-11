@@ -5,11 +5,24 @@ const Varianti = ({varianti, onSelect, selected}) => {
     const [selectedPath, setSelectedPath] = useState("");
     const [selectedVariantPath, setSelectedVariantPath] = useState("");
 
-    const updateOrResetPath = (newPath) => {
+    const updateOrResetPath = (newPath, isLeaf = false, isSubNodeLeaf = false) => {
+        console.log("updateOrResetPath", {newPath, isLeaf, isSubNodeLeaf, selectedPath});
+
+        if (isLeaf) {
+
+            if (newPath !== selectedPath) {
+                setSelectedPath(newPath);
+            }
+            return;
+        }
+
+
         if (selectedPath === newPath) {
-            setSelectedPath("");
+            setSelectedPath(newPath.split('.').slice(0, -1).join('.'));
+            console.log("Reset selectedPath to parent:", newPath.split('.').slice(0, -1).join('.'));
         } else {
             setSelectedPath(newPath);
+            console.log("Set selectedPath to:", newPath);
         }
     };
 
@@ -39,7 +52,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 }
             });
         });
-        console.log("Albero delle varianti:", albero);
+        //console.log("Albero delle varianti:", albero);
         return albero;
     };
 
@@ -51,16 +64,18 @@ const Varianti = ({varianti, onSelect, selected}) => {
     };
 
     const renderVarianteCard = (variante) => {
-        console.log("variante", variante.nome);
+        //console.log("variante", variante.nome);
 
-        return <div key={variante.id} className={` p-2 border-2 rounded-lg cursor-pointer 
-            transition-colors shadow-sm ` +
-            (variante.id === selected.id ? 'bg-blue-100 border-blue-300' : 'bg-gray-100  border-gray-300  hover:border-blue-500 hover:shadow-md ')}
-                    onClick={() => {
-                        if (onSelect) onSelect(variante);
-                    }}>
+        return <div
+            key={variante.id}
+            className={` p-2 border-2 rounded-lg cursor-pointer flex flex-col justify-between
+        transition-colors shadow-sm ` +
+                (variante.id === selected.id ? 'bg-blue-100 border-blue-300' : 'bg-gray-100  border-gray-300  hover:border-blue-500 hover:shadow-md ')}
+            onClick={() => {
+                if (onSelect) onSelect(variante);
+            }}>
 
-            <h4 className="font-semibold text-sm mb-2">{variante.nome}</h4>
+            <h4 className="font-semibold text-sm mb-2">{variante.dynamicName}</h4>
 
             <div className="space-y-1">
 
@@ -70,12 +85,13 @@ const Varianti = ({varianti, onSelect, selected}) => {
                     </span>
                 )}
 
+                <br/>
+
                 <span className="text-lg font-bold text-blue-600">
                     {variante.prezzo.prezzoTotale.toFixed(2)} €
                 </span>
 
-
-                <p className="text-xs text-green-600">{variante.rifornimento.status}</p>
+                <p className="text-xs " style={{color: variante.rifornimento.color}}>{variante.rifornimento.status}</p>
             </div>
         </div>
     };
@@ -84,14 +100,18 @@ const Varianti = ({varianti, onSelect, selected}) => {
 
         const figliLength = Object.keys(nodo.figli).length + nodo.varianti.length;
 
-
         return <div
             key={path}
             className={` p-3 border-2 rounded-lg cursor-pointer transition-colors
-         ${selectedVariantPath.startsWith(path) ? ' bg-blue-100 shadow-md' : 'bg-white hover:border-gray-400'}
+         ${selectedVariantPath.startsWith(path) ? ' bg-blue-100 shadow-md' : `bg-white hover:${selectedPath === path ? 'border-blue-500' :  'border-gray-400' }`}
             ${selectedPath === path ? 'border-blue-500 shadow-lg' : 'border-gray-300 '}
           `}
-            onClick={() => updateOrResetPath(path)}
+            onClick={() => {
+                // Determina se è una leaf principale o di sub-nodo
+                const isLeaf = Object.keys(nodo.figli).length === 0;
+                const isSubNodeLeaf = path.includes('.') && isLeaf;
+                updateOrResetPath(path, isLeaf, isSubNodeLeaf);
+            }}
         >
             <div className="flex justify-between items-center">
                 <div>
@@ -118,13 +138,13 @@ const Varianti = ({varianti, onSelect, selected}) => {
                     </h3>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                <div className="flex flex-wrap items-stretch gap-4">
                     {Object.entries(nodi).map(([chiave, nodo]) => {
                         const nuovoPath = currentPath ? `${currentPath}.${chiave}` : chiave;
                         const isLeaf = !isSubVar ? (Object.keys(nodo.figli).length) === 0 : true;
                         const isOnlyVariant = !isSubVar ? (Object.keys(nodo.figli).length === 0 && nodo.varianti.length > 1) : true;
 
-                        console.log("Rendering node:", nodo);
+                        //console.log("Rendering node:", nodo);
 
                         if (isSubVar) {
                             return renderVarianteCard(nodo);
@@ -138,13 +158,21 @@ const Varianti = ({varianti, onSelect, selected}) => {
                             return (
                                 <div key={nuovoPath} className="contents">
                                     {nodo.varianti.map((variante) => {
-                                            return renderVarianteCard(variante);
-                                        }
-                                    )}
+                                        const isLeaf = true;
+                                        const isSubNodeLeaf = currentPath.includes('.');
+                                        return (
+                                            <div
+                                                key={variante.id}
+                                                onClick={() => updateOrResetPath(currentPath, isLeaf, isSubNodeLeaf)}
+                                            >
+                                                {renderVarianteCard(variante)}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             );
                         } else {
-                            console.log("node", nodo);
+                            //console.log("node", nodo);
                             return renderNodoCard(nodo, nuovoPath);
                         }
                     })}
@@ -154,7 +182,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
                     Object.entries(nodi).map(([chiave, nodo]) => {
                         const nuovoPath = currentPath ? `${currentPath}.${chiave}` : chiave;
 
-                        console.log("selectedPath", selectedPath);
+                        //console.log("selectedPath", selectedPath);
 
                         if (selectedPath.startsWith(nuovoPath)) {
                             return (

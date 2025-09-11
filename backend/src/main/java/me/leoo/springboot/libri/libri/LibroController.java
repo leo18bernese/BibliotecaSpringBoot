@@ -13,6 +13,7 @@ import me.leoo.springboot.libri.libri.search.SearchService;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utils.Sconto;
+import org.aspectj.weaver.ast.Var;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -213,25 +214,39 @@ public class LibroController {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
-        System.out.println("received request: " + request);
-
-        System.out.println("Creating variante for libro ID: " + id);
         Variante variante = new Variante(libro, request.nome(),
                 new Prezzo(request.prezzo()),
                 new Rifornimento(10),
                 request.dimensioni());
-        System.out.println("Created variante: " + variante.getPrezzo());
 
         variante.setLibro(libro);
         libro.getVarianti().add(variante);
 
-        System.out.println("Added variante to libro. Total varianti now: " + libro.getVarianti().size());
         libroRepository.save(libro);
-
-        System.out.println("Saved variante: " + variante.getPrezzo());
 
         return variante;
     }
+
+    @PostMapping("/{id}/variante/{varianteId}/duplicate")
+    public Variante duplicateVariante(@PathVariable Long id,
+                                      @PathVariable Long varianteId) {
+        Libro libro = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        Variante varianteOriginale = libro.getVariante(varianteId)
+                .orElseThrow(() -> new RuntimeException("Variante non trovata"));
+
+        Variante nuovaVariante = varianteOriginale.clone();
+
+        nuovaVariante.setId(null);
+        nuovaVariante.setLibro(libro);
+        libro.getVarianti().add(nuovaVariante);
+
+        libroRepository.save(libro);
+
+        return nuovaVariante;
+    }
+
 
     @PutMapping("/{id}/{varianteId}/rifornimento")
     public Libro updateRifornimento(@PathVariable Long id,

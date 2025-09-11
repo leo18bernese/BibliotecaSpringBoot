@@ -18,12 +18,10 @@ const fetchBookExists = async (id) => {
     return data;
 };
 
-// Nuova funzione per fetch delle prenotazioni
-const fetchPrenotazioni = async (id) => {
-    if (!id || id <= 0) return [];
-    const {data} = await axios.get(`/api/rifornimento/${id}/prenotazioni`);
-    return data.content || [];
-};
+const duplicateVariant = async (bookId, variantId) => {
+    const {data} = await axios.post(`/api/libri/${bookId}/variante/${variantId}/duplicate`);
+    return data;
+}
 
 const AdminBookInventory = () => {
     const {id} = useParams();
@@ -51,6 +49,16 @@ const AdminBookInventory = () => {
         }
     }, [book]);
 
+    const duplicateMutation = useMutation({
+        mutationFn: (variantId) => duplicateVariant(id, variantId),
+        onSuccess: (data) => {
+            toast.success("Variante duplicata con successo");
+            queryClient.invalidateQueries({queryKey: ['book', id]});
+        },
+        onError: (error) => {
+            toast.error("Errore durante la duplicazione della variante");
+        }
+    });
 
     const handleSave = () => {
         setHasUnsavedChanges(false);
@@ -149,16 +157,31 @@ const AdminBookInventory = () => {
                                             onClick={(e) => {
                                                 navigate("/admin/book/" + id + "/inventory/variante/" + variante.id);
                                             }}
-                                            title="Modifica indirizzo">
+                                            title="Modifica variante"
+                                            disabled={duplicateMutation.isLoading}
+                                    >
                                         <i className="bx bx-edit text-2xl"></i>
                                     </button>
+
+                                    <button className="ml-2 hover:text-blue-600"
+                                            onClick={(e) => {
+                                                duplicateMutation.mutate(variante.id);
+                                            }}
+                                            title="Duplica variante"
+                                            disabled={duplicateMutation.isLoading}
+                                    >
+                                        <i className="bx bx-copy text-2xl"></i>
+                                    </button>
+
 
                                     <button className="ml-2 hover:text-red-600"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toast("Delete functionality not implemented yet.");
                                             }}
-                                            title="Elimina indirizzo">
+                                            title="Elimina variante"
+                                            disabled={duplicateMutation.isLoading}
+                                    >
                                         <i className="bx bx-trash text-2xl"></i>
                                     </button>
 

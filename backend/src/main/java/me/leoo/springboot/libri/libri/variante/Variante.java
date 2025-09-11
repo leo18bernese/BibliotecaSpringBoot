@@ -11,17 +11,17 @@ import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.miscellaneous.DeliveryPackage;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
+import me.leoo.utils.common.string.StringUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Variante {
+public class Variante implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,6 +55,14 @@ public class Variante {
         this.dimensioni = dimensioni;
     }
 
+    public String getDynamicName() {
+        return attributiSpecifici.values()
+                .stream()
+                .map(StringUtil::capitalize)
+                .filter(s -> Objects.nonNull(s) && !s.isBlank())
+                .collect(Collectors.joining(" "));
+    }
+
     public void addAttributo(String key, String value) {
         this.attributiSpecifici.put(key, value);
     }
@@ -82,5 +90,21 @@ public class Variante {
 
         return this;
     }
+
+    @Override
+    public Variante clone() {
+        try {
+            Variante cloned = (Variante) super.clone();
+            cloned.prezzo = this.prezzo != null ? this.prezzo.clone() : null;
+            cloned.rifornimento = this.rifornimento != null ? this.rifornimento.clone() : null;
+            cloned.dimensioni = this.dimensioni.from();
+            cloned.recensioni = new ArrayList<>(); // leave empty, do not clone reviews
+            cloned.attributiSpecifici = new HashMap<>(this.attributiSpecifici);
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
 
 }

@@ -17,7 +17,7 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Rifornimento {
+public class Rifornimento implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -88,7 +88,7 @@ public class Rifornimento {
             return "Disponibilità illimitata";
         }
 
-        return "Disponibili " + disponibili + " unità al momento.";
+        return "Disponibili " + disponibili + " unità.";
     }
 
     public String getColor() {
@@ -121,6 +121,23 @@ public class Rifornimento {
 
     public void rimuoviRifornimento() {
         this.prossimoRifornimento = null;
+    }
+
+    @Override
+    public Rifornimento clone() {
+        try {
+            Rifornimento cloned = (Rifornimento) super.clone();
+
+            cloned.prossimoRifornimento = this.prossimoRifornimento != null
+                    ? (Date) this.prossimoRifornimento.clone()
+                    : null;
+
+            cloned.setId(null);
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
 }

@@ -16,7 +16,7 @@ import me.leoo.springboot.libri.utils.Sconto;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Prezzo {
+public class Prezzo implements Cloneable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,4 +65,17 @@ public class Prezzo {
         return this;
     }
 
+    public Prezzo clone() {
+        try {
+            Prezzo cloned = (Prezzo) super.clone();
+
+            cloned.setId(null);
+
+            // Se Sconto è mutabile e implementa Cloneable, clonalo qui
+            // cloned.sconto = this.sconto != null ? this.sconto.clone() : null;
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
