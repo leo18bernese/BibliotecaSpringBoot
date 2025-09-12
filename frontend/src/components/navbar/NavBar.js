@@ -45,7 +45,7 @@ const NavBar = () => {
                 <ul className="flex space-x-2 list-none m-0 p-0">
                     <li>
                         <Link to="/" className="text-white hover:text-gray-300 font-medium">
-                            Home
+                            Home GG
                         </Link>
 
                         {
