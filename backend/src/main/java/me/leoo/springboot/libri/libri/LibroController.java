@@ -247,6 +247,20 @@ public class LibroController {
         return nuovaVariante;
     }
 
+    @DeleteMapping("/{id}/variante/{varianteId}")
+    public void deleteVariante(@PathVariable Long id,
+                                 @PathVariable Long varianteId) {
+        Libro libro = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato"));
+
+        Variante variante = libro.getVariante(varianteId)
+                .orElseThrow(() -> new RuntimeException("Variante non trovata"));
+
+        // Rimuovi la variante dal carrello
+        //carrelloService.removeVarianteFromAllCarts(varianteId);
+        libro.getVarianti().remove(variante);
+        libroRepository.save(libro);
+    }
 
     @PutMapping("/{id}/{varianteId}/rifornimento")
     public Libro updateRifornimento(@PathVariable Long id,

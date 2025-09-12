@@ -1,8 +1,9 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-import React from "react";
+import React, {useState} from "react";
 
 const AdminBar = () => {
     const location = useLocation();
+    const [showSidebar, setShowSidebar] = useState(false);
 
     const renderMenuItem = (path, label, icon) => (
         <li className="hover:underline">
@@ -11,6 +12,7 @@ const AdminBar = () => {
             <NavLink
                 to={path}
                 className={location.pathname.startsWith(path) ? "underline" : ""}
+                onClick={() => setShowSidebar(false)}
             >
                 {label}
             </NavLink>
@@ -18,8 +20,18 @@ const AdminBar = () => {
     );
 
     return (
-        <div className="flex flex-row">
-            <div className="admin-bar bg-red-500 text-red-100 pl-2 pt-4 pr-20">
+        <div className="flex flex-col md:flex-row">
+
+            <button
+                className="md:hidden w-full  bg-red-500 text-white p-2 rounded"
+                onClick={() => setShowSidebar(true)}
+            >
+                &#9776; Admin
+            </button>
+
+            <div className={`admin-bar bg-red-500 text-red-100 pl-2 pt-4 pr-20 w-64 fixed top-0 left-0 z-30 transition-transform duration-300
+                ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:static md:translate-x-0 md:w-3/12 h-screen overflow-y-auto`}>
+
                 <h3 className="text-2xl font-semibold">Admin Panel</h3>
                 <div className="border-t border-red-200 my-2"></div>
                 <ul className="text-xl">
@@ -39,7 +51,14 @@ const AdminBar = () => {
                 </ul>
             </div>
 
-            <div className="w-3/4 mx-auto">
+            {showSidebar && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-40 z-10 md:hidden"
+                    onClick={() => setShowSidebar(false)}
+                />
+            )}
+
+            <div className="w-5/6 mx-10 overflow-x-auto">
                 <Outlet />
             </div>
         </div>

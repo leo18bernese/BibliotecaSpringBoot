@@ -23,6 +23,11 @@ const duplicateVariant = async (bookId, variantId) => {
     return data;
 }
 
+const deleteVariant = async (bookId, variantId) => {
+    const {data} = await axios.delete(`/api/libri/${bookId}/variante/${variantId}`);
+    return data;
+}
+
 const AdminBookInventory = () => {
     const {id} = useParams();
     const navigate = useNavigate();
@@ -57,6 +62,17 @@ const AdminBookInventory = () => {
         },
         onError: (error) => {
             toast.error("Errore durante la duplicazione della variante");
+        }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (variantId) => deleteVariant(id, variantId),
+        onSuccess: (data) => {
+            toast.success("Variante eliminata con successo");
+            queryClient.invalidateQueries({queryKey: ['book', id]});
+        } ,
+        onError: (error) => {
+            toast.error("Errore durante l'eliminazione della variante");
         }
     });
 
@@ -158,7 +174,7 @@ const AdminBookInventory = () => {
                                                 navigate("/admin/book/" + id + "/inventory/variante/" + variante.id);
                                             }}
                                             title="Modifica variante"
-                                            disabled={duplicateMutation.isLoading}
+                                            disabled={duplicateMutation.isLoading || deleteMutation.isLoading}
                                     >
                                         <i className="bx bx-edit text-2xl"></i>
                                     </button>
@@ -168,7 +184,7 @@ const AdminBookInventory = () => {
                                                 duplicateMutation.mutate(variante.id);
                                             }}
                                             title="Duplica variante"
-                                            disabled={duplicateMutation.isLoading}
+                                            disabled={duplicateMutation.isLoading || deleteMutation.isLoading}
                                     >
                                         <i className="bx bx-copy text-2xl"></i>
                                     </button>
@@ -176,11 +192,12 @@ const AdminBookInventory = () => {
 
                                     <button className="ml-2 hover:text-red-600"
                                             onClick={(e) => {
-                                                e.stopPropagation();
-                                                toast("Delete functionality not implemented yet.");
+                                                if (window.confirm("Sei sicuro di voler eliminare questa variante?")) {
+                                                    deleteMutation.mutate(variante.id);
+                                                }
                                             }}
                                             title="Elimina variante"
-                                            disabled={duplicateMutation.isLoading}
+                                            disabled={duplicateMutation.isLoading || deleteMutation.isLoading}
                                     >
                                         <i className="bx bx-trash text-2xl"></i>
                                     </button>

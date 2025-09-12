@@ -1,0 +1,85 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+     permissions:
+      contents: read
+
+    steps:
+    # 1. Scarica il tuo codice da GitHub
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+      
+    # 2. Configura Java per compilare
+    - name: ☕ Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    # 3. Compila il backend (dal tuo PC virtualmente)
+    - name: 📦 Build Backend
+      run: mvn clean package -DskipTests
+        
+    # 4. Configura Node.js per il frontend
+    - name: 🎨 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    # 5. Compila il frontend (dal tuo PC virtualmente)  
+    - name: 🏗️ Build Frontend
+      run: |
+        cd frontend  # se il frontend è in sottocartella
+        npm ci
+        npm run build
+        
+    # 6. Pulisci la VPS da deployment precedenti
+    - name: 🧹 Clean previous deployment
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          rm -rf /home/leo18bernese/backend
+          rm -rf /home/leo18bernese/frontend
+          mkdir -p /home/leo18bernese/backend/target
+          mkdir -p /home/leo18bernese/frontend
+        
+    # 7. Carica il JAR compilato sulla VPS
+    - name: 📤 Upload Backend JAR
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        source: "target/*.jar"  # Qualsiasi JAR nel target
+        target: "/home/leo18bernese/backend/"
+        
+    # 8. Carica i file frontend compilati sulla VPS
+    - name: 📤 Upload Frontend Build
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        source: "frontend/build/*"
+        target: "/home/leo18bernese/frontend/"
+        
+    # 9. Esegue il deploy sulla VPS
+    - name: 🚀 Execute Deploy Script
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          cd /home/leo18bernese
+          chmod +x deploy.sh
+          ./deploy.sh
