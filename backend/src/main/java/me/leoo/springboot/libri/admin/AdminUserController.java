@@ -24,6 +24,7 @@ public class AdminUserController {
     public record UserResponse(Long id, String name, String email,
                                Set<String> roles, int cartItems, int wishlistItems,
                                int addresses) {
+
     }
 
     public record DetailedUserResponse(Long id, String name, String email,
