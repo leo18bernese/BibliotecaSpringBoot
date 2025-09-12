@@ -26,6 +26,7 @@ jobs:
     - name: 📦 Build Backend
       run: |
         cd backend
+        chmod +x ./gradlew
         ./gradlew build -x test
         
     # 4. Configura Node.js per il frontend
