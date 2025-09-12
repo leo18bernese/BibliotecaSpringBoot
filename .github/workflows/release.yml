@@ -62,7 +62,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
-        source: "target/*.jar"  # Qualsiasi JAR nel target
+        source: "backend/build/libs/*.jar"  # Qualsiasi JAR nel target
         target: "/home/leo18bernese/backend/"
         
     # 8. Carica i file frontend compilati sulla VPS
@@ -73,7 +73,7 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         source: "frontend/build/*"
-        target: "/home/leo18bernese/frontend/"
+        target: "/home/leo18bernese/build/"
         
     # 9. Esegue il deploy sulla VPS
     - name: 🚀 Execute Deploy Script
