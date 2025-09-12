@@ -24,7 +24,9 @@ jobs:
         
     # 3. Compila il backend (dal tuo PC virtualmente)
     - name: 📦 Build Backend
-      run: mvn clean package -DskipTests
+      run: |
+        cd backend
+        ./gradlew build -x test
         
     # 4. Configura Node.js per il frontend
     - name: 🎨 Setup Node.js
