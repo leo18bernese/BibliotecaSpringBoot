@@ -73,7 +73,7 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         source: "frontend/build/*"
-        target: "/home/leo18bernese/build/"
+        target: "/home/leo18bernese/frontend/build/"
         
     # 9. Esegue il deploy sulla VPS
     - name: 🚀 Execute Deploy Script
