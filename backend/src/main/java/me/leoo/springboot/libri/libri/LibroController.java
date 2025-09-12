@@ -230,7 +230,7 @@ public class LibroController {
 
     @PostMapping("/{id}/variante/{varianteId}/duplicate")
     public Variante duplicateVariante(@PathVariable Long id,
-                                      @PathVariable Long varianteId) {
+                                     @PathVariable Long varianteId) {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
