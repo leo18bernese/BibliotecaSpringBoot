@@ -40,7 +40,7 @@ jobs:
       run: |
         cd frontend  # se il frontend è in sottocartella
         npm ci --legacy-peer-deps
-        npm run build
+        CI=false npm run build
         
     # 6. Pulisci la VPS da deployment precedenti
     - name: 🧹 Clean previous deployment
