@@ -50,7 +50,7 @@ public class UtenteService implements UserDetailsService {
         utente.setPassword(passwordEncoder.encode(utente.getPassword()));
 
         // Add ROLE_USER
-        utente.addRuolo("ROLE_ADMIN");
+        //utente.addRuolo("ROLE_ADMIN");
 
         return utenteRepository.save(utente);
     }

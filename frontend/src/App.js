@@ -45,6 +45,9 @@ import {WishlistProvider} from "./components/libri/wishlist/WishlistContext";
 import AdminBookVariant from "./components/admin/book/AdminBookVariant";
 import Security from "./components/user/pages/Security";
 import AdminHome from "./components/admin/AdminHome";
+import AdminHomeBook from "./components/admin/book/AdminBookHome";
+import AdminBookHome from "./components/admin/book/AdminBookHome";
+import AdminUserHome from "./components/admin/user/AdminUserHome";
 
 const queryClient = new QueryClient();
 
@@ -103,12 +106,15 @@ function App() {
                                             <Route path="/admin/reso/:id" element={<AdminReso/>}/>
                                             <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
 
+                                            <Route path="/admin/book" element={<AdminBookHome/>}/>
                                             <Route path="/admin/book/:id" element={<AdminBookOverview/>}/>
                                             <Route path="/admin/book/:id/edit" element={<AdminBook/>}/>
                                             <Route path="/admin/book/:id/images" element={<AdminBookImages/>}/>
                                             <Route path="/admin/book/:id/inventory" element={<AdminBookInventory/>}/>
                                             <Route path="/admin/book/:id/inventory/variante/:varianteId"
                                                    element={<AdminBookVariant/>}/>
+
+                                            <Route path="/admin/users" element={<AdminUserHome />}/>
 
 
                                         </Route>

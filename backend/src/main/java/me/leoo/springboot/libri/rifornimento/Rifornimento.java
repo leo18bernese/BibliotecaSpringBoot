@@ -66,6 +66,10 @@ public class Rifornimento implements Cloneable {
         return this.quantita >= quantita;
     }
 
+    public boolean isEsaurito() {
+        return this.quantita <= 0;
+    }
+
     // Status
     public String getStatus() {
         int disponibili = quantita;

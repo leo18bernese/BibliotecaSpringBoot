@@ -130,9 +130,7 @@ public class Libro {
         // Usa la variante più economica per la risposta lite da usare in home page
         Variante variante = getLowestVariant();
 
-        if (variante == null) {
-            throw new IllegalStateException("Il libro deve avere almeno una variante");
-        }
+        if (variante == null) return null;
 
         return new LibroController.LiteBookResponse(
                 this.id,
@@ -165,12 +163,14 @@ public class Libro {
                 .orElse(0.0);
     }
 
-    @JsonIgnore
     public Variante getLowestVariant() {
         return varianti.stream()
-                .min(Comparator.comparing(v -> v.getPrezzo().getPrezzoTotale()))
-                .orElse(null);
+                .sorted(Comparator.comparing(v -> v.getPrezzo().getPrezzoTotale()))
+                .filter(v -> !v.getRifornimento().isEsaurito())
+                .findFirst()
+                .orElse(varianti.get(0));
     }
+
 
     @JsonIgnore
     public Variante getVarianteStandard() {
