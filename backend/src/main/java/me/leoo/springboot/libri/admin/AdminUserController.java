@@ -3,13 +3,11 @@ package me.leoo.springboot.libri.admin;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
+import me.leoo.springboot.libri.utente.UtenteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +18,7 @@ import java.util.stream.Collectors;
 public class AdminUserController {
 
     private final UtenteRepository utenteRepository;
+    private final UtenteService utenteService;
 
     public record UserResponse(Long id, String name, String email,
                                Set<String> roles, int cartItems, int wishlistItems,
@@ -50,9 +49,11 @@ public class AdminUserController {
                                               @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Utente> libros = utenteRepository.findAll(pageable);
+        Page<Utente> utenti = utenteRepository.findAll(pageable);
 
-        return libros.stream()
+        System.out.println(utenti.getContent());
+
+        return utenti.stream()
                 .map(l -> new UserResponse(
                         l.getId(),
                         l.getUsername(),
@@ -66,8 +67,10 @@ public class AdminUserController {
     }
 
     @GetMapping("/{id}")
-    public DetailedUserResponse getUserById(@RequestParam Long id) {
-        Utente l = utenteRepository.findById(id).orElseThrow();
+    public DetailedUserResponse getUserById(@PathVariable Long id) {
+        Utente l = utenteService.getUtenteById(id);
+
+        System.out.println("indirizzi: " + l);
 
         Set<AddressResponse> addresses = l.getIndirizzi() != null ? l.getIndirizzi().stream()
                 .map(a -> new AddressResponse(

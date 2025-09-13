@@ -45,9 +45,9 @@ const AdminBar = () => {
                     </li>
 
                     {renderMenuItem("/admin/book", "Manage Books", 'bxr bxs-book')}
-                    {renderMenuItem("/admin/orders", "Manage Orders", 'bxr bxs-cart')}
-                    {renderMenuItem("/admin/returns", "Manage Returns", 'bxr bxs-package')}
-                    {renderMenuItem("/admin/users", "Manage Users", 'bxr bxs-user')}
+                    {renderMenuItem("/admin/order", "Manage Orders", 'bxr bxs-cart')}
+                    {renderMenuItem("/admin/reso", "Manage Returns", 'bxr bxs-package')}
+                    {renderMenuItem("/admin/user", "Manage Users", 'bxr bxs-user')}
                 </ul>
             </div>
 

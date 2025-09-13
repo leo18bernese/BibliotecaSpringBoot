@@ -45,6 +45,7 @@ const AdminUserHome = () => {
 
                 <tbody>
                 {users.map((user) => (
+                    console.log(user),
                     <tr key={user.id} className="hover:bg-gray-100">
                         <td className="py-2 px-4 border-b border-gray-200">{user.id}</td>
                         <td className="py-2 px-4 border-b border-gray-200">{user.name}</td>

@@ -48,6 +48,7 @@ import AdminHome from "./components/admin/AdminHome";
 import AdminHomeBook from "./components/admin/book/AdminBookHome";
 import AdminBookHome from "./components/admin/book/AdminBookHome";
 import AdminUserHome from "./components/admin/user/AdminUserHome";
+import AdminUser from "./components/admin/user/AdminUser";
 
 const queryClient = new QueryClient();
 
@@ -114,7 +115,8 @@ function App() {
                                             <Route path="/admin/book/:id/inventory/variante/:varianteId"
                                                    element={<AdminBookVariant/>}/>
 
-                                            <Route path="/admin/users" element={<AdminUserHome />}/>
+                                            <Route path="/admin/user" element={<AdminUserHome/>}/>
+                                            <Route path="/admin/user/:id" element={<AdminUser/>}/>
 
 
                                         </Route>
