@@ -6,6 +6,7 @@ import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.utente.Utente;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class CarrelloService {
     private LibroRepository libroRepository;
 
     @Transactional(readOnly = false)
+    @NotNull
     public Carrello getCarrelloByUtente(Utente utente) {
         return carrelloRepository.findByUtente(utente)
                 .orElseGet(() -> {

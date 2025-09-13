@@ -1,6 +1,8 @@
 package me.leoo.springboot.libri.admin;
 
 import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.carrello.Carrello;
+import me.leoo.springboot.libri.carrello.CarrelloService;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import me.leoo.springboot.libri.utente.UtenteService;
@@ -19,6 +21,7 @@ public class AdminUserController {
 
     private final UtenteRepository utenteRepository;
     private final UtenteService utenteService;
+    private final CarrelloService carrelloService;
 
     public record UserResponse(Long id, String name, String email,
                                Set<String> roles, int cartItems, int wishlistItems,
@@ -52,17 +55,21 @@ public class AdminUserController {
         Page<Utente> utenti = utenteRepository.findAll(pageable);
 
         System.out.println(utenti.getContent());
-
         return utenti.stream()
-                .map(l -> new UserResponse(
-                        l.getId(),
-                        l.getUsername(),
-                        l.getEmail(),
-                        l.getRuoli(),
-                        l.getCarrello() != null ? l.getCarrello().getItems().size() : 0,
-                        l.getWishlist() != null ? l.getWishlist().size() : 0,
-                        l.getIndirizzi() != null ? l.getIndirizzi().size() : 0
-                ))
+                .map(l -> {
+
+                    Carrello carrello = carrelloService.getCarrelloByUtente(l);
+
+                    return new UserResponse(
+                            l.getId(),
+                            l.getUsername(),
+                            l.getEmail(),
+                            l.getRuoli(),
+                            carrello.getItems().size(),
+                            l.getWishlist() != null ? l.getWishlist().size() : 0,
+                            l.getIndirizzi() != null ? l.getIndirizzi().size() : 0
+                    );
+                })
                 .collect(Collectors.toSet());
     }
 
@@ -70,7 +77,7 @@ public class AdminUserController {
     public DetailedUserResponse getUserById(@PathVariable Long id) {
         Utente l = utenteService.getUtenteById(id);
 
-        System.out.println("indirizzi: " + l);
+        Carrello carrello = carrelloService.getCarrelloByUtente(l);
 
         Set<AddressResponse> addresses = l.getIndirizzi() != null ? l.getIndirizzi().stream()
                 .map(a -> new AddressResponse(
@@ -81,12 +88,12 @@ public class AdminUserController {
                         a.getProvincia()
                 )).collect(Collectors.toSet()) : Set.of();
 
-        Set<CartItemResponse> cartItems = l.getCarrello() != null ? l.getCarrello().getItems().stream()
-                .map(i -> new CartItemResponse(
-                        i.getLibro().getId(),
-                        i.getLibro().getTitolo(),
-                        i.getQuantita()
-                )).collect(Collectors.toSet()) : Set.of();
+        Set<CartItemResponse> cartItems = carrello.getItems().stream()
+                        .map(i -> new CartItemResponse(
+                                i.getLibro().getId(),
+                                i.getLibro().getTitolo(),
+                                i.getQuantita()
+                        )).collect(Collectors.toSet());
 
         Set<WishlistItemResponse> wishlistItems = l.getWishlist() != null ? l.getWishlist().stream()
                 .map(w -> new WishlistItemResponse(
