@@ -49,7 +49,7 @@ const AdminUser = () => {
                     <p><strong>ID:</strong> {id}</p>
                     <p><strong>Name:</strong> {name}</p>
                     <p><strong>Email:</strong> {email}</p>
-                    <p><strong>Roles:</strong> {roles.join(', ')}</p>
+                    <p><strong>Roles:</strong> {roles.length > 0 ? roles.join(', ') : '/'}</p>
                 </div>
             </div>
 
