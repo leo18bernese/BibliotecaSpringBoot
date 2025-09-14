@@ -4,6 +4,8 @@ import {useQuery, useQueryClient} from "@tanstack/react-query";
 import React from "react";
 import {usePageTitle} from "../../utils/usePageTitle";
 import ButtonField from "./fields/ButtonField";
+import BookChart from "./chart/BookChart";
+import ImpressionChart from "./chart/ImpressionChart";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -115,8 +117,13 @@ const AdminBookOverview = () => {
 
                     </div>
 
-
+                    <div className="mt-8">
+                        <BookChart/>
+                        <ImpressionChart bookId={id}/>
+                    </div>
                 </div>
+
+
 
                 <div>
                     <button

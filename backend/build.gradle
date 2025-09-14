@@ -51,6 +51,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation("com.itextpdf:itextpdf:5.5.13.4")
 }
 
 tasks.named('test') {

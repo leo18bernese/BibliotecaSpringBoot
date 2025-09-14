@@ -1,5 +1,5 @@
 // src/components/BookInfo.js
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ImageGallery from "../images/ImageGallery";
@@ -83,6 +83,8 @@ const BookInfo = () => {
     const params = new URLSearchParams(location.search);
     const focusReview = params.get("focusReview");
 
+    const viewTracked = useRef(false);
+
     const [quantityToAdd, setQuantityToAdd] = useState(1);
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
@@ -122,6 +124,14 @@ const BookInfo = () => {
         queryFn: () => fetchHasWishlisted(bookId, selectedVariant?.id),
         enabled: !!user && !!selectedVariant,
     });
+
+    //Book viewed tracking
+    useEffect(() => {
+        if (bookId && user && !viewTracked.current) {
+            addViewedBook(bookId, user.id);
+            viewTracked.current = true;
+        }
+    }, [bookId, user]);
 
     // Set default variant when book data is loaded
     useEffect(() => {
@@ -215,6 +225,19 @@ const BookInfo = () => {
             quantity: quantity,
         });
     }
+
+    const addViewedBook = async (productId) => {
+        try {
+            await axios.post('http://localhost:8080/api/impressions/event', {
+                type: 'VIEW',
+                productId: productId,
+                userId:  user ? user.id : null,
+            });
+            console.log(`Visualizzazione tracciata con successo per il prodotto: ${productId}`);
+        } catch (error) {
+            console.error(`Errore nel tracciamento della visualizzazione per il prodotto: ${productId}`, error);
+        }
+    };
 
     const isLoading = isBookLoading || areImagesLoading || areReviewsLoading;
 

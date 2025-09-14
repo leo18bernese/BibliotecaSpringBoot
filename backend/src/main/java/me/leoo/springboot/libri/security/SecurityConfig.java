@@ -38,7 +38,7 @@ public class SecurityConfig {
                         // Endpoints che richiedono autenticazione
                         .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/buono/**", "/api/ordini/**", "/api/resi/**", "/api/wishlist/**").authenticated()
                         // Endpoints per gli amministratori
-                        .requestMatchers("/api/admin/**", "/api/rifornimento").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/api/rifornimento", "/api/impressions").hasRole("ADMIN")
                         // Proteggi tutti gli altri endpoint per default
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

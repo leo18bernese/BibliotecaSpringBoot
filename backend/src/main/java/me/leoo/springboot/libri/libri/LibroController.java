@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.libri;
 
+import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.carrello.CarrelloService;
@@ -10,17 +11,20 @@ import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
 import me.leoo.springboot.libri.libri.search.SearchService;
+import me.leoo.springboot.libri.libri.utils.PdfGeneratorService;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
 import me.leoo.springboot.libri.utils.Sconto;
-import org.aspectj.weaver.ast.Var;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +39,7 @@ public class LibroController {
     private final AutoreRepository autoreRepository;
     private final AutoreService autoreService;
     private final CarrelloService carrelloService;
+    private final PdfGeneratorService pdfGeneratorService;
 
     // DTO per le risposte
     public record GoogleResponse(Long libroId, String titolo, String autore, double prezzo, String valuta,
@@ -228,10 +233,9 @@ public class LibroController {
     }
 
 
-
     @PostMapping("/{id}/variante/{varianteId}/duplicate")
     public Variante duplicateVariante(@PathVariable Long id,
-                                     @PathVariable Long varianteId) {
+                                      @PathVariable Long varianteId) {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
@@ -251,7 +255,7 @@ public class LibroController {
 
     @DeleteMapping("/{id}/variante/{varianteId}")
     public void deleteVariante(@PathVariable Long id,
-                                 @PathVariable Long varianteId) {
+                               @PathVariable Long varianteId) {
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro non trovato"));
 
@@ -399,5 +403,33 @@ public class LibroController {
             return Sort.by(Sort.Direction.DESC, "prezzo");
         }
         return Sort.by(Sort.Direction.DESC, "id");
+    }
+
+    // Utils
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> generateBookReport(@PathVariable Long id) {
+        // 1. Recupera il libro dal database
+        Libro book = libroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Libro non trovato con ID: " + id));
+
+        try {
+            // 2. Genera il PDF con i dati del libro
+            byte[] pdfBytes = pdfGeneratorService.generateBookReportPdf(book);
+
+            // 3. Imposta le intestazioni per il download del PDF
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            String filename = "report-" + book.getTitolo().replaceAll(" ", "_") + ".pdf";
+            headers.setContentDispositionFormData("attachment", filename);
+
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

@@ -49,6 +49,7 @@ import AdminHomeBook from "./components/admin/book/AdminBookHome";
 import AdminBookHome from "./components/admin/book/AdminBookHome";
 import AdminUserHome from "./components/admin/user/AdminUserHome";
 import AdminUser from "./components/admin/user/AdminUser";
+import BookPdfDownloader from "./components/admin/book/pdf/BookPdfDownloader";
 
 const queryClient = new QueryClient();
 
@@ -71,8 +72,9 @@ function App() {
 
                                     <Route path="/book/:id" element={<BookInfo/>}/>
                                     <Route path="/libri/:id" element={<RedirectToBook/>}/>
-                                    <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
                                     <Route path="/libro/:id" element={<RedirectToBook/>}/>
+                                    <Route path="/book/:id/pdf" element={<BookPdfDownloader/>}/>
+                                    <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
 
                                     <Route path="/ordine/:id" element={<Ordine/>}/>
                                     <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>

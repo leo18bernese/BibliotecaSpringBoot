@@ -1,38 +1,66 @@
 import LiteBook from "./lite/LiteBook";
-import React from "react";
+import React, {useContext, useEffect} from "react";
+import axios from "axios";
+import {UserContext} from "../user/UserContext";
 
 function BookDisplay({idList, contentList, isLoading, error}) {
-
     const list = idList || contentList;
+    const {user} = useContext(UserContext);
+    console.log("User context in BookDisplay:", user);
 
-    console.log("bookkkks", list);
+    // Simulate impression tracking on component mount
+    useEffect(() => {
+        if (idList) {
+            idList.forEach(productId => {
+                trackImpression(productId);
+            });
+        } else if (contentList) {
+            contentList.forEach(book => {
+                trackImpression(book.id);
+            });
+        }
+    }, [idList, contentList]);
 
-    return <div
-        className="homepage-items grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 p-10">
+    const trackImpression = async (productId) => {
+        try {
+            await axios.post('http://localhost:8080/api/impressions/event', {
+                type: 'IMPRESSION',
+                productId: productId,
+                userId:  user ? user.id : null,
+            });
+            console.log(`Impressione tracciata con successo per il prodotto: ${productId}`);
+        } catch (error) {
+            console.error(`Errore nel tracciamento dell'impressione per il prodotto: ${productId}`, error);
+        }
+    };
 
-        {(isLoading || !list) ? (
-            <p>Loading...</p>
+    if (isLoading || !list) {
+        return <p>Loading...</p>;
+    }
 
-        ) : error ? (
-            <p>Error loading items: {error.message}</p>
+    if (error) {
+        return <p>Error loading items: {error.message}</p>;
+    }
 
-        ) : list.length === 0 ? (
-            <p>Nessun libro trovato.</p>
+    if (list.length === 0) {
+        return <p>Nessun libro trovato.</p>;
+    }
 
-        ) : idList ? (
-            idList.map(item => (
-                <LiteBook bookID={item} key={item}/>
-            ))
-
-        ) : contentList ? (
-            contentList.map(item => (
-                <LiteBook book={item} key={item}/>
-            ))
-
-        ) : (
-            <p>Invalid data format.</p>
-        )}
-    </div>
+    return (
+        <div className="homepage-items grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 p-10">
+            {idList ? (
+                idList.map(id => (
+                    <LiteBook bookID={id} key={id} />
+                ))
+            ) : contentList ? (
+                contentList.map(book => (
+                    <LiteBook book={book} key={book.id} />
+                ))
+            ) : (
+                <p>Formato dati non valido.</p>
+            )}
+        </div>
+    );
 }
 
 export default BookDisplay;
