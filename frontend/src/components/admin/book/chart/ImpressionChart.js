@@ -79,8 +79,14 @@ const ImpressionChart = ({ bookId }) => {
 
     const chartData = useMemo(() => {
         const dataPoints = periods[period];
+        const startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+        startDate.setDate(startDate.getDate() - dataPoints);
 
-        const filterDataByPeriod = (data) => data.slice(-(dataPoints || data.length));
+        const filterDataByPeriod = (data) => {
+            if (!dataPoints) return data;
+            return data.filter(item => new Date(item.date) >= startDate);
+        };
 
         const filteredViews = filterDataByPeriod(fullData.views);
         const filteredImpressions = filterDataByPeriod(fullData.impressions);

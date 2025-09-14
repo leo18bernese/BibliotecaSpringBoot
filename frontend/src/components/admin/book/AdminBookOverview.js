@@ -118,7 +118,6 @@ const AdminBookOverview = () => {
                     </div>
 
                     <div className="mt-8">
-                        <BookChart/>
                         <ImpressionChart bookId={id}/>
                     </div>
                 </div>
