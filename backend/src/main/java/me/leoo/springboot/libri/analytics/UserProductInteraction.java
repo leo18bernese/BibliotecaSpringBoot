@@ -37,4 +37,20 @@ public class UserProductInteraction {
         counts.put(eventType, counts.getOrDefault(eventType, 0) + 1);
         events.add(new InteractionEvent(eventType, timestamp));
     }
+
+    public int countUniqueEvents(InteractionEnum eventType, long intervalMillis) {
+        events.sort(Comparator.comparing(InteractionEvent::timestamp));
+
+        int uniqueCount = 0;
+        Date lastCounted = null;
+        for (InteractionEvent event : events) {
+            if (event.type() == eventType) {
+                if (lastCounted == null || event.timestamp().getTime() - lastCounted.getTime() >= intervalMillis) {
+                    uniqueCount++;
+                    lastCounted = event.timestamp();
+                }
+            }
+        }
+        return uniqueCount;
+    }
 }

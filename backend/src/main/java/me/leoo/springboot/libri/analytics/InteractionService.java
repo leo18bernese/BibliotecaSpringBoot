@@ -3,7 +3,9 @@ package me.leoo.springboot.libri.analytics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,4 +23,6 @@ public class InteractionService {
         interaction.addInteraction(eventType, new Date());
         interactionRepository.save(interaction);
     }
+
+
 }

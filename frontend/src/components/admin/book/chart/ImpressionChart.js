@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -10,7 +10,7 @@ import {
     Legend,
     TimeScale
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import {Line} from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import axios from "axios";
 
@@ -33,9 +33,11 @@ const periods = {
     '12m': 365,
 };
 
-const ImpressionChart = ({ bookId }) => {
+const ImpressionChart = ({bookId}) => {
     const [period, setPeriod] = useState('1m');
-    const [fullData, setFullData] = useState({ views: [], impressions: [] });
+    const [fullData, setFullData] = useState({views: [], impressions: []});
+    const [allUnique, setAllUnique] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -44,7 +46,8 @@ const ImpressionChart = ({ bookId }) => {
             if (!bookId) return;
             setLoading(true);
             try {
-                const { data } = await axios.get(`/api/impressions/all/${bookId}`);
+                const {data} = await axios.get(`/api/impressions/all/${bookId}`);
+                const {data: uniqueData} = await axios.get(`/api/impressions/unique/${bookId}`);
 
                 const allEvents = data.flatMap(item => item.events || []);
 
@@ -65,7 +68,12 @@ const ImpressionChart = ({ bookId }) => {
                 const aggregatedViews = aggregateEvents(allEvents, 'VIEW');
                 const aggregatedImpressions = aggregateEvents(allEvents, 'IMPRESSION');
 
-                setFullData({ views: aggregatedViews, impressions: aggregatedImpressions });
+
+                setFullData({views: aggregatedViews, impressions: aggregatedImpressions});
+                setAllUnique(uniqueData);
+
+                console.log("Aggregated Views:", aggregatedViews);
+                console.log("Unique Data:", uniqueData);
             } catch (e) {
                 setError(e.message);
                 console.error("Failed to fetch impressions:", e);
@@ -162,16 +170,30 @@ const ImpressionChart = ({ bookId }) => {
     if (error) return <div>Errore nel caricamento dei dati: {error}</div>;
 
     return (
-        <div style={{ width: '90%', margin: 'auto' }}>
-            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{width: '90%', margin: 'auto'}}>
+            <div style={{marginBottom: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <strong>Periodo:</strong>
                 {Object.keys(periods).map(p => (
-                    <button key={p} onClick={() => setPeriod(p)} style={{ marginLeft: '5px', fontWeight: period === p ? 'bold' : 'normal' }}>
+                    <button key={p} onClick={() => setPeriod(p)}
+                            style={{marginLeft: '5px', fontWeight: period === p ? 'bold' : 'normal'}}>
                         {p.toUpperCase()}
                     </button>
                 ))}
             </div>
-            <Line options={options} data={chartData} />
+
+            <Line options={options} data={chartData}/>
+
+            <div style={{marginTop: '30px', textAlign: 'center'}}>
+                <h3>Eventi Unici</h3>
+                <ul style={{listStyle: 'none', padding: 0}}>
+                    {Object.entries(allUnique).map(([key, value]) => (
+                        <li key={key} style={{margin: '8px 0'}}>
+                            <strong>{key.replace(/_/g, ' ')}:</strong> {value}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
         </div>
     );
 };
