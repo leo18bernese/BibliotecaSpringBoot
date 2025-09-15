@@ -6,6 +6,7 @@ import {usePageTitle} from "../../utils/usePageTitle";
 import ButtonField from "./fields/ButtonField";
 import BookChart from "./chart/BookChart";
 import ImpressionChart from "./chart/ImpressionChart";
+import AnalyticsOverview from "./chart/Analytics";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -119,6 +120,10 @@ const AdminBookOverview = () => {
 
                     <div className="mt-8">
                         <ImpressionChart bookId={id}/>
+                    </div>
+
+                    <div className="mt-8">
+                        <AnalyticsOverview  productId={id}/>
                     </div>
                 </div>
 

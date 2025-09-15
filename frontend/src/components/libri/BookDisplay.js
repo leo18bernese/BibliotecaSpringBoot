@@ -23,10 +23,11 @@ function BookDisplay({idList, contentList, isLoading, error}) {
 
     const trackImpression = async (productId) => {
         try {
-            await axios.post('http://localhost:8080/api/impressions/event', {
-                type: 'IMPRESSION',
-                productId: productId,
-                userId:  user ? user.id : null,
+            await axios.post('http://localhost:8080/api/analytics/events', null, {
+                params: {
+                    productId: productId,
+                    eventType: 'IMPRESSION',
+                }
             });
             console.log(`Impressione tracciata con successo per il prodotto: ${productId}`);
         } catch (error) {

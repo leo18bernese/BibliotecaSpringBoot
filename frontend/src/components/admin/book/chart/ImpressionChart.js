@@ -46,8 +46,8 @@ const ImpressionChart = ({bookId}) => {
             if (!bookId) return;
             setLoading(true);
             try {
-                const {data} = await axios.get(`/api/impressions/all/${bookId}`);
-                const {data: uniqueData} = await axios.get(`/api/impressions/unique/${bookId}`);
+                const {data} = await axios.get(`/api/analytics/all/${bookId}`);
+                const {data: uniqueData} = await axios.get(`/api/analytics/unique/${bookId}`);
 
                 const allEvents = data.flatMap(item => item.events || []);
 
