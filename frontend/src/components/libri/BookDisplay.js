@@ -23,12 +23,11 @@ function BookDisplay({idList, contentList, isLoading, error}) {
 
     const trackImpression = async (productId) => {
         try {
-            await axios.post('http://localhost:8080/api/analytics/events', null, {
-                params: {
-                    productId: productId,
-                    eventType: 'IMPRESSION',
-                }
-            });
+            const formData = new FormData();
+            formData.append('productId', productId);
+            formData.append('eventType', 'IMPRESSION');
+
+            await axios.post('http://localhost:8080/api/analytics/events', formData);
             console.log(`Impressione tracciata con successo per il prodotto: ${productId}`);
         } catch (error) {
             console.error(`Errore nel tracciamento dell'impressione per il prodotto: ${productId}`, error);
@@ -51,11 +50,11 @@ function BookDisplay({idList, contentList, isLoading, error}) {
         <div className="homepage-items grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 p-10">
             {idList ? (
                 idList.map(id => (
-                    <LiteBook bookID={id} key={id} />
+                    <LiteBook bookID={id} key={id}/>
                 ))
             ) : contentList ? (
                 contentList.map(book => (
-                    <LiteBook book={book} key={book.id} />
+                    <LiteBook book={book} key={book.id}/>
                 ))
             ) : (
                 <p>Formato dati non valido.</p>

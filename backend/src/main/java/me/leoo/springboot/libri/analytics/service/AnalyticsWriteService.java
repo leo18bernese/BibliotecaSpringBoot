@@ -26,7 +26,7 @@ public class AnalyticsWriteService {
         // Incrementa tutti i livelli di aggregazione in parallelo
         CompletableFuture.allOf(
             CompletableFuture.runAsync(() ->
-                incrementMetric("analytics_15min", productId, eventType, roundTo15Min(timestamp))),
+                incrementMetric("analytics_20min", productId, eventType, roundTo20Min(timestamp))),
             CompletableFuture.runAsync(() -> 
                 incrementMetric("analytics_hourly", productId, eventType, roundToHour(timestamp))),
             CompletableFuture.runAsync(() -> 
@@ -38,7 +38,7 @@ public class AnalyticsWriteService {
         // Batch insert per performance migliori
         events.forEach((eventType, count) -> {
             if (count > 0) {
-                incrementMetric("analytics_15min", productId, eventType, roundTo15Min(timestamp), count);
+                incrementMetric("analytics_20min", productId, eventType, roundTo20Min(timestamp), count);
                 incrementMetric("analytics_hourly", productId, eventType, roundToHour(timestamp), count);
                 incrementMetric("analytics_daily", productId, eventType, roundToDay(timestamp), count);
             }
@@ -55,12 +55,12 @@ public class AnalyticsWriteService {
                    .and("timeBucket").is(timeBucket)
         );
         
-        Update update = new Update().inc("metrics." + eventType.name(), count);
+        Update update = new Update().inc("counts." + eventType.name(), count);
         
         mongoTemplate.upsert(query, update, collection);
     }
 
-    private Date roundTo15Min(Date date) {
+    private Date roundTo20Min(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int minutes = cal.get(Calendar.MINUTE);

@@ -23,4 +23,6 @@ public interface AnalyticsDailyRepository extends MongoRepository<AnalyticsDaily
 
     @Query(value = "{ 'productId': ?0 }", sort = "{ 'timeBucket': -1 }")
     List<AnalyticsDaily> findByProductIdOrderByTimeBucketDesc(Long productId, Pageable pageable);
+
+    List<AnalyticsDaily> findByProductId(Long productId);
 }

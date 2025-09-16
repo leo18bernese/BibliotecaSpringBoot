@@ -27,6 +27,7 @@ public class AnalyticsController {
     public ResponseEntity<String> recordEvent(
             @RequestParam Long productId,
             @RequestParam InteractionEnum eventType) {
+        System.out.println("Recording event: " + eventType + " for productId: " + productId);
         writeService.recordEvent(productId, eventType, new Date());
         return ResponseEntity.ok("Event recorded");
     }
@@ -39,14 +40,16 @@ public class AnalyticsController {
     }
 
     // Time series data
-    @GetMapping("/products/{productId}/timeseries")
+    @GetMapping("/products/{productId}/timeseries/{metric}")
     public ResponseEntity<List<TimeSeriesPointDTO>> getTimeSeries(
             @PathVariable Long productId,
-            @RequestParam InteractionEnum metric,
+            @PathVariable InteractionEnum metric,
             @RequestParam(defaultValue = "7d") String period,
-            @RequestParam(defaultValue = "daily") String resolution) {
+            @RequestParam(defaultValue = "hourly") String resolution) {
         
-        List<TimeSeriesPointDTO> data = queryService.getTimeSeriesData(productId, metric, period, resolution);
+        List<TimeSeriesPointDTO> data = queryService.getTimeSeriesData(productId, metric,
+                period, resolution);
+
         return ResponseEntity.ok(data);
     }
 

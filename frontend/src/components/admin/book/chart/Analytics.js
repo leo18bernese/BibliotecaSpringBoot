@@ -7,7 +7,7 @@ const AnalyticsOverview = ({ productId }) => {
 
     useEffect(() => {
         axios
-            .get(`/api/analytics/products/${productId}/overview`)
+            .get(`/api/analytics/products/${productId}/timeseries/IMPRESSION`)
             .then((res) => {
                 setOverview(res.data);
                 setLoading(false);

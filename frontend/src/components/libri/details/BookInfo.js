@@ -228,10 +228,12 @@ const BookInfo = () => {
 
     const addViewedBook = async (productId) => {
         try {
-            await axios.post('http://localhost:8080/api/analytics/events', {
-                productId: productId,
-                eventType: 'VIEW',
-            });
+            const formData = new FormData();
+            formData.append('productId', productId);
+            formData.append('eventType', 'VIEW');
+
+            await axios.post('http://localhost:8080/api/analytics/events', formData);
+
             console.log(`Visualizzazione tracciata con successo per il prodotto: ${productId}`);
         } catch (error) {
             console.error(`Errore nel tracciamento della visualizzazione per il prodotto: ${productId}`, error);
