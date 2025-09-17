@@ -20,7 +20,7 @@ const AdminBar = () => {
     );
 
     return (
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row  ">
 
             <button
                 className="md:hidden w-full  bg-red-500 text-white p-2 rounded"
@@ -30,7 +30,7 @@ const AdminBar = () => {
             </button>
 
             <div className={`admin-bar bg-red-500 text-red-100 pl-2 pt-4 pr-20 w-64 fixed top-0 left-0 z-30 transition-transform duration-300
-                ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:static md:translate-x-0 md:w-3/12 h-screen overflow-y-auto`}>
+                ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:static md:translate-x-0 md:w-3/12 `}>
 
                 <h3 className="text-2xl font-semibold">Admin Panel</h3>
                 <div className="border-t border-red-200 my-2"></div>

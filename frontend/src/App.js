@@ -50,6 +50,7 @@ import AdminBookHome from "./components/admin/book/AdminBookHome";
 import AdminUserHome from "./components/admin/user/AdminUserHome";
 import AdminUser from "./components/admin/user/AdminUser";
 import BookPdfDownloader from "./components/admin/book/pdf/BookPdfDownloader";
+import NotFound from "./components/utils/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -65,73 +66,83 @@ function App() {
                                 <ScrollToTop/>
 
                                 <Toaster position="top-center" reverseOrder={false}/>
-                                <NavBar/>
-                                <Routes>
-                                    <Route path="/" element={<Home/>}/>
-                                    <Route path="/ricerca" element={<SearchPage/>}/>
 
-                                    <Route path="/book/:id" element={<BookInfo/>}/>
-                                    <Route path="/libri/:id" element={<RedirectToBook/>}/>
-                                    <Route path="/libro/:id" element={<RedirectToBook/>}/>
-                                    <Route path="/book/:id/pdf" element={<BookPdfDownloader/>}/>
-                                    <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+                                <div className="flex flex-col min-h-screen">
+                                    <NavBar/>
 
-                                    <Route path="/ordine/:id" element={<Ordine/>}/>
-                                    <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+                                    <main className="flex-1 flex flex-col">
 
-                                    <Route element={<ProtectedRoute/>}>
-                                        <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
-                                        <Route path="/ordine/:id" element={<Ordine/>}/>
-                                        <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
-                                        <Route path="/reso/:id" element={<Reso/>}/>
-                                        <Route path="/reso/:id/chat" element={<ResoChat/>}/>
+                                        <Routes>
+                                            <Route path="/" element={<Home/>}/>
+                                            <Route path="/ricerca" element={<SearchPage/>}/>
 
+                                            <Route path="/book/:id" element={<BookInfo/>}/>
+                                            <Route path="/libri/:id" element={<RedirectToBook/>}/>
+                                            <Route path="/libro/:id" element={<RedirectToBook/>}/>
+                                            <Route path="/book/:id/pdf" element={<BookPdfDownloader/>}/>
+                                            <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
 
-                                        <Route path="/account/*" element={<AccountInfo/>}>
-                                            <Route index element={<Navigate to="personal-details" replace/>}/>
-                                            <Route path="personal-details" element={<PersonalDetails/>}/>
-                                            <Route path="orders" element={<OrderHistory/>}/>
-                                            <Route path="reviews" element={<ReviewHistory/>}/>
-                                            <Route path="wishlist" element={<Wishlist/>}/>
-                                            <Route path="shipping" element={<Shipping/>}/>
-                                            <Route path="returns" element={<ReturnsHistory/>}/>
-                                            <Route path="security" element={<Security/>}/>
-                                        </Route>
+                                            <Route path="/ordine/:id" element={<Ordine/>}/>
+                                            <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+
+                                            <Route element={<ProtectedRoute/>}>
+                                                <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+                                                <Route path="/ordine/:id" element={<Ordine/>}/>
+                                                <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+                                                <Route path="/reso/:id" element={<Reso/>}/>
+                                                <Route path="/reso/:id/chat" element={<ResoChat/>}/>
 
 
-                                    </Route>
-
-                                    <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN"/>}>
-                                        <Route element={<AdminBar/>}>
-
-                                            <Route path="/admin" element={<AdminHome/>}/>
-
-                                            <Route path="/admin/reso/:id" element={<AdminReso/>}/>
-                                            <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
-
-                                            <Route path="/admin/book" element={<AdminBookHome/>}/>
-                                            <Route path="/admin/book/:id" element={<AdminBookOverview/>}/>
-                                            <Route path="/admin/book/:id/edit" element={<AdminBook/>}/>
-                                            <Route path="/admin/book/:id/images" element={<AdminBookImages/>}/>
-                                            <Route path="/admin/book/:id/inventory" element={<AdminBookInventory/>}/>
-                                            <Route path="/admin/book/:id/inventory/variante/:varianteId"
-                                                   element={<AdminBookVariant/>}/>
-
-                                            <Route path="/admin/user" element={<AdminUserHome/>}/>
-                                            <Route path="/admin/user/:id" element={<AdminUser/>}/>
+                                                <Route path="/account/*" element={<AccountInfo/>}>
+                                                    <Route index element={<Navigate to="personal-details" replace/>}/>
+                                                    <Route path="personal-details" element={<PersonalDetails/>}/>
+                                                    <Route path="orders" element={<OrderHistory/>}/>
+                                                    <Route path="reviews" element={<ReviewHistory/>}/>
+                                                    <Route path="wishlist" element={<Wishlist/>}/>
+                                                    <Route path="shipping" element={<Shipping/>}/>
+                                                    <Route path="returns" element={<ReturnsHistory/>}/>
+                                                    <Route path="security" element={<Security/>}/>
+                                                </Route>
 
 
-                                        </Route>
-                                    </Route>
+                                            </Route>
+
+                                            <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN"/>}>
+                                                <Route element={<AdminBar/>}>
+
+                                                    <Route path="/admin" element={<AdminHome/>}/>
+
+                                                    <Route path="/admin/reso/:id" element={<AdminReso/>}/>
+                                                    <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
+
+                                                    <Route path="/admin/book" element={<AdminBookHome/>}/>
+                                                    <Route path="/admin/book/:id" element={<AdminBookOverview/>}/>
+                                                    <Route path="/admin/book/:id/edit" element={<AdminBook/>}/>
+                                                    <Route path="/admin/book/:id/images" element={<AdminBookImages/>}/>
+                                                    <Route path="/admin/book/:id/inventory"
+                                                           element={<AdminBookInventory/>}/>
+                                                    <Route path="/admin/book/:id/inventory/variante/:varianteId"
+                                                           element={<AdminBookVariant/>}/>
+
+                                                    <Route path="/admin/user" element={<AdminUserHome/>}/>
+                                                    <Route path="/admin/user/:id" element={<AdminUser/>}/>
 
 
-                                    <Route path="/cart" element={<Carrello/>}/>
-                                    <Route path="/checkout" element={<CheckOut/>}/>
+                                                </Route>
+                                            </Route>
 
-                                    <Route path="/login" element={<Login/>}/>
-                                    <Route path="/register" element={<Register/>}/>
-                                    <Route path="/logout" element={<Logout/>}/>
-                                </Routes>
+
+                                            <Route path="/cart" element={<Carrello/>}/>
+                                            <Route path="/checkout" element={<CheckOut/>}/>
+
+                                            <Route path="/login" element={<Login/>}/>
+                                            <Route path="/register" element={<Register/>}/>
+                                            <Route path="/logout" element={<Logout/>}/>
+
+                                            <Route path="*" element={<NotFound/>}/>
+                                        </Routes>
+                                    </main>
+                                </div>
                             </WishlistProvider>
                         </CartProvider>
                     </UserProvider>

@@ -39,7 +39,7 @@ const NavBar = () => {
     };
 
     return (
-        <nav className="bg-gray-800 text-white shadow-md">
+        <nav className="bg-gray-800 text-white shadow-md ">
             <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                 {/* Left side - Navigation links */}
                 <ul className="flex space-x-2 list-none m-0 p-0">
