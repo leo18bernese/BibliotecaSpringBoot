@@ -540,6 +540,15 @@ const BookInfo = () => {
                                 </>
                             )}
                         </div>
+
+                        <div className="bg-white shadow-md rounded-lg p-4 mt-4">
+                            <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
+
+                            <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
+                                    onClick={() => navigate(`/admin/book/${book.id}`)}>
+                                Gestisci Libro
+                            </button>
+                        </div>
                     </div>
                 </div>
 
