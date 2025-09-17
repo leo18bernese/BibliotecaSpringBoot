@@ -45,7 +45,7 @@ public class AnalyticsController {
             @PathVariable Long productId,
             @PathVariable InteractionEnum metric,
             @RequestParam(defaultValue = "7d") String period,
-            @RequestParam(defaultValue = "hourly") String resolution) {
+            @RequestParam(defaultValue = "20min") String resolution) {
         
         List<TimeSeriesPointDTO> data = queryService.getTimeSeriesData(productId, metric,
                 period, resolution);
