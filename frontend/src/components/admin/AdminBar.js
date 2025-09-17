@@ -20,7 +20,7 @@ const AdminBar = () => {
     );
 
     return (
-        <div className="flex flex-col md:flex-row  ">
+        <div className="flex flex-col md:flex-row ">
 
             <button
                 className="md:hidden w-full  bg-red-500 text-white p-2 rounded"
