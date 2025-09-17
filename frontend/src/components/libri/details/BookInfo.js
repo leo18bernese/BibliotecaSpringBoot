@@ -12,6 +12,7 @@ import {useCartMutations} from "../../hook/useCartMutations";
 import {usePageTitle} from "../../utils/usePageTitle";
 import Varianti from "./Varianti";
 import RecensioneInfo from "../../recensioni/RecensioneInfo";
+import {useAnalyticsMutation} from "../../admin/book/chart/useAnalytics";
 
 const API_URL = '/api/images';
 
@@ -71,6 +72,7 @@ const BookInfo = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const {updateCartItemMutation} = useCartMutations();
+    const {addEventMutation} = useAnalyticsMutation();
 
     const bookId = Number.parseInt(id);
     const previousId = bookId - 1;
@@ -128,17 +130,10 @@ const BookInfo = () => {
     //Book viewed tracking
     useEffect(() => {
         if (bookId && user && !viewTracked.current) {
-            addViewedBook(bookId, user.id);
+            addViewedBook();
             viewTracked.current = true;
         }
     }, [bookId, user]);
-
-    // Set default variant when book data is loaded
-    useEffect(() => {
-        if (book && book.varianti && book.varianti.length > 0 && !selectedVariant) {
-            setSelectedVariant(book.varianti[0]);
-        }
-    }, [book]);
 
 
     useEffect(() => {
@@ -157,23 +152,6 @@ const BookInfo = () => {
         if (nextBookExists) {
             navigate(`/book/${nextId}`);
         }
-    };
-
-    const handleUpload = () => {
-        if (!file) {
-            console.error('No file selected for upload');
-            toast.error('Please upload a file');
-            return;
-        }
-        const formData = new FormData();
-        formData.append('file', file);
-        axios.post(`/api/images/${id}`, formData)
-            .then(response => {
-                console.log('File uploaded successfully:', response.data);
-            })
-            .catch(error => {
-                console.error('Error uploading file:', error);
-            });
     };
 
     const addToWishlist = async (bookId, variantId) => {
@@ -226,19 +204,19 @@ const BookInfo = () => {
         });
     }
 
-    const addViewedBook = async (productId) => {
-        try {
-            const formData = new FormData();
-            formData.append('productId', productId);
-            formData.append('eventType', 'VIEW');
-
-            await axios.post('http://localhost:8080/api/analytics/events', formData);
-
-            console.log(`Visualizzazione tracciata con successo per il prodotto: ${productId}`);
-        } catch (error) {
-            console.error(`Errore nel tracciamento della visualizzazione per il prodotto: ${productId}`, error);
-        }
+    const addViewedBook = async () => {
+        addEventMutation.mutate({
+            productId: bookId,
+            eventType: 'VIEW'
+        });
     };
+
+    const addViewedImage = async () => {
+        addEventMutation.mutate({
+            productId: bookId,
+            eventType: 'VIEW_IMAGE'
+        });
+    }
 
     const isLoading = isBookLoading || areImagesLoading || areReviewsLoading;
 
@@ -257,11 +235,12 @@ const BookInfo = () => {
     }, [areReviewsLoading, focusReview, isLoading]);
 
     const {pathname} = useLocation();
+
     useEffect(() => {
         if (book && book.varianti && book.varianti.length > 0 && !selectedVariant) {
             setSelectedVariant(book.varianti[0]);
         }
-    }, [book, pathname]);
+    }, [book]);
 
 
     // Modifica il tuo useEffect per i dati strutturati
@@ -278,7 +257,7 @@ const BookInfo = () => {
                 "@type": "Product",
                 "name": `${book.titolo} (${selectedVariant.nome})`, // Aggiungi il nome della variante al titolo
                 "image": '',
-                "description":  '',
+                "description": '',
                 "sku": selectedVariant.id, // Usa l'ID della variante come SKU
                 "offers": {
                     "@type": "Offer",
@@ -300,7 +279,7 @@ const BookInfo = () => {
                 "isbn": book.isbn
             };
 
-           // console.log("Generated product schema:", productSchema);
+            // console.log("Generated product schema:", productSchema);
             const script = document.createElement('script');
             script.type = 'application/ld+json';
             script.innerHTML = JSON.stringify(productSchema);
@@ -361,7 +340,8 @@ const BookInfo = () => {
                     <div className="flex flex-col md:w-2/6 ">
 
                         <div className=" ">
-                            <ImageGallery id={id} images={images} API_URL={API_URL}/>
+                            <ImageGallery id={id} images={images} API_URL={API_URL} onView={addViewedImage}/>
+
                         </div>
                     </div>
 
@@ -544,8 +524,9 @@ const BookInfo = () => {
                         <div className="bg-white shadow-md rounded-lg p-4 mt-4">
                             <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
 
-                            <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
-                                    onClick={() => navigate(`/admin/book/${book.id}`)}>
+                            <button
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
+                                onClick={() => navigate(`/admin/book/${book.id}`)}>
                                 Gestisci Libro
                             </button>
                         </div>
@@ -611,7 +592,8 @@ const BookInfo = () => {
                 )}
             </div>
         </>
-    );
+    )
+        ;
 };
 
 export default BookInfo;

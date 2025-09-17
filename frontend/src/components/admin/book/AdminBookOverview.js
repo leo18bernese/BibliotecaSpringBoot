@@ -119,14 +119,13 @@ const AdminBookOverview = () => {
                     </div>
 
                     <div className="mt-8">
-                        <ImpressionChart bookId={id}/>
+                        <ImpressionChart productId={id}/>
                     </div>
 
                     <div className="mt-8">
                         <AnalyticsOverview  productId={id}/>
                     </div>
                 </div>
-
 
 
                 <div>

@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, { useEffect, useState, useMemo } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -9,9 +9,9 @@ import {
     Tooltip,
     Legend,
     TimeScale
-} from 'chart.js';
-import {Line} from 'react-chartjs-2';
-import 'chartjs-adapter-date-fns';
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import "chartjs-adapter-date-fns";
 import axios from "axios";
 
 ChartJS.register(
@@ -33,57 +33,50 @@ const periods = {
     '12m': 365,
 };
 
-const ImpressionChart = ({bookId}) => {
-    const [period, setPeriod] = useState('1m');
-    const [fullData, setFullData] = useState({views: [], impressions: []});
-    const [allUnique, setAllUnique] = useState([]);
+const metrics = [
+    { key: "IMPRESSION", label: "Impressioni", color: "rgb(255, 99, 132)" },
+    { key: "VIEW", label: "Visualizzazioni", color: "rgb(54, 162, 235)" },
+    { key: "VIEW_IMAGE", label: "Visualizzazioni Immagine", color: "rgb(255, 206, 86)" }
+];
 
+const ImpressionChart = ({ productId }) => {
+    const [period, setPeriod] = useState('1m');
+    const [dataByMetric, setDataByMetric] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!bookId) return;
-            setLoading(true);
-            try {
-                const {data} = await axios.get(`/api/analytics/all/${bookId}`);
-                const {data: uniqueData} = await axios.get(`/api/analytics/unique/${bookId}`);
+        if (!productId) return;
+        setLoading(true);
+        setError(null);
 
-                const allEvents = data.flatMap(item => item.events || []);
-
-                const aggregateEvents = (events, type) => {
-                    const filteredEvents = events.filter(event => event.type === type);
-                    const countsByDate = filteredEvents.reduce((acc, event) => {
-                        const date = event.timestamp.split('T')[0];
-                        acc[date] = (acc[date] || 0) + 1;
-                        return acc;
-                    }, {});
-
-                    return Object.keys(countsByDate).map(date => ({
-                        date: date,
-                        count: countsByDate[date],
-                    })).sort((a, b) => new Date(a.date) - new Date(b.date));
-                };
-
-                const aggregatedViews = aggregateEvents(allEvents, 'VIEW');
-                const aggregatedImpressions = aggregateEvents(allEvents, 'IMPRESSION');
-
-
-                setFullData({views: aggregatedViews, impressions: aggregatedImpressions});
-                setAllUnique(uniqueData);
-
-                console.log("Aggregated Views:", aggregatedViews);
-                console.log("Unique Data:", uniqueData);
-            } catch (e) {
-                setError(e.message);
-                console.error("Failed to fetch impressions:", e);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [bookId]);
+        Promise.all(
+            metrics.map(metric =>
+                axios
+                    .get(`/api/analytics/products/${productId}/timeseries/${metric.key}`)
+                    .then(res => ({
+                        key: metric.key,
+                        data: (Array.isArray(res.data) ? res.data : Object.values(res.data)).map(item => ({
+                            date: item.timestamp,
+                            count: item.value
+                        }))
+                    }))
+                    .catch(() => ({
+                        key: metric.key,
+                        data: []
+                    }))
+            )
+        )
+            .then(results => {
+                const mapped = {};
+                results.forEach(r => {
+                    mapped[r.key] = r.data;
+                });
+                setDataByMetric(mapped);
+            })
+            .catch(e => setError(e.message))
+            .finally(() => setLoading(false));
+    }, [productId]);
 
     const chartData = useMemo(() => {
         const dataPoints = periods[period];
@@ -91,109 +84,78 @@ const ImpressionChart = ({bookId}) => {
         startDate.setHours(0, 0, 0, 0);
         startDate.setDate(startDate.getDate() - dataPoints);
 
-        const filterDataByPeriod = (data) => {
-            if (!dataPoints) return data;
-            return data.filter(item => new Date(item.date) >= startDate);
-        };
+        // Trova tutte le date uniche tra le metriche
+        const allDates = new Set();
+        metrics.forEach(metric => {
+            (dataByMetric[metric.key] || []).forEach(item => {
+                const d = new Date(item.date);
+                if (d >= startDate) allDates.add(item.date);
+            });
+        });
+        const sortedDates = Array.from(allDates).sort();
 
-        const filteredViews = filterDataByPeriod(fullData.views);
-        const filteredImpressions = filterDataByPeriod(fullData.impressions);
-
-        const allDates = [...new Set([
-            ...filteredViews.map(d => d.date),
-            ...filteredImpressions.map(d => d.date)
-        ])].sort((a, b) => new Date(a) - new Date(b));
-
-        const createDataset = (data, allLabels) => {
-            const dataMap = new Map(data.map(item => [item.date, item.count]));
-            return allLabels.map(label => dataMap.get(label) || 0);
-        };
+        // Per ogni metrica, crea un array di valori allineato alle date
+        const datasets = metrics.map(metric => {
+            const dataMap = {};
+            (dataByMetric[metric.key] || []).forEach(item => {
+                dataMap[item.date] = item.count;
+            });
+            return {
+                label: metric.label,
+                data: sortedDates.map(date => dataMap[date] || 0),
+                borderColor: metric.color,
+                backgroundColor: metric.color , // trasparente
+                tension: 0.1
+            };
+        });
 
         return {
-            labels: allDates,
-            datasets: [
-                {
-                    label: 'Visualizzazioni (VIEW)',
-                    data: createDataset(filteredViews, allDates),
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                    tension: 0.1
-                },
-                {
-                    label: 'Impressioni (IMPRESSION)',
-                    data: createDataset(filteredImpressions, allDates),
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    tension: 0.1
-                }
-            ]
+            labels: sortedDates,
+            datasets
         };
-    }, [period, fullData]);
+    }, [period, dataByMetric]);
 
     const options = {
         responsive: true,
         plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Andamento Interazioni Prodotto',
-            },
+            legend: { position: "top" },
+            title: { display: true, text: "Andamento Impressioni, Visualizzazioni e Visualizzazioni Immagine" }
         },
         scales: {
             x: {
-                type: 'time',
+                type: "time",
                 time: {
-                    unit: 'day',
-                    tooltipFormat: 'dd/MM/yyyy',
+                    unit: "hour",
+                    stepSize: 1,
+                    displayFormats: { hour: "HH" },
+                    tooltipFormat: "dd/MM/yyyy HH:mm"
                 },
-                title: {
-                    display: true,
-                    text: 'Data'
-                }
+                title: { display: true, text: "Ora" }
             },
             y: {
-                title: {
-                    display: true,
-                    text: 'Numero di Eventi'
-                },
+                title: { display: true, text: "Numero" },
                 beginAtZero: true,
-                ticks: {
-                    stepSize: 1
-                }
+                ticks: { stepSize: 1 }
             }
         }
     };
 
-    if (loading) return <div>Caricamento dati...</div>;
-    if (error) return <div>Errore nel caricamento dei dati: {error}</div>;
+    if (loading) return <div>Caricamento...</div>;
+    if (error) return <div>Errore: {error}</div>;
+    if (!chartData.labels.length) return <div>Nessun dato disponibile.</div>;
 
     return (
-        <div style={{width: '90%', margin: 'auto'}}>
-            <div style={{marginBottom: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <div style={{ width: "90%", margin: "auto" }}>
+            <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <strong>Periodo:</strong>
                 {Object.keys(periods).map(p => (
                     <button key={p} onClick={() => setPeriod(p)}
-                            style={{marginLeft: '5px', fontWeight: period === p ? 'bold' : 'normal'}}>
+                            style={{ marginLeft: "5px", fontWeight: period === p ? "bold" : "normal" }}>
                         {p.toUpperCase()}
                     </button>
                 ))}
             </div>
-
-            <Line options={options} data={chartData}/>
-
-            <div style={{marginTop: '30px', textAlign: 'center'}}>
-                <h3>Eventi Unici</h3>
-                <ul style={{listStyle: 'none', padding: 0}}>
-                    {Object.entries(allUnique).map(([key, value]) => (
-                        <li key={key} style={{margin: '8px 0'}}>
-                            <strong>{key.replace(/_/g, ' ')}:</strong> {value}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
+            <Line options={options} data={chartData} />
         </div>
     );
 };

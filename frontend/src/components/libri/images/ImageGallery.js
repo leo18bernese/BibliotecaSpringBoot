@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 
-const ImageGallery = ({id, images, API_URL}) => {
+const ImageGallery = ({id, images, API_URL, onView}) => {
     const [selectedImage, setSelectedImage] = useState(images === -1 ? -1 : 0);
     const [showPopup, setShowPopup] = useState(false);
 
     const handleImageClick = () => {
+        console.log("Image clicked, calling onView");
         setShowPopup(true);
+        onView();
     };
 
     const closePopup = () => {

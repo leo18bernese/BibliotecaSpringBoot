@@ -1,37 +1,36 @@
 import LiteBook from "./lite/LiteBook";
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useRef} from "react";
 import axios from "axios";
 import {UserContext} from "../user/UserContext";
+import {useAnalyticsMutation} from "../admin/book/chart/useAnalytics";
 
 function BookDisplay({idList, contentList, isLoading, error}) {
     const list = idList || contentList;
     const {user} = useContext(UserContext);
+
+    const {addEventMutation} = useAnalyticsMutation();
+
     console.log("User context in BookDisplay:", user);
+
+    const impressionTracked = useRef(false);
 
     // Simulate impression tracking on component mount
     useEffect(() => {
-        if (idList) {
-            idList.forEach(productId => {
+        if (!impressionTracked.current && (idList || contentList)) {
+            const list = idList || contentList;
+            list.forEach(item => {
+                const productId = item.id || item;
                 trackImpression(productId);
             });
-        } else if (contentList) {
-            contentList.forEach(book => {
-                trackImpression(book.id);
-            });
+            impressionTracked.current = true;
         }
     }, [idList, contentList]);
 
     const trackImpression = async (productId) => {
-        try {
-            const formData = new FormData();
-            formData.append('productId', productId);
-            formData.append('eventType', 'IMPRESSION');
-
-            await axios.post('http://localhost:8080/api/analytics/events', formData);
-            console.log(`Impressione tracciata con successo per il prodotto: ${productId}`);
-        } catch (error) {
-            console.error(`Errore nel tracciamento dell'impressione per il prodotto: ${productId}`, error);
-        }
+        addEventMutation.mutate({
+            productId: productId,
+            eventType: 'IMPRESSION'
+        });
     };
 
     if (isLoading || !list) {

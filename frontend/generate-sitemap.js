@@ -23,7 +23,7 @@ async function generateSitemap() {
     staticLinks.forEach(link => sitemapStream.write(link));
 
     try {
-        const response = await axios.get('http://localhost:8080/api/libri/google');
+        const response = await axios.get('/api/libri/google');
         const books = response.data;
 
         books.forEach(book => {
