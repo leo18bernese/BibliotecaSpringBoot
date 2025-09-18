@@ -25,7 +25,7 @@ ChartJS.register(
     TimeScale
 );
 
-const periods = {
+const defaultPeriods = {
     '3d': 3,
     '1w': 7,
     '2w': 14,
@@ -36,11 +36,15 @@ const periods = {
     'all': 10000
 };
 
-const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle, options: customOptions, resolution }) => {
-    const [period, setPeriod] = useState('1m');
+const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle,
+                                    options: customOptions, resolution,
+                                    periods: customPeriods }) => {
     const [dataByMetric, setDataByMetric] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const periods = customPeriods || defaultPeriods;
+    const [period, setPeriod] = useState(Object.keys(periods)[0]);
 
     useEffect(() => {
         setLoading(true);
@@ -76,7 +80,7 @@ const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle, options: customO
             })
             .catch(e => setError(e.message))
             .finally(() => setLoading(false));
-    }, [apiUrls, metrics]);
+    }, [apiUrls, metrics, period, resolution]); // <-- aggiungi period e resolution qui
 
     const chartData = useMemo(() => {
         const dataPoints = periods[period];
@@ -142,7 +146,6 @@ const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle, options: customO
 
     if (loading) return <div>Caricamento...</div>;
     if (error) return <div>Errore: {error}</div>;
-    if (!chartData.labels.length) return <div>Nessun dato disponibile.</div>;
 
     return (
         <div style={{ width: "90%", margin: "auto" }}>

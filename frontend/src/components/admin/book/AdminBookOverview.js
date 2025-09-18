@@ -7,9 +7,9 @@ import ButtonField from "./fields/ButtonField";
 import BookChart from "./chart/BookChart";
 import ImpressionChart from "./chart/ImpressionChart";
 import AnalyticsOverview from "./chart/Analytics";
-import MinImpressionChart from "./chart/MinImpressionChart";
-import DailyImpressionChart from "./chart/DailyImpressionChart";
-import HourlyImpressionChart from "./chart/HourlyImpressionChart";
+import MinImpressionChart from "./chart/periods/MinImpressionChart";
+import DailyImpressionChart from "./chart/periods/DailyImpressionChart";
+import HourlyImpressionChart from "./chart/periods/HourlyImpressionChart";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -123,6 +123,8 @@ const AdminBookOverview = () => {
                     </div>
 
                     <div className="mt-8">
+
+                        <h2 className="text-xl font-semibold mb-4">Book Analytics</h2>
 
                         <select value={selectedChart} onChange={(e) => setSelectedChart(e.target.value)}
                                 className="p-2 border border-gray-300 rounded-md">

@@ -13,6 +13,7 @@ import me.leoo.springboot.libri.analytics.objects.BaseAnalytics;
 import me.leoo.springboot.libri.analytics.repo.Analytics20MinRepository;
 import me.leoo.springboot.libri.analytics.repo.AnalyticsDailyRepository;
 import me.leoo.springboot.libri.analytics.repo.AnalyticsHourlyRepository;
+import me.leoo.utils.common.time.TimeUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -188,24 +189,9 @@ public class AnalyticsQueryService {
         Calendar cal = Calendar.getInstance();
         cal.setTime(endTime);
 
-        switch (period) {
-            case "1h":
-                cal.add(Calendar.HOUR, -1);
-                break;
-            case "24h":
-                cal.add(Calendar.HOUR, -24);
-                break;
-            case "7d":
-                cal.add(Calendar.DAY_OF_MONTH, -7);
-                break;
-            case "30d":
-                cal.add(Calendar.DAY_OF_MONTH, -30);
-                break;
-            case "90d":
-                cal.add(Calendar.DAY_OF_MONTH, -90);
-                break;
-            default:
-                cal.add(Calendar.DAY_OF_MONTH, -7);
+        long millis = TimeUtil.millisFromTimeString(period);
+        if (millis > 0) {
+            cal.add(Calendar.MILLISECOND, (int) -millis);
         }
 
         return cal.getTime();
