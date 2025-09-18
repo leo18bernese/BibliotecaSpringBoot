@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { Line } from "react-chartjs-2";
+import axios from "axios";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -10,9 +12,7 @@ import {
     Legend,
     TimeScale
 } from "chart.js";
-import { Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
-import axios from "axios";
 
 ChartJS.register(
     CategoryScale,
@@ -26,34 +26,34 @@ ChartJS.register(
 );
 
 const periods = {
+    '3d': 3,
     '1w': 7,
+    '2w': 14,
     '1m': 30,
     '3m': 90,
     '6m': 180,
     '12m': 365,
+    'all': 10000
 };
 
-const metrics = [
-    { key: "IMPRESSION", label: "Impressioni", color: "rgb(255, 99, 132)" },
-    { key: "VIEW", label: "Visualizzazioni", color: "rgb(54, 162, 235)" },
-    { key: "VIEW_IMAGE", label: "Visualizzazioni Immagine", color: "rgb(255, 206, 86)" }
-];
-
-const ImpressionChart = ({ productId }) => {
+const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle, options: customOptions, resolution }) => {
     const [period, setPeriod] = useState('1m');
     const [dataByMetric, setDataByMetric] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!productId) return;
         setLoading(true);
         setError(null);
 
+        const formData = new FormData();
+        formData.append("resolution", resolution || "daily");
+        formData.append("period", period);
+
         Promise.all(
-            metrics.map(metric =>
+            metrics.map((metric, idx) =>
                 axios
-                    .get(`/api/analytics/products/${productId}/timeseries/${metric.key}`)
+                    .get(apiUrls[idx], { params: { resolution: resolution || "daily", period } })
                     .then(res => ({
                         key: metric.key,
                         data: (Array.isArray(res.data) ? res.data : Object.values(res.data)).map(item => ({
@@ -76,7 +76,7 @@ const ImpressionChart = ({ productId }) => {
             })
             .catch(e => setError(e.message))
             .finally(() => setLoading(false));
-    }, [productId]);
+    }, [apiUrls, metrics]);
 
     const chartData = useMemo(() => {
         const dataPoints = periods[period];
@@ -84,7 +84,6 @@ const ImpressionChart = ({ productId }) => {
         startDate.setHours(0, 0, 0, 0);
         startDate.setDate(startDate.getDate() - dataPoints);
 
-        // Trova tutte le date uniche tra le metriche
         const allDates = new Set();
         metrics.forEach(metric => {
             (dataByMetric[metric.key] || []).forEach(item => {
@@ -94,7 +93,6 @@ const ImpressionChart = ({ productId }) => {
         });
         const sortedDates = Array.from(allDates).sort();
 
-        // Per ogni metrica, crea un array di valori allineato alle date
         const datasets = metrics.map(metric => {
             const dataMap = {};
             (dataByMetric[metric.key] || []).forEach(item => {
@@ -104,7 +102,7 @@ const ImpressionChart = ({ productId }) => {
                 label: metric.label,
                 data: sortedDates.map(date => dataMap[date] || 0),
                 borderColor: metric.color,
-                backgroundColor: metric.color , // trasparente
+                backgroundColor: metric.color,
                 tension: 0.1
             };
         });
@@ -113,13 +111,13 @@ const ImpressionChart = ({ productId }) => {
             labels: sortedDates,
             datasets
         };
-    }, [period, dataByMetric]);
+    }, [period, dataByMetric, metrics]);
 
-    const options = {
+    const defaultOptions = {
         responsive: true,
         plugins: {
             legend: { position: "top" },
-            title: { display: true, text: "Andamento Impressioni, Visualizzazioni e Visualizzazioni Immagine" }
+            title: { display: true, text: chartTitle }
         },
         scales: {
             x: {
@@ -140,6 +138,8 @@ const ImpressionChart = ({ productId }) => {
         }
     };
 
+    const mergedOptions = { ...defaultOptions, ...customOptions };
+
     if (loading) return <div>Caricamento...</div>;
     if (error) return <div>Errore: {error}</div>;
     if (!chartData.labels.length) return <div>Nessun dato disponibile.</div>;
@@ -155,9 +155,9 @@ const ImpressionChart = ({ productId }) => {
                     </button>
                 ))}
             </div>
-            <Line options={options} data={chartData} />
+            <Line options={mergedOptions} data={chartData} />
         </div>
     );
 };
 
-export default ImpressionChart;
+export default GenericTimeSeriesChart;

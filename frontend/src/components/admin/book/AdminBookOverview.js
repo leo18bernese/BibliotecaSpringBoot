@@ -1,12 +1,15 @@
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
-import React from "react";
+import React, {useState} from "react";
 import {usePageTitle} from "../../utils/usePageTitle";
 import ButtonField from "./fields/ButtonField";
 import BookChart from "./chart/BookChart";
 import ImpressionChart from "./chart/ImpressionChart";
 import AnalyticsOverview from "./chart/Analytics";
+import MinImpressionChart from "./chart/MinImpressionChart";
+import DailyImpressionChart from "./chart/DailyImpressionChart";
+import HourlyImpressionChart from "./chart/HourlyImpressionChart";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -51,6 +54,7 @@ const AdminBookOverview = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    const [selectedChart, setSelectedChart] = useState("20min" );
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['book', id],
@@ -119,12 +123,21 @@ const AdminBookOverview = () => {
                     </div>
 
                     <div className="mt-8">
-                        <ImpressionChart productId={id}/>
+
+                        <select value={selectedChart} onChange={(e) => setSelectedChart(e.target.value)}
+                                className="p-2 border border-gray-300 rounded-md">
+                            <option value="20min">Last 20 Minutes</option>
+                            <option value="hourly">Last 24 Hours (Hourly)</option>
+                            <option value="daily">Last 30 Days (Daily)</option>
+                        </select>
+
+                        <div className="mt-4">
+                            {selectedChart === "20min" && <MinImpressionChart productId={id} />}
+                            {selectedChart === "hourly" && <HourlyImpressionChart productId={id} />}
+                            {selectedChart === "daily" && <DailyImpressionChart productId={id} />}
+                        </div>
                     </div>
 
-                    <div className="mt-8">
-                        <AnalyticsOverview  productId={id}/>
-                    </div>
                 </div>
 
 
