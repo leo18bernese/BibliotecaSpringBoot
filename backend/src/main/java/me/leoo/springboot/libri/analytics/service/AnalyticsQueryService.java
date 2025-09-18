@@ -92,7 +92,7 @@ public class AnalyticsQueryService {
 
         return data.stream()
                 .map(record -> TimeSeriesPointDTO.builder()
-                        .timestamp(record.getDate())
+                        .timestamp(record.getTimeBucket())
                         .value(record.getCount(metric))
                         .build())
                 .collect(Collectors.toList());
