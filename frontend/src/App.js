@@ -51,6 +51,8 @@ import AdminUserHome from "./components/admin/user/AdminUserHome";
 import AdminUser from "./components/admin/user/AdminUser";
 import BookPdfDownloader from "./components/admin/book/pdf/BookPdfDownloader";
 import NotFound from "./components/utils/NotFound";
+import AdminOrder from "./components/admin/order/AdminOrder";
+import AdminOrderHome from "./components/admin/order/AdminOrderHome";
 
 const queryClient = new QueryClient();
 
@@ -127,6 +129,8 @@ function App() {
                                                     <Route path="/admin/user" element={<AdminUserHome/>}/>
                                                     <Route path="/admin/user/:id" element={<AdminUser/>}/>
 
+                                                    <Route path="/admin/order" element={<AdminOrderHome/>}/>
+                                                    <Route path="/admin/order/:id" element={<AdminOrder/>}/>
 
                                                 </Route>
                                             </Route>

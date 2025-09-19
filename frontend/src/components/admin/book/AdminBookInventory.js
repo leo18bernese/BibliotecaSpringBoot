@@ -164,7 +164,7 @@ const AdminBookInventory = () => {
                                 <div>
 
                                     <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
-                                    <p className="text-sm text-gray-600 mb-4">{variante.descrizione}</p>
+                                    <p className="text-sm text-gray-600 mb-4">Nome basato su attributi: <b>{variante.dynamicName}</b></p>
                                 </div>
 
                                 <div>
