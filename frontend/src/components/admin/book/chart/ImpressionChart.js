@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Line } from "react-chartjs-2";
+import React, {useEffect, useState, useMemo} from "react";
+import {Line} from "react-chartjs-2";
 import axios from "axios";
 import {
     Chart as ChartJS,
@@ -36,15 +36,17 @@ const defaultPeriods = {
     'all': 10000
 };
 
-const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle,
+const GenericTimeSeriesChart = ({
+                                    apiUrls, metrics, chartTitle,
                                     options: customOptions, resolution,
-                                    periods: customPeriods }) => {
+                                    periods: customPeriods, selectedPeriod
+                                }) => {
     const [dataByMetric, setDataByMetric] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const periods = customPeriods || defaultPeriods;
-    const [period, setPeriod] = useState(Object.keys(periods)[0]);
+    const [period, setPeriod] =  useState(selectedPeriod || Object.keys(periods)[0]);
 
     useEffect(() => {
         setLoading(true);
@@ -57,7 +59,7 @@ const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle,
         Promise.all(
             metrics.map((metric, idx) =>
                 axios
-                    .get(apiUrls[idx], { params: { resolution: resolution || "daily", period } })
+                    .get(apiUrls[idx], {params: {resolution: resolution || "daily", period}})
                     .then(res => ({
                         key: metric.key,
                         data: (Array.isArray(res.data) ? res.data : Object.values(res.data)).map(item => ({
@@ -120,8 +122,8 @@ const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle,
     const defaultOptions = {
         responsive: true,
         plugins: {
-            legend: { position: "top" },
-            title: { display: true, text: chartTitle }
+            legend: {position: "top"},
+            title: {display: true, text: chartTitle}
         },
         scales: {
             x: {
@@ -129,36 +131,36 @@ const GenericTimeSeriesChart = ({ apiUrls, metrics, chartTitle,
                 time: {
                     unit: "hour",
                     stepSize: 1,
-                    displayFormats: { hour: "HH" },
+                    displayFormats: {hour: "HH"},
                     tooltipFormat: "dd/MM/yyyy HH:mm"
                 },
-                title: { display: true, text: "Ora" }
+                title: {display: true, text: "Ora"}
             },
             y: {
-                title: { display: true, text: "Numero" },
+                title: {display: true, text: "Numero"},
                 beginAtZero: true,
-                ticks: { stepSize: 1 }
+                ticks: {stepSize: 1}
             }
         }
     };
 
-    const mergedOptions = { ...defaultOptions, ...customOptions };
+    const mergedOptions = {...defaultOptions, ...customOptions};
 
     if (loading) return <div>Caricamento...</div>;
     if (error) return <div>Errore: {error}</div>;
 
     return (
-        <div style={{ width: "90%", margin: "auto" }}>
-            <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div style={{width: "90%", margin: "auto"}}>
+            <div style={{marginBottom: "20px", display: "flex", justifyContent: "center", alignItems: "center"}}>
                 <strong>Periodo:</strong>
                 {Object.keys(periods).map(p => (
                     <button key={p} onClick={() => setPeriod(p)}
-                            style={{ marginLeft: "5px", fontWeight: period === p ? "bold" : "normal" }}>
+                            style={{marginLeft: "5px", fontWeight: period === p ? "bold" : "normal"}}>
                         {p.toUpperCase()}
                     </button>
                 ))}
             </div>
-            <Line options={mergedOptions} data={chartData} />
+            <Line options={mergedOptions} data={chartData}/>
         </div>
     );
 };

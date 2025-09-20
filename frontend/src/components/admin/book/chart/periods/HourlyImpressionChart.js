@@ -4,6 +4,7 @@ const HourlyImpressionChart = ({ productId }) => (
         productId={productId}
         resolution="hourly"
         periods={{ '1d': 24, '3d': 72, '7d': 168, '14d': 336 }}
+        selectedPeriod="3d"
     />
 );
 export default HourlyImpressionChart;

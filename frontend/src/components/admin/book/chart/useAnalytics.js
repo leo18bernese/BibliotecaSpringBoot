@@ -1,11 +1,15 @@
 import {createContext, useContext} from "react";
 import {useMutation} from "@tanstack/react-query";
 import axios from "axios";
+import {UserContext} from "../../../user/UserContext";
 
-const trackImpression = async (productId, type) => {
+const trackImpression = async (productId, user, type) => {
     try {
         const formData = new FormData();
         formData.append('productId', productId);
+
+        {user && formData.append('userId', user.id);}
+
         formData.append('eventType', type);
 
         await axios.post('/api/analytics/events', formData);
@@ -17,10 +21,11 @@ const trackImpression = async (productId, type) => {
 };
 
 export const useAnalyticsMutation = () => {
+    const {user} = useContext(UserContext);
 
     const addEventMutation = useMutation({
         mutationFn: async ({productId, eventType}) => {
-            return await trackImpression(productId, eventType);
+            return await trackImpression(productId, user, eventType);
         },
         onError: (error) => {
             console.error('Error tracking event:', error);

@@ -128,9 +128,9 @@ const AdminBookOverview = () => {
 
                         <select value={selectedChart} onChange={(e) => setSelectedChart(e.target.value)}
                                 className="p-2 border border-gray-300 rounded-md">
-                            <option value="20min">Last 20 Minutes</option>
-                            <option value="hourly">Last 24 Hours (Hourly)</option>
-                            <option value="daily">Last 30 Days (Daily)</option>
+                            <option value="20min">20 Minutes interval (up to 3 days)</option>
+                            <option value="hourly">Hour interval (up to 14 days)</option>
+                            <option value="daily">Daily interval</option>
                         </select>
 
                         <div className="mt-4">

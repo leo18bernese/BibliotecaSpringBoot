@@ -8,7 +8,7 @@ const metrics = [
     { key: "VIEW_IMAGE", label: "Visualizzazioni Immagine", color: "rgb(255, 206, 86)" }
 ];
 
-const ImprViewChart = ({ productId, resolution, periods }) => (
+const ImprViewChart = ({ productId, resolution, periods, selectedPeriod }) => (
     <GenericTimeSeriesChart
         apiUrls={[
             `/api/analytics/products/${productId}/timeseries/IMPRESSION`,
@@ -22,6 +22,7 @@ const ImprViewChart = ({ productId, resolution, periods }) => (
         }}
         resolution={resolution}
         periods={periods}
+        selectedPeriod={selectedPeriod}
     />
 );
 

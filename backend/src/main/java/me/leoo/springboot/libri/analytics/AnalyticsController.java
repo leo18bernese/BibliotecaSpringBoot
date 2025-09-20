@@ -26,9 +26,10 @@ public class AnalyticsController {
     @PostMapping("/events")
     public ResponseEntity<String> recordEvent(
             @RequestParam Long productId,
+            @RequestParam(required = false) Long userId,
             @RequestParam InteractionEnum eventType) {
         System.out.println("Recording event: " + eventType + " for productId: " + productId);
-        writeService.recordEvent(productId, eventType, new Date());
+        writeService.recordEvent(productId, userId, eventType, new Date());
         return ResponseEntity.ok("Event recorded");
     }
 

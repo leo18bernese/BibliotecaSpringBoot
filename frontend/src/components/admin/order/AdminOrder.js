@@ -33,7 +33,7 @@ const AdminOrder = () => {
         }
     });
 
-    const {data: reso, isLoading, error: queryError} = useQuery({
+    const {data: ordine, isLoading, error: queryError} = useQuery({
         queryKey: ['adminOrder', id],
         queryFn: () => fetchOrder(id),
         onError: (err) => {
@@ -81,10 +81,10 @@ const AdminOrder = () => {
         "ok": "bg-green-100 text-green-800",
     }
 
-    console.log(reso);
+    console.log(ordine);
 
-    const warn = reso.statoWarning;
-    const attesa = reso.stato === "IN_ATTESA";
+    const warn = ordine.statoWarning;
+    const attesa = ordine.stato === "IN_ATTESA";
     const colorClass = warn ? colors.error : (attesa ? colors.wait : colors.ok);
 
     return (
@@ -100,29 +100,20 @@ const AdminOrder = () => {
 
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h1 className="text-2xl font-semibold">Order #{reso.id}</h1>
+                                    <h1 className="text-2xl font-semibold">Ordine #{ordine.id}</h1>
                                 </div>
 
-                                <button
-                                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-                                    onClick={() => navigate(`/admin/reso/${id}/chat`)}>
 
-                                    <div className=" flex items-center ">
-                                        <i className="bx bx-message-dots mr-2 text-xl "></i>
-                                        <span>Vai alla Chat</span>
-                                    </div>
-
-                                </button>
                             </div>
 
 
                             <div className="mt-4 mb-4">
                             <span className={`p-2 rounded-2xl font-semibold uppercase text-sm mb ${colorClass}`}>
-                                <span className="">{reso.statoName}</span>
+                                <span className="">{ordine.statoName}</span>
                             </span>
                             </div>
 
-                            <p className="mt-8 text-gray-800">{reso.statoDescrizione}</p>
+                            <p className="mt-8 text-gray-800">{ordine.statoDescrizione}</p>
 
                             <div className="margin-top flex items-center mt-4">
 
@@ -134,41 +125,6 @@ const AdminOrder = () => {
                                     Metti in attesa
                                 </button>
 
-
-                                {/* chiedi prove */}
-                                <button
-                                    onClick={() => navigate(`/admin/reso/${id}/prove`)}
-                                    className="mr-2 py-2 px-4 rounded-md bg-gray-400 hover:bg-gray-400 text-white transition-colors"
-                                >
-                                    Chiedi prove
-                                </button>
-
-
-                                {/* approva reso */}
-
-                                <button
-                                    onClick={() => navigate(`/admin/reso/${id}/approva`)}
-                                    className="mr-2 py-2 px-4 rounded-md bg-green-200 hover:bg-green-300 text-green-600 transition-colors"
-                                >
-                                    Approva reso
-                                </button>
-
-
-                                {/* rifiuta reso */}
-                                <button
-                                    onClick={() => navigate(`/admin/reso/${id}/rifiuta`)}
-                                    className="mr-2 py-2 px-4 rounded-md bg-red-600 hover:bg-red-500 text-white transition-colors"
-                                >
-                                    Rifiuta reso
-                                </button>
-
-                                {/*annulla reso */}
-                                <button
-                                    onClick={() => navigate(`/admin/reso/${id}/annulla`)}
-                                    className="mr-2 py-2 px-4 rounded-md bg-gray-300 hover:bg-gray-400 text-black transition-colors"
-                                >
-                                    Annulla reso
-                                </button>
 
                             </div>
                         </div>
@@ -197,17 +153,14 @@ const AdminOrder = () => {
                         </div>
 
 
-                        {Object.entries(reso.stati).map((stato) => (
-                            <div className="p-2 mb-3 border-b" key={stato.id}>
+                        {Object.entries(ordine.stati).map(([stato, date]) => (
+                            <div className="p-2 mb-3 border-b" key={stato}>
                                 <h2 className="text-sm font-semibold text-gray-800">
-                                    {stato.stato} - {new Date(stato.dataAggiornamento).toLocaleString()}
+                                    {stato} - {new Date(date).toLocaleString()}
                                 </h2>
-
-                                {stato.messaggio && (
-                                    <div className="text-sm text-gray-700">{stato.messaggio}</div>
-                                )}
                             </div>
                         ))}
+
 
                         {/*enumStati && <AddStateForm resoId={reso.id} stati={enumStati}/>*/}
 
@@ -221,13 +174,43 @@ const AdminOrder = () => {
 
                         <div className="flex justify-between border-b py-2 text-md ">
                             <h3 className="font-semibold text-gray-500">Data Creazione:</h3>
-                            <h3 className="font-semibold text-right text-gray-800">{new Date(reso.dataCreazione).toLocaleString()}
+                            <h3 className="font-semibold text-right text-gray-800">{new Date(ordine.dataCreazione).toLocaleString()}</h3>
+                        </div>
+
+                        <div className="flex justify-between border-b py-2 text-md ">
+                            <h3 className="font-semibold text-gray-500">Somma Totale:</h3>
+                            <h3 className="font-semibold text-right text-gray-800">
+                                € {ordine.sommaTotale.toFixed(2)}
                             </h3>
                         </div>
 
                         <div className="flex justify-between border-b py-2 text-md ">
-                            <h3 className="font-semibold text-gray-500">Totale reso stimato:</h3>
-                            <h3 className="font-semibold text-right text-gray-800">{reso.totaleOrder} €</h3>
+                            <h3 className="font-semibold text-gray-500">Spese Spedizione:</h3>
+                            <h3 className="font-semibold text-right text-gray-800">
+                                € {ordine.speseSpedizione.toFixed(2)}
+                            </h3>
+                        </div>
+
+                        <div className="flex justify-between py-2 text-md ">
+                            <h3 className="font-semibold text-gray-500">Coupon:</h3>
+
+                            <h3 className="font-semibold text-right text-gray-800 mt-1">
+
+                                {ordine.couponCodes.length === 0 && (
+                                    <span className="p-2 rounded-2xl font-semibold uppercase text-sm"
+                                          style={{backgroundColor: '#fef3c7', color: '#92400e'}}>
+                                            Nessun coupon applicato
+                                        </span>
+                                )}
+
+                                {ordine.couponCodes.map((code, index) => (
+                                    <span key={index}
+                                          className="p-2 rounded-2xl font-semibold uppercase text-sm  ml-2"
+                                          style={{backgroundColor: '#d1fae5', color: '#065f46'}}>
+                                    {code.codice} {" "}
+                                </span>
+                                ))}
+                            </h3>
                         </div>
                     </div>
                 </div>
