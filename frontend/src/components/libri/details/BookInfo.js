@@ -245,29 +245,57 @@ const BookInfo = () => {
 
     // Modifica il tuo useEffect per i dati strutturati
     useEffect(() => {
-        if (book && selectedVariant) {
+        if (book && selectedVariant && images) {
             const reviewsCount = reviews.length;
             const averageRating = reviewsCount > 0
                 ? (reviews.reduce((sum, r) => sum + r.recensione.voto, 0) / reviewsCount)
                 : 0;
 
+            const stripHtml = (html) => {
+                const tmp = document.createElement("DIV");
+                tmp.innerHTML = html;
+                return tmp.textContent || tmp.innerText || "";
+            }
+
             // Definisci lo Schema.org con i dati della variante selezionata
             const productSchema = {
                 "@context": "https://schema.org/",
-                "@type": "Product",
+                "@type": "Book",
                 "name": `${book.titolo} (${selectedVariant.nome})`, // Aggiungi il nome della variante al titolo
-                "image": '',
-                "description": '',
+                "image": images && images.length > 0 ? `${window.location.origin}/api/images/${book.id}/${images[0].id}` : '',
+                "description": stripHtml(book.descrizione.descrizioneHtml),
                 "sku": selectedVariant.id, // Usa l'ID della variante come SKU
+                "isbn": book.isbn,
                 "offers": {
                     "@type": "Offer",
                     "priceCurrency": selectedVariant.prezzo.valuta,
                     "price": selectedVariant.prezzo.prezzoTotale.toFixed(2),
-                    "availability": selectedVariant.rifornimento.quantita > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+                    "priceValidUntil": new Date(new Date().getFullYear() + 1, 11, 31).toISOString().split('T')[0], // Fine dell'anno prossimo
+                    "availability": selectedVariant.rifornimento.quantita > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                    "shippingDetails": {
+                        "@type": "OfferShippingDetails",
+                        "shippingRate": {
+                            "@type": "MonetaryAmount",
+                            "value": 3.90,
+                            "currency": "EUR"
+                        },
+                        "shippingDestination": {
+                            "@type": "DefinedRegion",
+                            "addressCountry": "IT"
+                        }
+                    },
+                    "hasMerchantReturnPolicy": {
+                        "@type": "MerchantReturnPolicy",
+                        "applicableCountry": "IT",
+                        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                        "merchantReturnDays": 14,
+                        "returnMethod": "https://schema.org/ReturnByMail",
+                        "returnFees": "https://schema.org/FreeReturn"
+                    }
                 },
                 "aggregateRating": reviewsCount > 0 ? {
                     "@type": "AggregateRating",
-                    "ratingValue": 0,//averageRating.toFixed(1),
+                    "ratingValue": averageRating.toFixed(1),
                     "reviewCount": reviewsCount,
                 } : undefined,
                 "bookEdition": selectedVariant.nome,
@@ -275,8 +303,7 @@ const BookInfo = () => {
                     "@type": "Person",
                     "name": book.autore.nome
                 },
-                "publisher": book.editore,
-                "isbn": book.isbn
+                "publisher": book.editore
             };
 
             // console.log("Generated product schema:", productSchema);
@@ -597,3 +624,4 @@ const BookInfo = () => {
 };
 
 export default BookInfo;
+
