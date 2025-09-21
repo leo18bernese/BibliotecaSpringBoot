@@ -162,7 +162,7 @@ const AdminOrder = () => {
                         ))}
 
 
-                        {enumStati && <AddStateForm resoId={reso.id} stati={enumStati}/>}
+                        {/*enumStati && <AddStateForm resoId={reso.id} stati={enumStati}/>*/}
 
                     </div>
 
