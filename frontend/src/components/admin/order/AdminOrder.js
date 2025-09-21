@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useQuery} from "@tanstack/react-query";
 import {useNavigate, useParams} from "react-router-dom";
 import {Toaster} from "react-hot-toast";
+import AdminOrderItem from "./AdminOrderItem";
 
 const fetchExistOrder = async (id) => {
     const response = await axios.get(`/api/admin/order/${id}/exists`);
@@ -133,14 +134,13 @@ const AdminOrder = () => {
                     <div id="tracking" className="p-4 bg-white shadow-md rounded-lg ">
                         <div className="p-2 rounded flex items-center font-semibold text-black">
                             <i className="bx bx-package mr-2 text-2xl text-blue-600"></i>
-                            <span>Articoli di Order</span>
+                            <span>Articoli dell'ordine</span>
+
                         </div>
 
-                        {/*reso.items.map((item) => (
-                            <>
-                                <AdminOrderItem item={item} key={item.id}/>
-                            </>
-                        ))*/}
+                        {ordine.items.map((item) => (
+                            <AdminOrderItem book={item} bookId={item.id} key={item.id}/>
+                        ))}
 
                     </div>
                 </div>
@@ -162,7 +162,7 @@ const AdminOrder = () => {
                         ))}
 
 
-                        {/*enumStati && <AddStateForm resoId={reso.id} stati={enumStati}/>*/}
+                        {enumStati && <AddStateForm resoId={reso.id} stati={enumStati}/>}
 
                     </div>
 
