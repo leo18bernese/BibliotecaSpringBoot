@@ -53,6 +53,7 @@ import BookPdfDownloader from "./components/admin/book/pdf/BookPdfDownloader";
 import NotFound from "./components/utils/NotFound";
 import AdminOrder from "./components/admin/order/AdminOrder";
 import AdminOrderHome from "./components/admin/order/AdminOrderHome";
+import AdminResoHome from "./components/admin/reso/AdminResoHome";
 
 const queryClient = new QueryClient();
 
@@ -82,15 +83,14 @@ function App() {
                                             <Route path="/libri/:id" element={<RedirectToBook/>}/>
                                             <Route path="/libro/:id" element={<RedirectToBook/>}/>
                                             <Route path="/book/:id/pdf" element={<BookPdfDownloader/>}/>
-                                            <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
-
-                                            <Route path="/ordine/:id" element={<Ordine/>}/>
-                                            <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
 
                                             <Route element={<ProtectedRoute/>}>
+
                                                 <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>
+
                                                 <Route path="/ordine/:id" element={<Ordine/>}/>
                                                 <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
+
                                                 <Route path="/reso/:id" element={<Reso/>}/>
                                                 <Route path="/reso/:id/chat" element={<ResoChat/>}/>
 
@@ -114,6 +114,7 @@ function App() {
 
                                                     <Route path="/admin" element={<AdminHome/>}/>
 
+                                                    <Route path="/admin/reso" element={<AdminResoHome/>}/>
                                                     <Route path="/admin/reso/:id" element={<AdminReso/>}/>
                                                     <Route path="/admin/reso/:id/chat" element={<AdminChat/>}/>
 

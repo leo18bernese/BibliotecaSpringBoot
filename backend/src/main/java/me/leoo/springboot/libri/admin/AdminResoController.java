@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.admin;
 
 import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.resi.Reso;
 import me.leoo.springboot.libri.resi.ResoController;
@@ -11,6 +12,9 @@ import me.leoo.springboot.libri.resi.chat.TipoMittente;
 import me.leoo.springboot.libri.resi.stato.StatoReso;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.websocket.ChatWebSocketController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/resi")
@@ -30,6 +36,28 @@ public class AdminResoController {
     private final ChatWebSocketController chatWebSocketController;
 
     public record UpdateStatoRequest(StatoReso stato, String messaggio) {
+    }
+
+    public record ResoResponse(Long id, Long ordineId, int itemsCount,
+                               StatoReso statoCorrente) {
+    }
+
+    @GetMapping("/light-all")
+    public Set<AdminResoController.ResoResponse> getAllLightResos(@RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Reso> libros = resoRepository.findAll(pageable);
+
+        return libros.stream()
+                .map(l -> new AdminResoController.ResoResponse(
+                        l.getId(),
+                        l.getOrdine().getId(),
+                        l.getItems().size(),
+                        l.getStati().isEmpty() ? null :
+                                l.getStati().get(l.getStati().size() - 1).getStato()
+                ))
+                .collect(Collectors.toSet());
     }
 
     @GetMapping("/{id}/exists")

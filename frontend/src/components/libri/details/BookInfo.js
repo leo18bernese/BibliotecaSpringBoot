@@ -66,7 +66,7 @@ const fetchHasWishlisted = async (id, variantId) => {
 };
 
 const BookInfo = () => {
-    const {user} = useContext(UserContext);
+    const {user, isAdmin} = useContext(UserContext);
     const {showLoginPrompt} = useAuth();
     const {id} = useParams();
     const navigate = useNavigate();
@@ -548,6 +548,7 @@ const BookInfo = () => {
                             )}
                         </div>
 
+                        {user && isAdmin && (
                         <div className="bg-white shadow-md rounded-lg p-4 mt-4">
                             <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
 
@@ -557,6 +558,7 @@ const BookInfo = () => {
                                 Gestisci Libro
                             </button>
                         </div>
+                        )}
                     </div>
                 </div>
 

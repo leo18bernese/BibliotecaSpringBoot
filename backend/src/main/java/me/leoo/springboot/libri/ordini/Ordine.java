@@ -156,6 +156,10 @@ public class Ordine {
             throw new IllegalArgumentException("Nuovo stato non può essere null");
         }
 
+        if (nuovoStato.ordinal() <= getStato().ordinal()) {
+            throw new IllegalArgumentException("Non è possibile tornare a uno stato precedente");
+        }
+
         stati.put(nuovoStato, new Date());
     }
 
@@ -164,10 +168,11 @@ public class Ordine {
             return StatoOrdine.IN_ATTESA;
         }
 
-        Optional<StatoOrdine> ultimoStato = stati.keySet().stream()
-                .reduce((first, second) -> second);
-
-        return ultimoStato.orElse(StatoOrdine.IN_ATTESA);
+        // Trova lo stato con la data più recente
+        return stati.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(StatoOrdine.IN_ATTESA);
     }
 
     public String getStatoName() {
@@ -180,5 +185,10 @@ public class Ordine {
 
     public String getStatoNext() {
         return getStato().getNextStepOrInfo();
+    }
+
+    //Reso
+    public boolean isResoAllowed() {
+        return getStato() == StatoOrdine.CONSEGNATO;
     }
 }

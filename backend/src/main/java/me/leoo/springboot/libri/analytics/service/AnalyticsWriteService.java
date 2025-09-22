@@ -69,7 +69,7 @@ public class AnalyticsWriteService {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int minutes = cal.get(Calendar.MINUTE);
-        int roundedMinutes = (minutes / 15) * 15;
+        int roundedMinutes = (minutes / 20) * 20;
         cal.set(Calendar.MINUTE, roundedMinutes);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);

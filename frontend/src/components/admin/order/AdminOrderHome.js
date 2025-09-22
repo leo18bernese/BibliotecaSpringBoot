@@ -15,7 +15,7 @@ const AdminOrderHome = () => {
         select: (data) => data.sort((a, b) => a.id - b.id),
     });
 
-    usePageTitle('Admin Home');
+    usePageTitle('Admin Home - Orders');
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -23,6 +23,13 @@ const AdminOrderHome = () => {
 
     if (error) {
         return <div>Error loading orders.</div>;
+    }
+
+    if(orders.length === 0) {
+        return <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Admin Home - Order List</h1>
+            <div>Nessun ordine presente.</div>
+        </div>
     }
 
     return (

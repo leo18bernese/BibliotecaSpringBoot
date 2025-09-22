@@ -15,7 +15,7 @@ const AdminUserHome = () => {
         select: (data) => data.sort((a, b) => a.id - b.id), // Ordina i libri per ID in ordine crescente
     });
 
-    usePageTitle('Admin Home');
+    usePageTitle('Admin Home - Users');
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -23,6 +23,13 @@ const AdminUserHome = () => {
 
     if (error) {
         return <div>Error loading users.</div>;
+    }
+
+    if(users.length === 0) {
+        return <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Admin Home - User List</h1>
+            <div>Nessun utente presente.</div>
+        </div>
     }
 
     return (

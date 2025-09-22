@@ -86,6 +86,20 @@ const Ordine = () => {
 
                 <p className="text-center mt-8">{ordine.statoDescrizione}</p>
                 <p className="text-center">{ordine.statoNext}</p>
+
+                {ordine.resoAllowed && (
+                    <div className=" mt-12">
+                        <a className="text-gray-500 mr-3">Hai ricevuto il tuo ordine e desideri effettuare un reso?</a>
+
+                        <button
+                            onClick={() => navigate(`/ordine/${ordine.id}/reso/nuovo`)}
+                            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                        >
+                            Inizia Reso
+                        </button>
+                    </div>
+                )}
+
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-4  mt-8" style={{alignItems: 'start'}}>

@@ -32,7 +32,7 @@ public class AdminOrderController {
     ) {
     }
 
-    public record UpdateStatoRequest(StatoOrdine stato, String messaggio) {
+    public record UpdateStatoRequest(StatoOrdine stato) {
     }
 
 
@@ -98,8 +98,6 @@ public class AdminOrderController {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
-
-        System.out.println("setStatoOrdine called with id: " + id + ", messaggio: " + request.messaggio);
 
         try {
             Ordine ordine = ordineService.getOrdineById(id);

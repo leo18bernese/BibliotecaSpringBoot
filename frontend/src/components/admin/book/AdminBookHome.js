@@ -15,7 +15,7 @@ const AdminBookHome = () => {
         select: (data) => data.sort((a, b) => a.id - b.id), // Ordina i libri per ID in ordine crescente
     });
 
-    usePageTitle('Admin Home');
+    usePageTitle('Admin Home - Libri');
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -23,6 +23,13 @@ const AdminBookHome = () => {
 
     if (error) {
         return <div>Error loading books.</div>;
+    }
+
+    if(books.length === 0) {
+        return <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Admin Home - Book List</h1>
+            <div>Nessun libro presente.</div>
+        </div>
     }
 
     return (

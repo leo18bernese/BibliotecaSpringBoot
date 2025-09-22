@@ -97,11 +97,10 @@ public class Reso {
             return StatoReso.IN_ATTESA;
         }
 
-        Optional<StatoReso> ultimoStato = stati.stream()
+        return stati.stream()
+                .max(Comparator.comparing(StatoResoStorico::getDataAggiornamento))
                 .map(StatoResoStorico::getStato)
-                .reduce((first, second) -> second);
-
-        return ultimoStato.orElse(StatoReso.IN_ATTESA);
+                .orElse(StatoReso.IN_ATTESA);
     }
 
     public String getStatoName() {

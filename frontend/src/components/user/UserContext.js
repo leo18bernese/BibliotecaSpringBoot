@@ -36,7 +36,7 @@ export const UserProvider = ({children}) => {
         fetchAndSetUser(jwtToken);
     }, []);
 
-// Aggiungi un parametro 'token'
+    // Aggiungi un parametro 'token'
     const sendLogoutRequest = async (token) => {
         // Controlla se il token è null prima di inviare la richiesta
         if (!token) {
@@ -65,12 +65,21 @@ export const UserProvider = ({children}) => {
         setUser(null);
     };
 
+    const hasRole = (role) => {
+        if (!user || !user.ruoli) return false;
+        return user.ruoli.includes(role);
+    };
+
+    const isAdmin = () => hasRole('ROLE_ADMIN');
+
     const authContextValue = {
         user,
         setUser,
         isLoading,
-        fetchAndSetUser, // Esponi la nuova funzione
-        logout, // Esponi anche la funzione di logout
+        fetchAndSetUser,
+        logout,
+        hasRole,
+        isAdmin, // Espone la funzione isAdmin
     };
 
     if (isLoading) {

@@ -4,6 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 import {useNavigate, useParams} from "react-router-dom";
 import {Toaster} from "react-hot-toast";
 import AdminOrderItem from "./AdminOrderItem";
+import OrderAddStateForm from "./form/AddStateForm";
 
 const fetchExistOrder = async (id) => {
     const response = await axios.get(`/api/admin/order/${id}/exists`);
@@ -162,7 +163,7 @@ const AdminOrder = () => {
                         ))}
 
 
-                        {/*enumStati && <AddStateForm resoId={reso.id} stati={enumStati}/>*/}
+                        {enumStati && <OrderAddStateForm orderId={ordine.id} stati={enumStati}/>}
 
                     </div>
 
