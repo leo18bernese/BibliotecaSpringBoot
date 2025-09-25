@@ -1,4 +1,5 @@
 import ImprViewChart from "./ImprViewChart";
+import CartWishChart from "./CartWishChart";
 
 const DailyImpressionChart = ({productId}) => {
 
@@ -18,11 +19,20 @@ const DailyImpressionChart = ({productId}) => {
         }
     }
 
-    return <ImprViewChart
-        productId={productId}
-        resolution="daily"
-        selectedPeriod="2w"
-        options={options}
-    />
+    return <>
+
+        <ImprViewChart
+            productId={productId}
+            resolution="daily"
+            selectedPeriod="2w"
+            options={options}
+        />
+
+        <CartWishChart
+            productId={productId}
+            resolution="daily"
+            selectedPeriod="2w"
+            options={options}
+        /></>
 };
 export default DailyImpressionChart;
