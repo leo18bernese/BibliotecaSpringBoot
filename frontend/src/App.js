@@ -183,11 +183,7 @@ function Home() {
 
             <header className="App-header ">
 
-                {!user ? (
-                    <div className="user-info">
-                        <h3 className="text-gray-700">Login to see your information</h3>
-                    </div>
-                ) : (
+                {user && (
                     <div className="user-info">
                         <h3 className="text-gray-700">Welcome back, {user.username}!</h3>
                     </div>

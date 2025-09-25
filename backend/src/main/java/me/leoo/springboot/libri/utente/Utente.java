@@ -33,6 +33,7 @@ public class Utente implements UserDetails {
     private String nome;
     private String cognome;
     private String email;
+    private String telefono;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> ruoli = new HashSet<>();

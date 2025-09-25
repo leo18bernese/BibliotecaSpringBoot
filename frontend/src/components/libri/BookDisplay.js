@@ -34,7 +34,7 @@ function BookDisplay({idList, contentList, isLoading, error}) {
     };
 
     if (isLoading || !list) {
-        return <p>Loading...</p>;
+        return <h2 className="text-center">We are loading the books...</h2>;
     }
 
     if (error) {
