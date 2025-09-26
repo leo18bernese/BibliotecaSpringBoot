@@ -1,11 +1,24 @@
 import React, {useEffect, useState} from "react";
+import {useIMask} from "react-imask";
 
 const EditableField = ({
                            id, label, icon, value, placeholder, minChars, maxChars = 10000,
-                           type, onChange, description
+                           type, onChange, description, mask
                        }) => {
     const [editing, setEditing] = useState(false);
     const [inputValue, setInputValue] = useState('');
+
+    const {ref, maskRef} = useIMask(
+        mask ? {mask} : {mask: /.*/}, // Applica la maschera solo se fornita
+        {
+            onAccept: (val) => {
+                // Se la maschera è attiva, l'aggiornamento è gestito da useIMask
+                if (mask) {
+                    setInputValue(val);
+                }
+            }
+        }
+    );
 
     const handleBlur = () => {
         setEditing(false);
@@ -22,8 +35,9 @@ const EditableField = ({
     };
 
     const handleInputChange = (e) => {
-        const newValue = e.target.value;
+        if (mask) return;
 
+        const newValue = e.target.value;
 
         if (type === 'number') {
 
@@ -62,6 +76,7 @@ const EditableField = ({
                 <i className={`bx bx-${icon} text-2xl`}></i>
 
                 <input
+                    ref={mask ? ref : null} // Applica il ref solo se la maschera è presente
                     type={type || "text"}
                     min={minChars}
                     max={maxChars}

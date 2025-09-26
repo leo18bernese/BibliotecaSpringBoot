@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.recensioni;
 
+import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,11 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/recensioni")
+@RequiredArgsConstructor
 public class RecensioneController {
 
-    @Autowired
-    private RecensioneRepository recensioneRepository;
-
-    @Autowired
-    private UtenteRepository utenteRepository;
+    private final RecensioneRepository recensioneRepository;
+    private final UtenteRepository utenteRepository;
 
     public record RecensioneResponse(
             Recensione recensione, String username
@@ -97,6 +96,26 @@ public class RecensioneController {
 
             Recensione savedRecensione = recensioneRepository.save(recensione);
             return ResponseEntity.ok(getResponse(savedRecensione));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/{id}/utile")
+    public ResponseEntity<RecensioneResponse> markRecensioneUtile(@AuthenticationPrincipal Utente utente,
+                                                                 @PathVariable Long id) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Recensione recensione = recensioneRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Recensione non trovata per ID: " + id));
+
+            recensione.switchUtile(utente.getId());
+            Recensione updatedRecensione = recensioneRepository.save(recensione);
+
+            return ResponseEntity.ok(getResponse(updatedRecensione));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

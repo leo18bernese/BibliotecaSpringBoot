@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/utenti")
@@ -19,6 +16,13 @@ public class UtenteController {
 
     @Autowired
     private UtenteService utenteService;
+
+    public record UpdateUserRequest(
+            String nome,
+            String cognome,
+            String telefono
+    ) {
+    }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Utente> getUtente(@PathVariable Long id) {
@@ -62,6 +66,23 @@ public class UtenteController {
             return ResponseEntity.ok(utente);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateUtente(@AuthenticationPrincipal Utente utente,
+                                          @RequestBody UpdateUserRequest request) {
+        if (utente == null) {
+            return ResponseEntity.status(403).body("Utente non autenticato");
+        }
+
+        try {
+            Utente updatedUtente = utente.updateFrom(request);
+            utenteRepository.save(updatedUtente);
+
+            return ResponseEntity.ok(updatedUtente);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Errore durante l'aggiornamento dell'utente: " + e.getMessage());
         }
     }
 

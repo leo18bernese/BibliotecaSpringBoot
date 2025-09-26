@@ -54,6 +54,7 @@ import NotFound from "./components/utils/NotFound";
 import AdminOrder from "./components/admin/order/AdminOrder";
 import AdminOrderHome from "./components/admin/order/AdminOrderHome";
 import AdminResoHome from "./components/admin/reso/AdminResoHome";
+import PersonalDetailsEdit from "./components/user/pages/edit/PersonalDetailsEdit";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,7 @@ function App() {
                                                 <Route path="/account/*" element={<AccountInfo/>}>
                                                     <Route index element={<Navigate to="personal-details" replace/>}/>
                                                     <Route path="personal-details" element={<PersonalDetails/>}/>
+                                                    <Route path="personal-details/edit" element={<PersonalDetailsEdit/>}/>
                                                     <Route path="orders" element={<OrderHistory/>}/>
                                                     <Route path="reviews" element={<ReviewHistory/>}/>
                                                     <Route path="wishlist" element={<Wishlist/>}/>

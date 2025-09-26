@@ -5,6 +5,10 @@ import me.leoo.springboot.libri.security.AuthenticationService;
 import me.leoo.springboot.libri.security.JwtService;
 import me.leoo.springboot.libri.utente.security.LoginHistory;
 import me.leoo.springboot.libri.utente.security.LoginHistoryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -92,16 +96,19 @@ public class AuthController {
     }
 
     @GetMapping("/account-accesses")
-    public ResponseEntity<?> getAccountAccesses(@AuthenticationPrincipal Utente utente) {
+    public ResponseEntity<?> getAccountAccesses(@AuthenticationPrincipal Utente utente,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
         if (utente == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
 
         try {
-            // Fetch login history records for the authenticated user
-            List<LoginHistory> loginHistoryRecords = loginHistoryService.getAll(utente.getId());
+            Page<LoginHistory> loginHistoryPage = loginHistoryService.getAll(utente.getId(), pageable);
 
-            List<AccessRecord> accessRecords = loginHistoryRecords
+            List<AccessRecord> accessRecords = loginHistoryPage
                     .stream()
                     .map(record -> new AccessRecord(
                             record.getLoginTime(),
@@ -111,7 +118,11 @@ public class AuthController {
                     ))
                     .toList();
 
-            return ResponseEntity.ok(accessRecords);
+            // Ricrea l'oggetto Page con i dati mappati e le informazioni di paginazione originali
+            Page<AccessRecord> accessRecordPage = new PageImpl<>(accessRecords,
+                    pageable, loginHistoryPage.getTotalElements());
+
+            return ResponseEntity.ok(accessRecordPage);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error retrieving access records: " + e.getMessage());
         }

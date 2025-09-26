@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
-import ButtonField from "./fields/ButtonField";
+import ButtonField from "../../fields/ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
 import CreateVariant from "./variant/CreateVariant";
 

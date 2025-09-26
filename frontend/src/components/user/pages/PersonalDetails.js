@@ -1,9 +1,11 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
-import {UserContext} from "../UserContext"; // Recommended for prop type validation
+import {UserContext} from "../UserContext";
+import {useNavigate} from "react-router-dom"; // Recommended for prop type validation
 
 const PersonalDetails = () => {
     const {user} = useContext(UserContext);
+    const navigate = useNavigate();
 
     if (!user) {
         return (
@@ -16,6 +18,8 @@ const PersonalDetails = () => {
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mb-4">
             <h2 className="text-2xl font-bold mb-4">Account Information</h2>
+
+            <div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -32,9 +36,25 @@ const PersonalDetails = () => {
                 </div>
                 <div>
                     <p className="text-gray-500 text-sm">Phone Number</p>
-                    <p className="text-lg font-medium">{user.phoneNumber || 'Not provided'}</p>
+                    <p className="text-lg font-medium">{user.telefono || 'Not provided'}</p>
                 </div>
                 {/* Add more fields as needed */}
+
+
+            </div>
+
+                <div className="text-right">
+                    <button
+                        onClick={() => {
+                            navigate('/account/personal-details/edit');
+                        }}
+                        className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2
+                        focus:ring-blue-500 focus:ring-opacity-50 "
+                    >
+                        Edit Details
+                    </button>
+                </div>
+
             </div>
 
             <div className="mt-6 border-t pt-4">
@@ -46,7 +66,8 @@ const PersonalDetails = () => {
 
                 <button
                     onClick={() => alert('Navigate to change password page')}
-                    className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2
+                    focus:ring-blue-500 focus:ring-opacity-50"
                 >
                     Change Password
                 </button>

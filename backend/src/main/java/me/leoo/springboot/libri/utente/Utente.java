@@ -63,6 +63,13 @@ public class Utente implements UserDetails {
         System.out.println("creato utente " + username);
     }
 
+    public Utente updateFrom(UtenteController.UpdateUserRequest request) {
+        this.nome = request.nome();
+        this.cognome = request.cognome();
+        this.telefono = request.telefono();
+        return this;
+    }
+
     // Ruoli
     public void addRuolo(String ruolo) {
         ruoli.add(ruolo);
