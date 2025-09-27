@@ -99,6 +99,36 @@ const BookInfo = () => {
         queryFn: () => fetchBookById(bookId),
     });
 
+    useEffect(() => {
+        if (!book) return;
+
+        let variantToSet = null;
+
+        // Prioritize restoring from location state
+        if (location.state?.bookState?.variantId) {
+            const restoredVariant = book.varianti.find(v => v.id === location.state.bookState.variantId);
+            if (restoredVariant) {
+                variantToSet = restoredVariant;
+            }
+        }
+
+        // If no variant was restored, and none is selected, set the default
+        if (!variantToSet && !selectedVariant && book.varianti && book.varianti.length > 0) {
+            variantToSet = book.varianti[0];
+        }
+
+        if (variantToSet) {
+            setSelectedVariant(variantToSet);
+        }
+
+        // Handle quantity separately
+        if (location.state?.bookState?.quantity) {
+            setQuantityToAdd(location.state.bookState.quantity);
+        }
+
+    }, [location.state, book, selectedVariant]);
+
+
     const {data: previousBookExists} = useQuery({
         queryKey: ['bookExists', previousId],
         queryFn: () => fetchBookExists(previousId),
@@ -161,7 +191,7 @@ const BookInfo = () => {
 
     const addToWishlist = async (bookId, variantId) => {
         if (!user) {
-            showLoginPrompt();
+            showLoginPrompt({ bookState: { quantity: quantityToAdd, variantId: selectedVariant?.id } });
             return;
         }
         try {
@@ -177,7 +207,7 @@ const BookInfo = () => {
 
     const removeFromWishlist = async (bookId, variantId) => {
         if (!user) {
-            showLoginPrompt();
+            showLoginPrompt({ bookState: { quantity: quantityToAdd, variantId: selectedVariant?.id } });
             return;
         }
         try {
@@ -193,7 +223,7 @@ const BookInfo = () => {
 
     const updateItem = (quantity) => {
         if (!user) {
-            showLoginPrompt();
+            showLoginPrompt({ bookState: { quantity: quantityToAdd, variantId: selectedVariant?.id } });
             return;
         }
 
@@ -409,9 +439,9 @@ const BookInfo = () => {
                             {/* Price and Discount */}
                             {selectedVariant && (
                                 <>
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center space-x-3 ">
                                         {selectedVariant.prezzo.prezzoTotale < selectedVariant.prezzo.prezzo && (
-                                            <p className="text-red-600 text-2xl line-through font-semibold mb-2"
+                                            <p className="text-red-600  text-2xl line-through font-semibold mb-2"
                                                style={{textDecorationThickness: '2px'}}>
                                                 {selectedVariant.prezzo.prezzo.toFixed(2)} €
                                             </p>
@@ -489,9 +519,9 @@ const BookInfo = () => {
                                     )*/}
 
                                     <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-4 flex-row  ">
-                                            <div className="flex gap-3">
-                                                <button className="text-blue-500 font-black text-2xl"
+                                        <div className="flex items-center gap-2 md:gap-4 flex-col sm:flex-row">
+                                            <div className="flex gap-2 md:gap-3 flex-shrink-0">
+                                                <button className="text-blue-500 font-black text-xl md:text-2xl w-8 h-8 md:w-auto md:h-auto flex items-center justify-center"
                                                         onClick={() => {
                                                             const newQuantity = Math.max(1, quantityToAdd - 1);
                                                             setQuantityToAdd(newQuantity)
@@ -499,7 +529,7 @@ const BookInfo = () => {
                                                 </button>
 
                                                 <input type="number"
-                                                       className="w-16 text-center border-4 border-blue-500 p-1.5 rounded-lg text-blue-800"
+                                                       className="w-14 md:w-16 text-center border-4 border-blue-500 p-1 md:p-1.5 rounded-lg text-blue-800 text-sm md:text-base"
                                                        value={quantityToAdd}
                                                        min={1}
                                                        max={quantitaDisponibile}
@@ -509,7 +539,7 @@ const BookInfo = () => {
                                                        }}
                                                 />
 
-                                                <button className="text-blue-500 font-black text-2xl"
+                                                <button className="text-blue-500 font-black text-xl md:text-2xl w-8 h-8 md:w-auto md:h-auto flex items-center justify-center"
                                                         onClick={() => {
                                                             const newQuantity = Math.min(quantitaDisponibile, quantityToAdd + 1);
                                                             setQuantityToAdd(newQuantity)
@@ -519,33 +549,34 @@ const BookInfo = () => {
 
                                             {isMaxed ?
                                                 <button
-                                                    className={`flex-grow bg-blue-500 hover:bg-blue-600'} 
-                                                    text-white font-semibold py-2 px-4 rounded-xl transition`}
+                                                    className="w-full sm:flex-grow bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-2 md:px-4 rounded-xl transition text-sm md:text-base min-w-0"
                                                     onClick={() => navigate('/cart')}
                                                 >
-                                                    Vai al carrello
+                                                    <span className="truncate">Vai al carrello</span>
                                                 </button>
                                                 :
 
                                                 <button
-                                                    className={`flex-grow ${isUpdateButtonDisabled ?
+                                                    className={`w-full sm:flex-grow ${isUpdateButtonDisabled ?
                                                         'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
-                                                    text-white font-semibold py-2 px-4 rounded-xl transition`}
+                                                    text-white font-semibold py-2 px-2 md:px-4 rounded-xl transition text-sm md:text-base min-w-0`}
                                                     onClick={() => updateItem(quantityToAdd)}
                                                     disabled={isUpdateButtonDisabled}
                                                 >
-                                                    {updateCartItemMutation.isPending ? 'Aggiungendo...' :
-                                                        (cartItem && cartItem.quantita > 0) ? 'Aggiorna quantità' :
-                                                            'Aggiungi al carrello'
-                                                    }
+                                                    <span className="truncate">
+                                                        {updateCartItemMutation.isPending ? 'Aggiungendo...' :
+                                                            (cartItem && cartItem.quantita > 0) ? 'Aggiorna quantità' :
+                                                                'Aggiungi al carrello'
+                                                        }
+                                                    </span>
                                                 </button>
                                             }
                                         </div>
 
                                         {isDisponibile && (
                                             <button
-                                                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition">
-                                                Acquista Ora
+                                                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-2 md:px-4 rounded-xl transition text-sm md:text-base">
+                                                <span className="truncate">Acquista Ora</span>
                                             </button>
                                         )}
                                     </div>

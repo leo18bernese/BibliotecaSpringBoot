@@ -30,7 +30,7 @@ const Login = () => {
 
             toast.success("Login successful!");
 
-            navigate(from, {replace: true}); // Redirect to the previous page or home
+            navigate(from, {replace: true, state: location.state}); // Redirect to the previous page or home
         },
         onError: (error) => {
             console.error("Errore durante il login:", error.response?.data.errore || error.message);
@@ -47,8 +47,9 @@ const Login = () => {
         loginMutation.mutate({username, password});
     };
 
+    console.log(user, loggedIn, from, location);
     if (user && !loggedIn) {
-        navigate(from, {replace: true}); // Redirect to the previous page or home
+        navigate(from, {replace: true, state: location.state}); // Redirect to the previous page or home
         return null;
     }
 

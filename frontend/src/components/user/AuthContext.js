@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useLocation} from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -7,14 +7,25 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({children}) => {
     const [prompt, setPrompt] = useState(false);
+    const [redirectState, setRedirectState] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const showLoginPrompt = () => setPrompt(true);
-    const hideLoginPrompt = () => setPrompt(false);
+    const showLoginPrompt = (state = null) => {
+        setRedirectState(state);
+        console.log("Setting redirect state to:", state);
+        setPrompt(true);
+    };
+
+    const hideLoginPrompt = () => {
+        setPrompt(false);
+        //setRedirectState(null);
+    };
 
     const handleLoginRedirect = () => {
         hideLoginPrompt();
-        navigate('/login');
+        console.log({state: {from: location, ...redirectState}});
+        navigate('/login', {state: {from: location, ...redirectState}});
     };
 
     return (
