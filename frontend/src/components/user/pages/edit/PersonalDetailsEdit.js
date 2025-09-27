@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {UserContext} from "../../UserContext";
-import EditableField from "../../../fields/EditableField";
+import EditableField from "../../../ui/fields/EditableField";
 import axios from "axios";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import toast from "react-hot-toast";

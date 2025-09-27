@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useState} from "react";
 import {usePageTitle} from "../../utils/usePageTitle";
-import ButtonField from "../../fields/ButtonField";
+import ButtonField from "../../ui/fields/ButtonField";
 import BookChart from "./chart/BookChart";
 import ImpressionChart from "./chart/ImpressionChart";
 import AnalyticsOverview from "./chart/Analytics";

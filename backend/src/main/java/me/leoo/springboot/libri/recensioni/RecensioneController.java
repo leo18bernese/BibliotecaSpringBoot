@@ -3,6 +3,10 @@ package me.leoo.springboot.libri.recensioni;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,15 +38,16 @@ public class RecensioneController {
     }
 
     @GetMapping("/all/user")
-    public ResponseEntity<RecensioneResponse[]> getRecensioniByUtenteId(@AuthenticationPrincipal Utente utente) {
+    public ResponseEntity<Page<RecensioneResponse>> getRecensioniByUtenteId(
+            @AuthenticationPrincipal Utente utente,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
         try {
-            Set<Recensione> recensioni = recensioneRepository.findByUtenteId(utente.getId());
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Recensione> recensioniPage = recensioneRepository.findByUtenteId(utente.getId(), pageable);
 
-            RecensioneResponse[] recensioniResponse = recensioni.stream()
-                    .map(this::getResponse)
-                    .toArray(RecensioneResponse[]::new);
-
-            return ResponseEntity.ok(recensioniResponse);
+            Page<RecensioneResponse> responsePage = recensioniPage.map(this::getResponse);
+            return ResponseEntity.ok(responsePage);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

@@ -1,14 +1,14 @@
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import EditableField from "../../fields/EditableField";
-import SelectableRadioField from "../../fields/SelectableRadioField";
+import EditableField from "../../ui/fields/EditableField";
+import SelectableRadioField from "../../ui/fields/SelectableRadioField";
 import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
-import ViewableField from "../../fields/ViewableField";
-import ButtonField from "../../fields/ButtonField";
+import ViewableField from "../../ui/fields/ViewableField";
+import ButtonField from "../../ui/fields/ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
-import RemovableField from "../../fields/RemovableField";
+import RemovableField from "../../ui/fields/RemovableField";
 
 const fetchBookByIdAndVariante = async (id, varianteId) => {
     const {data} = await axios.get(`/api/libri/${id}/variante/${varianteId}`);
