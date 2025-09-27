@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
+import me.leoo.springboot.libri.utente.role.UserRole;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -71,16 +73,16 @@ public class Utente implements UserDetails {
     }
 
     // Ruoli
-    public void addRuolo(String ruolo) {
-        ruoli.add(ruolo);
+    public void addRuolo(UserRole ruolo) {
+        ruoli.add(ruolo.getId());
     }
 
-    public void removeRuolo(String ruolo) {
-        ruoli.remove(ruolo);
+    public void removeRuolo(UserRole ruolo) {
+        ruoli.remove(ruolo.getId());
     }
 
     public boolean isAdmin() {
-        return ruoli.contains("ROLE_ADMIN");
+        return ruoli.contains(UserRole.ADMIN.getId());
     }
 
     // Wishlist

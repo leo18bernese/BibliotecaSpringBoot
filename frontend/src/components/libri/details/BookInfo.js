@@ -30,8 +30,13 @@ const fetchBookExists = async (id) => {
 
 const fetchImageIds = async (id) => {
     try {
-        const {data} = await axios.get(`/api/images/${id}`);
-        return data;
+        const data = await axios.get(`/api/images/${id}`);
+
+        if(data.status === 204) {
+            return [];
+        }
+
+        return data.data;
     } catch (error) {
         if (error.response && error.response.status === 404) {
             console.warn("No images found for this book:", error);

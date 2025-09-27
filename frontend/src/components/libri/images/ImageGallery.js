@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 const ImageGallery = ({id, images, API_URL, onView}) => {
-    const [selectedImage, setSelectedImage] = useState(images === -1 ? -1 : 0);
+    const [selectedImage, setSelectedImage] = useState(images.length <= 0 ? -1 : 0);
     const [showPopup, setShowPopup] = useState(false);
 
     const handleImageClick = () => {
@@ -29,7 +29,11 @@ const ImageGallery = ({id, images, API_URL, onView}) => {
                 )}
 
                 <div className="mt-4 w-full text-center text-gray-500 text-sm italic">
-                    {selectedImage === -1 ? 'Nessuna immagine disponibile' : 'Clicca sull\'immagine per ingrandirla'}
+
+
+                    {selectedImage === -1 ?
+                        (<div className="h-48"> Non è presente nessuna immagine per questo prodotto</div>) :
+                        'Clicca sull\'immagine per ingrandirla'}
                 </div>
             </div>
 

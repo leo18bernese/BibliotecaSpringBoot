@@ -3,7 +3,6 @@ package me.leoo.springboot.libri.recensioni;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,12 +53,17 @@ public class RecensioneController {
         try {
             Set<Recensione> recensioni = recensioneRepository.findByLibroId(libroId);
 
+            System.out.println("Recensioni trovate per libroId " + libroId + ": " + recensioni.size());
+
             RecensioneResponse[] recensioniResponse = recensioni.stream()
                     .map(this::getResponse)
                     .toArray(RecensioneResponse[]::new);
 
+            System.out.println("RecensioniResponse create: " + recensioniResponse.length);
+
             return ResponseEntity.ok(recensioniResponse);
         } catch (Exception e) {
+            System.out.println("Errore nel recupero delle recensioni per libroId " + libroId + ": " + e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
@@ -103,7 +107,7 @@ public class RecensioneController {
 
     @PostMapping("/{id}/utile")
     public ResponseEntity<RecensioneResponse> markRecensioneUtile(@AuthenticationPrincipal Utente utente,
-                                                                 @PathVariable Long id) {
+                                                                  @PathVariable Long id) {
         if (utente == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -125,7 +129,9 @@ public class RecensioneController {
         if (recensione == null) return null;
 
         Utente utente = utenteRepository.findById(recensione.getUtenteId())
-                .orElseThrow(() -> new RuntimeException("Utente non trovato per ID: " + recensione.getUtenteId()));
+                .orElse(null);
+
+        if (utente == null) return new RecensioneResponse(recensione, "Utente non trovato");
 
         return new RecensioneResponse(recensione, utente.getUsername());
     }

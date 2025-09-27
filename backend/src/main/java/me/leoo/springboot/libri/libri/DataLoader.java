@@ -11,6 +11,7 @@ import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
 import me.leoo.springboot.libri.utente.Utente;
 import me.leoo.springboot.libri.utente.UtenteRepository;
 import me.leoo.springboot.libri.utente.UtenteService;
+import me.leoo.springboot.libri.utente.role.UserRole;
 import me.leoo.springboot.libri.utils.Sconto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -58,6 +59,7 @@ public class DataLoader implements CommandLineRunner {
         SpedizioneIndirizzo ind3 = new SpedizioneIndirizzo("Anna Verdi", "Via Napoli 3", "Grugliasco", "Torino", "10095", "1122334455");
 
         Utente u = new Utente("Daniel18", "ciao1234", "Daniel", "Bello", "daniel@gmail.com");
+        u.addRuolo(UserRole.ADMIN);
 
         // Aggiungi un libro alla wishlist se esistono libri
         List<Libro> libri = libroRepository.findAll();
