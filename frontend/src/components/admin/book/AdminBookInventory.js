@@ -3,7 +3,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
-import ButtonField from "../../ui/fields/ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
 import CreateVariant from "./variant/CreateVariant";
 
@@ -70,7 +69,7 @@ const AdminBookInventory = () => {
         onSuccess: (data) => {
             toast.success("Variante eliminata con successo");
             queryClient.invalidateQueries({queryKey: ['book', id]});
-        } ,
+        },
         onError: (error) => {
             toast.error("Errore durante l'eliminazione della variante");
         }
@@ -164,7 +163,8 @@ const AdminBookInventory = () => {
                                 <div>
 
                                     <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
-                                    <p className="text-sm text-gray-600 mb-4">Nome basato su attributi: <b>{variante.dynamicName}</b></p>
+                                    <p className="text-sm text-gray-600 mb-4">Nome basato su
+                                        attributi: <b>{variante.dynamicName}</b></p>
                                 </div>
 
                                 <div>

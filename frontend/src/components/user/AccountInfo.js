@@ -36,7 +36,8 @@ const AccountInfo = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-[20%_80%] gap-4">
 
                     {/* Sidebar mobile/desktop */}
-                    <div className={`bg-white shadow-md rounded-lg p-4 mb-4 text-black fixed top-0 left-0 z-30 transition-transform duration-300 h-full w-64 lg:static lg:translate-x-0 lg:w-auto lg:h-auto ${showSidebar ? "translate-x-0" : "-translate-x-full"} lg:mb-0`}>
+                    <div
+                        className={`bg-white shadow-md rounded-lg p-4 mb-4 text-black fixed top-0 left-0 z-30 transition-transform duration-300 h-full w-64 lg:static lg:translate-x-0 lg:w-auto lg:h-auto ${showSidebar ? "translate-x-0" : "-translate-x-full"} lg:mb-0`}>
                         <div>
                             <h3 className="text-lg mb-4">My Account</h3>
                         </div>

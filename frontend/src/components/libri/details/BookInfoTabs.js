@@ -1,5 +1,5 @@
 // src/components/BookInfoTabs.js
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 const TabPanel = ({children, value, index}) => {
     return (

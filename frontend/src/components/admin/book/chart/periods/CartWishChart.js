@@ -3,11 +3,11 @@ import React from "react";
 import GenericTimeSeriesChart from "../ImpressionChart";
 
 const metrics = [
-    { key: "ADD_TO_CART", label: "Aggiunte al Carrello", color: "rgb(75, 192, 192)" },
-    { key: "ADD_TO_WISHLIST", label: "Aggiunte alla Lista Desideri", color: "rgb(153, 102, 255)" }
+    {key: "ADD_TO_CART", label: "Aggiunte al Carrello", color: "rgb(75, 192, 192)"},
+    {key: "ADD_TO_WISHLIST", label: "Aggiunte alla Lista Desideri", color: "rgb(153, 102, 255)"}
 ];
 
-const CartWishChart = ({ productId, resolution, periods, options, selectedPeriod }) => (
+const CartWishChart = ({productId, resolution, periods, options, selectedPeriod}) => (
     <GenericTimeSeriesChart
         apiUrls={[
             `/api/analytics/products/${productId}/timeseries/ADD_TO_CART`,

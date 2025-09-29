@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import {NavLink, Outlet, useLocation} from "react-router-dom";
 import React, {useState} from "react";
 
 const AdminBar = () => {
@@ -59,7 +59,7 @@ const AdminBar = () => {
             )}
 
             <div className="w-5/6 mx-10 overflow-x-auto">
-                <Outlet />
+                <Outlet/>
             </div>
         </div>
     );

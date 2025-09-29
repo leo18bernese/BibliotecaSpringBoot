@@ -1,12 +1,6 @@
 import React from 'react';
 import {Steps} from 'antd';
-import {
-    ContainerOutlined,
-    InboxOutlined,
-    TruckOutlined,
-    HomeOutlined,
-    CheckCircleOutlined
-} from '@ant-design/icons';
+import {CheckCircleOutlined, ContainerOutlined, HomeOutlined, InboxOutlined, TruckOutlined} from '@ant-design/icons';
 
 const {Step} = Steps;
 

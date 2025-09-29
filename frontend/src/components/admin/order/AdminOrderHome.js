@@ -25,7 +25,7 @@ const AdminOrderHome = () => {
         return <div>Error loading orders.</div>;
     }
 
-    if(orders.length === 0) {
+    if (orders.length === 0) {
         return <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Admin Home - Order List</h1>
             <div>Nessun ordine presente.</div>

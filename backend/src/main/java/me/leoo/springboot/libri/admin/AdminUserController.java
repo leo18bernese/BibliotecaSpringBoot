@@ -9,6 +9,7 @@ import me.leoo.springboot.libri.utente.UtenteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -48,29 +49,30 @@ public class AdminUserController {
 
 
     @GetMapping("/light-all")
-    public Set<UserResponse> getAllLightUsers(@RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ResponseEntity<Page<UserResponse>> getAllLightUsers(@RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "20") int size) {
 
-        Page<Utente> utenti = utenteRepository.findAll(pageable);
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Utente> utenti = utenteRepository.findAll(pageable);
 
-        System.out.println(utenti.getContent());
-        return utenti.stream()
-                .map(l -> {
+            Page<UserResponse> userResponses = utenti.map(l -> {
+                Carrello carrello = carrelloService.getCarrelloByUtente(l);
+                return new UserResponse(
+                        l.getId(),
+                        l.getUsername(),
+                        l.getEmail(),
+                        l.getRuoli(),
+                        carrello.getItems().size(),
+                        l.getWishlist() != null ? l.getWishlist().size() : 0,
+                        l.getIndirizzi() != null ? l.getIndirizzi().size() : 0
+                );
+            });
 
-                    Carrello carrello = carrelloService.getCarrelloByUtente(l);
-
-                    return new UserResponse(
-                            l.getId(),
-                            l.getUsername(),
-                            l.getEmail(),
-                            l.getRuoli(),
-                            carrello.getItems().size(),
-                            l.getWishlist() != null ? l.getWishlist().size() : 0,
-                            l.getIndirizzi() != null ? l.getIndirizzi().size() : 0
-                    );
-                })
-                .collect(Collectors.toSet());
+            return ResponseEntity.ok(userResponses);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -89,11 +91,11 @@ public class AdminUserController {
                 )).collect(Collectors.toSet()) : Set.of();
 
         Set<CartItemResponse> cartItems = carrello.getItems().stream()
-                        .map(i -> new CartItemResponse(
-                                i.getLibro().getId(),
-                                i.getLibro().getTitolo(),
-                                i.getQuantita()
-                        )).collect(Collectors.toSet());
+                .map(i -> new CartItemResponse(
+                        i.getLibro().getId(),
+                        i.getLibro().getTitolo(),
+                        i.getQuantita()
+                )).collect(Collectors.toSet());
 
         Set<WishlistItemResponse> wishlistItems = l.getWishlist() != null ? l.getWishlist().stream()
                 .map(w -> new WishlistItemResponse(

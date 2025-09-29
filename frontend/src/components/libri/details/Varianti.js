@@ -103,7 +103,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
         return <div
             key={path}
             className={` p-3 border-2 rounded-lg cursor-pointer transition-colors
-         ${selectedVariantPath.startsWith(path) ? ' bg-blue-100 shadow-md' : `bg-white hover:${selectedPath === path ? 'border-blue-500' :  'border-gray-400' }`}
+         ${selectedVariantPath.startsWith(path) ? ' bg-blue-100 shadow-md' : `bg-white hover:${selectedPath === path ? 'border-blue-500' : 'border-gray-400'}`}
             ${selectedPath === path ? 'border-blue-500 shadow-lg' : 'border-gray-300 '}
           `}
             onClick={() => {

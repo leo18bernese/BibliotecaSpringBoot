@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 
-const AnalyticsOverview = ({ productId }) => {
+const AnalyticsOverview = ({productId}) => {
     const [overview, setOverview] = useState(null);
     const [loading, setLoading] = useState(true);
 

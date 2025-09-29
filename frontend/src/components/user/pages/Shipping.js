@@ -1,13 +1,13 @@
 import React, {useContext} from 'react';
 import {UserContext} from "../UserContext";
-import {useNavigate} from "react-router-dom"; // Recommended for prop type validation
+import {useNavigate} from "react-router-dom";
+import {usePageTitle} from "../../utils/usePageTitle"; // Recommended for prop type validation
 
 const Shipping = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
 
-
-    console.log("Orders:", user);
+    usePageTitle('Shipping Addresses');
 
     const indirizzi = user.indirizzi || [];
 

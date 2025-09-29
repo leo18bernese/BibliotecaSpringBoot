@@ -1,10 +1,11 @@
-import React, {useContext, useState} from 'react';
-import {UserContext} from "../UserContext";
-import {useQuery} from "@tanstack/react-query";
-import axios from "axios";
+import React from 'react';
 import Pageable from "../../ui/pages/Pageable";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const Security = () => {
+
+    usePageTitle('Security & Access Logs');
+
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mb-4">
             <h2 className="text-2xl font-bold mb-4">Security & Access Logs</h2>

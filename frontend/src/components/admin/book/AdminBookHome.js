@@ -25,7 +25,7 @@ const AdminBookHome = () => {
         return <div>Error loading books.</div>;
     }
 
-    if(books.length === 0) {
+    if (books.length === 0) {
         return <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Admin Home - Book List</h1>
             <div>Nessun libro presente.</div>

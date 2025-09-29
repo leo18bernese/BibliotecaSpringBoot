@@ -3,12 +3,12 @@ import React from "react";
 import GenericTimeSeriesChart from "../ImpressionChart";
 
 const metrics = [
-    { key: "IMPRESSION", label: "Impressioni", color: "rgb(255, 99, 132)" },
-    { key: "VIEW", label: "Visualizzazioni", color: "rgb(54, 162, 235)" },
-    { key: "VIEW_IMAGE", label: "Visualizzazioni Immagine", color: "rgb(255, 206, 86)" }
+    {key: "IMPRESSION", label: "Impressioni", color: "rgb(255, 99, 132)"},
+    {key: "VIEW", label: "Visualizzazioni", color: "rgb(54, 162, 235)"},
+    {key: "VIEW_IMAGE", label: "Visualizzazioni Immagine", color: "rgb(255, 206, 86)"}
 ];
 
-const ImprViewChart = ({ productId, resolution, periods, options, selectedPeriod }) => (
+const ImprViewChart = ({productId, resolution, periods, options, selectedPeriod}) => (
     <GenericTimeSeriesChart
         apiUrls={[
             `/api/analytics/products/${productId}/timeseries/IMPRESSION`,

@@ -32,7 +32,7 @@ const fetchImageIds = async (id) => {
     try {
         const data = await axios.get(`/api/images/${id}`);
 
-        if(data.status === 204) {
+        if (data.status === 204) {
             return [];
         }
 
@@ -191,7 +191,7 @@ const BookInfo = () => {
 
     const addToWishlist = async (bookId, variantId) => {
         if (!user) {
-            showLoginPrompt({ bookState: { quantity: quantityToAdd, variantId: selectedVariant?.id } });
+            showLoginPrompt({bookState: {quantity: quantityToAdd, variantId: selectedVariant?.id}});
             return;
         }
         try {
@@ -207,7 +207,7 @@ const BookInfo = () => {
 
     const removeFromWishlist = async (bookId, variantId) => {
         if (!user) {
-            showLoginPrompt({ bookState: { quantity: quantityToAdd, variantId: selectedVariant?.id } });
+            showLoginPrompt({bookState: {quantity: quantityToAdd, variantId: selectedVariant?.id}});
             return;
         }
         try {
@@ -223,7 +223,7 @@ const BookInfo = () => {
 
     const updateItem = (quantity) => {
         if (!user) {
-            showLoginPrompt({ bookState: { quantity: quantityToAdd, variantId: selectedVariant?.id } });
+            showLoginPrompt({bookState: {quantity: quantityToAdd, variantId: selectedVariant?.id}});
             return;
         }
 
@@ -521,11 +521,12 @@ const BookInfo = () => {
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-center gap-2 md:gap-4 flex-col sm:flex-row">
                                             <div className="flex gap-2 md:gap-3 flex-shrink-0">
-                                                <button className="text-blue-500 font-black text-xl md:text-2xl w-8 h-8 md:w-auto md:h-auto flex items-center justify-center"
-                                                        onClick={() => {
-                                                            const newQuantity = Math.max(1, quantityToAdd - 1);
-                                                            setQuantityToAdd(newQuantity)
-                                                        }}>-
+                                                <button
+                                                    className="text-blue-500 font-black text-xl md:text-2xl w-8 h-8 md:w-auto md:h-auto flex items-center justify-center"
+                                                    onClick={() => {
+                                                        const newQuantity = Math.max(1, quantityToAdd - 1);
+                                                        setQuantityToAdd(newQuantity)
+                                                    }}>-
                                                 </button>
 
                                                 <input type="number"
@@ -539,11 +540,12 @@ const BookInfo = () => {
                                                        }}
                                                 />
 
-                                                <button className="text-blue-500 font-black text-xl md:text-2xl w-8 h-8 md:w-auto md:h-auto flex items-center justify-center"
-                                                        onClick={() => {
-                                                            const newQuantity = Math.min(quantitaDisponibile, quantityToAdd + 1);
-                                                            setQuantityToAdd(newQuantity)
-                                                        }}>+
+                                                <button
+                                                    className="text-blue-500 font-black text-xl md:text-2xl w-8 h-8 md:w-auto md:h-auto flex items-center justify-center"
+                                                    onClick={() => {
+                                                        const newQuantity = Math.min(quantitaDisponibile, quantityToAdd + 1);
+                                                        setQuantityToAdd(newQuantity)
+                                                    }}>+
                                                 </button>
                                             </div>
 
@@ -585,15 +587,15 @@ const BookInfo = () => {
                         </div>
 
                         {user && isAdmin && (
-                        <div className="bg-white shadow-md rounded-lg p-4 mt-4">
-                            <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
+                            <div className="bg-white shadow-md rounded-lg p-4 mt-4">
+                                <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
 
-                            <button
-                                className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
-                                onClick={() => navigate(`/admin/book/${book.id}`)}>
-                                Gestisci Libro
-                            </button>
-                        </div>
+                                <button
+                                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
+                                    onClick={() => navigate(`/admin/book/${book.id}`)}>
+                                    Gestisci Libro
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>

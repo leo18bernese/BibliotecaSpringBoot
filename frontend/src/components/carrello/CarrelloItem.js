@@ -152,7 +152,7 @@ const CarrelloItem = ({item}) => {
                                        style={{
                                            appearance: "textfield",
                                            margin: "0",
-                                             padding: "0",
+                                           padding: "0",
                                        }}
                                 ></input>
 

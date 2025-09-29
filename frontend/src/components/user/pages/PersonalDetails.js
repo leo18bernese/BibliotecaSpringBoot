@@ -1,11 +1,14 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {UserContext} from "../UserContext";
-import {useNavigate} from "react-router-dom"; // Recommended for prop type validation
+import {useNavigate} from "react-router-dom";
+import {usePageTitle} from "../../utils/usePageTitle"; // Recommended for prop type validation
 
 const PersonalDetails = () => {
     const {user} = useContext(UserContext);
     const navigate = useNavigate();
+
+    usePageTitle('Personal Details');
 
     if (!user) {
         return (
@@ -21,27 +24,27 @@ const PersonalDetails = () => {
 
             <div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <p className="text-gray-500 text-sm">Username</p>
-                    <p className="text-lg font-medium">{user.username}</p>
-                </div>
-                <div>
-                    <p className="text-gray-500 text-sm">Email Address</p>
-                    <p className="text-lg font-medium">{user.email}</p>
-                </div>
-                <div>
-                    <p className="text-gray-500 text-sm">Full Name</p>
-                    <p className="text-lg font-medium">{user.nome} {user.cognome}</p>
-                </div>
-                <div>
-                    <p className="text-gray-500 text-sm">Phone Number</p>
-                    <p className="text-lg font-medium">{user.telefono || 'Not provided'}</p>
-                </div>
-                {/* Add more fields as needed */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p className="text-gray-500 text-sm">Username</p>
+                        <p className="text-lg font-medium">{user.username}</p>
+                    </div>
+                    <div>
+                        <p className="text-gray-500 text-sm">Email Address</p>
+                        <p className="text-lg font-medium">{user.email}</p>
+                    </div>
+                    <div>
+                        <p className="text-gray-500 text-sm">Full Name</p>
+                        <p className="text-lg font-medium">{user.nome} {user.cognome}</p>
+                    </div>
+                    <div>
+                        <p className="text-gray-500 text-sm">Phone Number</p>
+                        <p className="text-lg font-medium">{user.telefono || 'Not provided'}</p>
+                    </div>
+                    {/* Add more fields as needed */}
 
 
-            </div>
+                </div>
 
                 <div className="text-right">
                     <button

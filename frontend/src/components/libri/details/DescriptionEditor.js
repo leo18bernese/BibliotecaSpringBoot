@@ -1,5 +1,5 @@
 import {Editor} from '@tinymce/tinymce-react';
-import {useRef, useImperativeHandle, forwardRef, useState, useEffect} from 'react';
+import {forwardRef, useEffect, useImperativeHandle, useRef, useState} from 'react';
 
 const DescriptionEditor = forwardRef(({initialContent}, ref) => {
     const editorRef = useRef(null);

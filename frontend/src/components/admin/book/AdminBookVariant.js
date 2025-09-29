@@ -315,7 +315,7 @@ const AdminBookVariant = () => {
                                            type="number"
                                            onChange={(newWidth) => {
                                                setDimensioni(prev => ({...prev, width: newWidth}));
-                                                  setHasUnsavedChanges(true);
+                                               setHasUnsavedChanges(true);
                                            }}
                             />
 
@@ -327,7 +327,7 @@ const AdminBookVariant = () => {
                                            type="number"
                                            onChange={(newHeight) => {
                                                setDimensioni(prev => ({...prev, height: newHeight}));
-                                                  setHasUnsavedChanges(true);
+                                               setHasUnsavedChanges(true);
                                            }}
                             />
 
@@ -339,7 +339,7 @@ const AdminBookVariant = () => {
                                            type="number"
                                            onChange={(newWeight) => {
                                                setDimensioni(prev => ({...prev, weight: newWeight}));
-                                                    setHasUnsavedChanges(true);
+                                               setHasUnsavedChanges(true);
                                            }}
                             />
                         </div>

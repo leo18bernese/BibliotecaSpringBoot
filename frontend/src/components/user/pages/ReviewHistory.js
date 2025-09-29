@@ -1,10 +1,13 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom";
 import Pageable from "../../ui/pages/Pageable";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 
 const ReviewHistory = () => {
     const navigate = useNavigate();
+
+    usePageTitle('Review History');
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mb-4">
@@ -14,26 +17,22 @@ const ReviewHistory = () => {
                       id={"reviews"}
 
                       columns={[
-                          {key: 'Review #', value: 'id', function: (id) => `#${id}`},
+                          {key: 'Review #', function: (row) => row.recensione.id},
                           {
                               key: 'Date',
-                              value: 'dataCreazione',
-                              function: (dataCreazione) => new Date(dataCreazione).toLocaleString()
+                              function: (row) => new Date(row.recensione.dataCreazione).toLocaleString()
                           },
                           {
                               key: 'Book #',
-                              value: 'libroId',
-                              function: (libroId) => libroId
+                              function: (row) => row.recensione.libroId
                           },
                           {
                               key: 'Stars',
-                              value: 'stelle',
-                              function: (stelle) => stelle
+                              function: (row) => row.recensione.stelle
                           },
                           {
                               key: 'Title',
-                              value: 'titolo',
-                              function: (titolo) => titolo
+                              function: (row) => row.recensione.titolo
                           },
                       ]}
 

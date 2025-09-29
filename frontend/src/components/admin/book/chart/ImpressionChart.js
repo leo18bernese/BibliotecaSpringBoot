@@ -1,16 +1,16 @@
-import React, {useEffect, useState, useMemo} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Line} from "react-chartjs-2";
 import axios from "axios";
 import {
-    Chart as ChartJS,
     CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
+    Chart as ChartJS,
     Legend,
-    TimeScale
+    LinearScale,
+    LineElement,
+    PointElement,
+    TimeScale,
+    Title,
+    Tooltip
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 
@@ -46,7 +46,7 @@ const GenericTimeSeriesChart = ({
     const [error, setError] = useState(null);
 
     const periods = customPeriods || defaultPeriods;
-    const [period, setPeriod] =  useState(selectedPeriod || Object.keys(periods)[0]);
+    const [period, setPeriod] = useState(selectedPeriod || Object.keys(periods)[0]);
 
     useEffect(() => {
         setLoading(true);

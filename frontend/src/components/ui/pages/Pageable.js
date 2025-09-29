@@ -11,7 +11,8 @@ const Pageable = ({
 
     const {user} = useContext(UserContext);
     const [page, setPage] = useState(0);
-
+    const [size, setSize] = useState(10);
+    const [inputPage, setInputPage] = useState(1);
 
     const fetchContent = async (page = 0, size = 10) => {
         const {data} = await axios.get(endpoint, {
@@ -21,8 +22,8 @@ const Pageable = ({
     }
 
     const {data: pagedData, isLoading: isLoading, error: isError} = useQuery({
-        queryKey: [`content-${id}`, user.id, page],
-        queryFn: () => fetchContent(page),
+        queryKey: [`content-${id}`, user.id, page, size],
+        queryFn: () => fetchContent(page, size),
         keepPreviousData: true, // Utile per non mostrare uno stato di caricamento durante il cambio pagina
     });
 
@@ -35,10 +36,10 @@ const Pageable = ({
     }
 
     const content = pagedData?.content || [];
-
-    console.log(pagedData);
+    const totalPages = pagedData?.totalPages || 1;
 
     return (
+
         content.length === 0 ? (
             <div>
                 {noneFound}
@@ -46,6 +47,23 @@ const Pageable = ({
         ) : (
             <div>
                 {foundMessage}
+
+                <div className="flex items-center gap-2">
+                    Items per pagina:
+                    <select
+                        className="border rounded px-2 py-1"
+                        value={size}
+                        onChange={e => {
+                            setSize(Number(e.target.value));
+                            setPage(0);
+                            setInputPage(1);
+                        }}
+                    >
+                        {[5, 10, 20, 50].map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                    </select>
+                </div>
 
                 <table className="min-w-full divide-y divide-gray-200 mt-8">
                     <thead className="bg-gray-200">
@@ -59,15 +77,20 @@ const Pageable = ({
                     </thead>
 
                     <tbody className="bg-white divide-y divide-gray-200">
-                    {content.map((indirizzo) => (
-                        <tr key={indirizzo.id}
+                    {content.map((row) => (
+                        <tr key={row.id}
                             className="cursor-pointer hover:bg-gray-100"
-                            onClick={() => onRowClick && onRowClick(indirizzo)}>
+                            onClick={() => onRowClick && onRowClick(row)}>
 
                             {columns.map((col) => (
                                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">
-                                    {console.log(indirizzo[col.value])}
-                                    {col.function(indirizzo[col.value])}
+                                    {col.function ?
+                                        (col.value ?
+                                                col.function(row[col.value]) :
+                                                col.function(row)
+                                        ) :
+                                        (row[col.value])
+                                    }
                                 </td>
                             ))}
                         </tr>
@@ -77,19 +100,47 @@ const Pageable = ({
 
                 <div className="flex justify-between items-center mt-4">
                     <button
-                        onClick={() => setPage(old => Math.max(old - 1, 0))}
+                        onClick={() => {
+                            setPage(old => Math.max(old - 1, 0));
+                            setInputPage(old => Math.max(old - 1, 0) + 1);
+                        }}
                         disabled={pagedData?.first}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
                     >
                         Previous
                     </button>
 
-                    <span>
-                            Page {pagedData ? pagedData.number + 1 : 0} of {pagedData?.totalPages}
-                        </span>
+                    {/* CENTRO: selettore items per pagina e input pagina */}
+                    <div className="flex flex-col items-center gap-1">
+
+
+                        <label className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                min={1}
+                                max={totalPages}
+                                value={inputPage}
+                                onChange={e => {
+                                    let val = Number(e.target.value);
+                                    if (val < 1) val = 1;
+                                    if (val > totalPages) val = totalPages;
+                                    setInputPage(val);
+                                }}
+                                onBlur={() => setPage(inputPage - 1)}
+                                className="border rounded text-center no-spinner bg-gray-200 text-lg"
+                                style={{width: `${String(totalPages).length + 4}ch`, MozAppearance: 'textfield'}}
+                            />
+
+                            <span>/ {totalPages}</span>
+                        </label>
+                    </div>
+
 
                     <button
-                        onClick={() => setPage(old => (pagedData && !pagedData.last ? old + 1 : old))}
+                        onClick={() => {
+                            setPage(old => (pagedData && !pagedData.last ? old + 1 : old));
+                            setInputPage(old => (pagedData && !pagedData.last ? old + 2 : old));
+                        }}
                         disabled={pagedData?.last}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
                     >

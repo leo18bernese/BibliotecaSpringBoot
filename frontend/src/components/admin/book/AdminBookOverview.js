@@ -3,10 +3,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useState} from "react";
 import {usePageTitle} from "../../utils/usePageTitle";
-import ButtonField from "../../ui/fields/ButtonField";
-import BookChart from "./chart/BookChart";
-import ImpressionChart from "./chart/ImpressionChart";
-import AnalyticsOverview from "./chart/Analytics";
 import MinImpressionChart from "./chart/periods/MinImpressionChart";
 import DailyImpressionChart from "./chart/periods/DailyImpressionChart";
 import HourlyImpressionChart from "./chart/periods/HourlyImpressionChart";
@@ -54,7 +50,7 @@ const AdminBookOverview = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [selectedChart, setSelectedChart] = useState("20min" );
+    const [selectedChart, setSelectedChart] = useState("20min");
 
     const {data: book, isLoading: isBookLoading, error: bookError} = useQuery({
         queryKey: ['book', id],
@@ -134,9 +130,9 @@ const AdminBookOverview = () => {
                         </select>
 
                         <div className="mt-4">
-                            {selectedChart === "20min" && <MinImpressionChart productId={id} />}
-                            {selectedChart === "hourly" && <HourlyImpressionChart productId={id} />}
-                            {selectedChart === "daily" && <DailyImpressionChart productId={id} />}
+                            {selectedChart === "20min" && <MinImpressionChart productId={id}/>}
+                            {selectedChart === "hourly" && <HourlyImpressionChart productId={id}/>}
+                            {selectedChart === "daily" && <DailyImpressionChart productId={id}/>}
                         </div>
                     </div>
 

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, {useEffect, useRef} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import axios from 'axios';
 
 const BookPdfDownloader = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
     const effectRan = useRef(false); // Flag per il controllo
 
@@ -13,7 +13,7 @@ const BookPdfDownloader = () => {
             const downloadPdf = async () => {
                 try {
                     const url = `http://localhost:8080/api/libri/${id}/pdf`;
-                    const response = await axios.get(url, { responseType: 'blob' });
+                    const response = await axios.get(url, {responseType: 'blob'});
 
                     const filename = `report_libro_${id}.pdf`;
                     const fileURL = window.URL.createObjectURL(new Blob([response.data]));
@@ -40,9 +40,10 @@ const BookPdfDownloader = () => {
     }, [id, navigate]);
 
     return (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{padding: '20px', textAlign: 'center'}}>
             <h1>Preparazione del download...</h1>
-            <p>Il download del tuo file PDF inizierà a breve. Se non dovesse partire, verifica le impostazioni del tuo browser.</p>
+            <p>Il download del tuo file PDF inizierà a breve. Se non dovesse partire, verifica le impostazioni del tuo
+                browser.</p>
         </div>
     );
 };

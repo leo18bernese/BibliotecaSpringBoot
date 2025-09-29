@@ -1,4 +1,4 @@
-import {createContext, useContext} from "react";
+import {useContext} from "react";
 import {useMutation} from "@tanstack/react-query";
 import axios from "axios";
 import {UserContext} from "../../../user/UserContext";
@@ -8,7 +8,9 @@ const trackImpression = async (productId, user, type) => {
         const formData = new FormData();
         formData.append('productId', productId);
 
-        {user && formData.append('userId', user.id);}
+        {
+            user && formData.append('userId', user.id);
+        }
 
         formData.append('eventType', type);
 

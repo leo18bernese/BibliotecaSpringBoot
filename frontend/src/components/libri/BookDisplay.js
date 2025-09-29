@@ -1,6 +1,5 @@
 import LiteBook from "./lite/LiteBook";
 import React, {useContext, useEffect, useRef} from "react";
-import axios from "axios";
 import {UserContext} from "../user/UserContext";
 import {useAnalyticsMutation} from "../admin/book/chart/useAnalytics";
 

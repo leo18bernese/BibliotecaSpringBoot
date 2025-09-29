@@ -1,4 +1,3 @@
-import toast from "react-hot-toast";
 import React, {useContext} from "react";
 import {UserContext} from "../../user/UserContext";
 import Indirizzo from "./Indirizzo";

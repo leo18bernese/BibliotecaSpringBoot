@@ -45,7 +45,6 @@ import {WishlistProvider} from "./components/libri/wishlist/WishlistContext";
 import AdminBookVariant from "./components/admin/book/AdminBookVariant";
 import Security from "./components/user/pages/Security";
 import AdminHome from "./components/admin/AdminHome";
-import AdminHomeBook from "./components/admin/book/AdminBookHome";
 import AdminBookHome from "./components/admin/book/AdminBookHome";
 import AdminUserHome from "./components/admin/user/AdminUserHome";
 import AdminUser from "./components/admin/user/AdminUser";
@@ -99,7 +98,8 @@ function App() {
                                                 <Route path="/account/*" element={<AccountInfo/>}>
                                                     <Route index element={<Navigate to="personal-details" replace/>}/>
                                                     <Route path="personal-details" element={<PersonalDetails/>}/>
-                                                    <Route path="personal-details/edit" element={<PersonalDetailsEdit/>}/>
+                                                    <Route path="personal-details/edit"
+                                                           element={<PersonalDetailsEdit/>}/>
                                                     <Route path="orders" element={<OrderHistory/>}/>
                                                     <Route path="reviews" element={<ReviewHistory/>}/>
                                                     <Route path="wishlist" element={<Wishlist/>}/>

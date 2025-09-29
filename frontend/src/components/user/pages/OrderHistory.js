@@ -1,9 +1,12 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom";
 import Pageable from "../../ui/pages/Pageable";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 const OrderHistory = () => {
     const navigate = useNavigate();
+
+    usePageTitle('Order History');
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mb-4">

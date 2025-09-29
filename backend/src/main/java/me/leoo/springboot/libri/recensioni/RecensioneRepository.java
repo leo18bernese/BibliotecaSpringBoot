@@ -1,5 +1,6 @@
 package me.leoo.springboot.libri.recensioni;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,5 +12,5 @@ public interface RecensioneRepository extends JpaRepository<Recensione, Long> {
 
     Set<Recensione> findByUtenteId(Long utenteId);
 
-    Set<Recensione> findByUtenteId(Long utenteId, Pageable pageable);
+    Page<Recensione> findByUtenteId(Long utenteId, Pageable pageable);
 }

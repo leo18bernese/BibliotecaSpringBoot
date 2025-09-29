@@ -1,16 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, {useMemo, useState} from 'react';
 import {
-    Chart as ChartJS,
     CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
+    Chart as ChartJS,
     Legend,
-    TimeScale
+    LinearScale,
+    LineElement,
+    PointElement,
+    TimeScale,
+    Title,
+    Tooltip
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import {Line} from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns'; // Importa l'adattatore per le date
 
 ChartJS.register(
@@ -59,8 +59,8 @@ const BookChart = () => {
     });
 
     const handleVisibilityChange = (event) => {
-        const { name, checked } = event.target;
-        setVisibleDatasets(prevState => ({ ...prevState, [name]: checked }));
+        const {name, checked} = event.target;
+        setVisibleDatasets(prevState => ({...prevState, [name]: checked}));
     };
 
     const chartData = useMemo(() => {
@@ -90,7 +90,7 @@ const BookChart = () => {
             });
         }
 
-        return { labels, datasets };
+        return {labels, datasets};
     }, [period, visibleDatasets]);
 
     const options = {
@@ -120,19 +120,20 @@ const BookChart = () => {
     };
 
     return (
-        <div style={{ width: '90%', margin: 'auto' }}>
-            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{width: '90%', margin: 'auto'}}>
+            <div style={{marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <div>
                     <strong>Periodo:</strong>
                     {Object.keys(periods).concat('full').map(p => (
-                        <button key={p} onClick={() => setPeriod(p)} style={{ marginLeft: '5px', fontWeight: period === p ? 'bold' : 'normal' }}>
+                        <button key={p} onClick={() => setPeriod(p)}
+                                style={{marginLeft: '5px', fontWeight: period === p ? 'bold' : 'normal'}}>
                             {p.toUpperCase()}
                         </button>
                     ))}
                 </div>
                 <div>
                     <strong>Filtri:</strong>
-                    <label style={{ marginLeft: '10px' }}>
+                    <label style={{marginLeft: '10px'}}>
                         <input
                             type="checkbox"
                             name="sales"
@@ -140,7 +141,7 @@ const BookChart = () => {
                             onChange={handleVisibilityChange}
                         /> Vendite
                     </label>
-                    <label style={{ marginLeft: '10px' }}>
+                    <label style={{marginLeft: '10px'}}>
                         <input
                             type="checkbox"
                             name="returns"
@@ -150,7 +151,7 @@ const BookChart = () => {
                     </label>
                 </div>
             </div>
-            <Line options={options} data={chartData} />
+            <Line options={options} data={chartData}/>
         </div>
     );
 };
