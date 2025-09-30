@@ -35,6 +35,13 @@ const Pageable = ({
         return <div className="text-center text-red-500">Error loading page content. Please try again later.</div>;
     }
 
+    if(!pagedData.pageable ) {
+        return <div className="text-center text-red-500">Error for developer: pageable missing in response, make sure
+            backend is returning a Page object.</div>;
+    }
+
+    console.log(pagedData);
+
     const content = pagedData?.content || [];
     const totalPages = pagedData?.totalPages || 1;
 

@@ -11,7 +11,7 @@ const AdminBar = () => {
 
             <NavLink
                 to={path}
-                className={location.pathname.startsWith(path) ? "underline" : ""}
+                className={(location.pathname.startsWith(path) ? "underline" : "" )}
                 onClick={() => setShowSidebar(false)}
             >
                 {label}
@@ -30,7 +30,7 @@ const AdminBar = () => {
             </button>
 
             <div className={`admin-bar bg-red-500 text-red-100 pl-2 pt-4 pr-20 w-64 fixed top-0 left-0 z-30 transition-transform duration-300
-                ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:static md:translate-x-0 md:w-3/12 `}>
+                ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:static md:translate-x-0 md:w-5/12 lg:w-3/12 `}>
 
                 <h3 className="text-2xl font-semibold">Admin Panel</h3>
                 <div className="border-t border-red-200 my-2"></div>

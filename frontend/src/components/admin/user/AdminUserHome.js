@@ -18,6 +18,7 @@ const AdminUserHome = () => {
                       columns={[
                           {key: 'ID', value: 'id', function: (id) => `#${id}`},
                           {key: 'Name', value: 'name'},
+                          {key: 'Surname', value: 'surname'},
                           {key: 'Email', value: 'email'},
                           {
                               key: 'Roles',

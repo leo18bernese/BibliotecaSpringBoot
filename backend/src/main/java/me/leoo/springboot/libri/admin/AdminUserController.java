@@ -24,7 +24,7 @@ public class AdminUserController {
     private final UtenteService utenteService;
     private final CarrelloService carrelloService;
 
-    public record UserResponse(Long id, String name, String email,
+    public record UserResponse(Long id, String name, String surname, String email,
                                Set<String> roles, int cartItems, int wishlistItems,
                                int addresses) {
 
@@ -60,7 +60,8 @@ public class AdminUserController {
                 Carrello carrello = carrelloService.getCarrelloByUtente(l);
                 return new UserResponse(
                         l.getId(),
-                        l.getUsername(),
+                        l.getNome(),
+                        l.getCognome(),
                         l.getEmail(),
                         l.getRuoli(),
                         carrello.getItems().size(),

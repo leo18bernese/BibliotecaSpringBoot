@@ -33,8 +33,29 @@ const AdminHome = () => {
                      className="inline-block mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                 <i className="bxr bxs-book mr-2"></i> Book List
             </NavLink>
+
+
+            <NavLink to={"/admin/order"}
+                     className="inline-block mb-4 ml-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+                <i className="bxr bxs-cart mr-2"></i> Order List
+            </NavLink>
+
+
+
+            <NavLink to={"/admin/reso"}
+                     className="inline-block mb-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                <i className="bxr bxs-refresh-cw-alt mr-2"></i> Return List
+            </NavLink>
+
+
+            <NavLink to={"/admin/user"}
+                     className="inline-block mb-4 ml-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                <i className="bxr bxs-user mr-2"></i> User List
+            </NavLink>
         </div>
-    );
+
+
+);
 }
 
 export default AdminHome;

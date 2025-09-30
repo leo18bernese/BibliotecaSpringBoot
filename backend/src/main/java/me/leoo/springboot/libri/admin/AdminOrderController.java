@@ -37,26 +37,29 @@ public class AdminOrderController {
 
 
     @GetMapping("/light-all")
-    public Set<OrderResponse> getAllLightOrders(@RequestParam(defaultValue = "0") int page,
-                                                @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ResponseEntity<Page<OrderResponse>> getAllLightOrders(@RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "20") int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Ordine> ordini = ordineRepository.findAll(pageable);
 
-        Page<Ordine> libros = ordineRepository.findAll(pageable);
+            Page<OrderResponse> orderResponses = ordini.map(l -> new OrderResponse(
+                    l.getId(),
+                    l.getUtente(),
+                    l.getDataCreazione(),
+                    l.getUltimaModifica(),
+                    l.getSommaTotale(),
+                    l.getPrezzoFinale(),
+                    l.getSpeseSpedizione(),
+                    l.getItems().size(),
+                    !l.getCouponCodes().isEmpty(),
+                    l.getStato()
+            ));
 
-        return libros.stream()
-                .map(l -> new OrderResponse(
-                        l.getId(),
-                        l.getUtente(),
-                        l.getDataCreazione(),
-                        l.getUltimaModifica(),
-                        l.getSommaTotale(),
-                        l.getPrezzoFinale(),
-                        l.getSpeseSpedizione(),
-                        l.getItems().size(),
-                        !l.getCouponCodes().isEmpty(),
-                        l.getStato()
-                ))
-                .collect(Collectors.toSet());
+            return ResponseEntity.ok(orderResponses);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}/exists")
