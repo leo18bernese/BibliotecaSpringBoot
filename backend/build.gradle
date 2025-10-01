@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation("com.itextpdf:itextpdf:5.5.13.4")
+    implementation("com.itextpdf:itext-core:9.3.0")
 }
 
 tasks.named('test') {

@@ -12,7 +12,7 @@ const BookPdfDownloader = () => {
         if (effectRan.current === true || process.env.NODE_ENV !== 'development') {
             const downloadPdf = async () => {
                 try {
-                    const url = `http://localhost:8080/api/libri/${id}/pdf`;
+                    const url = `http://localhost:8080/api/ordini/${id}/pdf`;
                     const response = await axios.get(url, {responseType: 'blob'});
 
                     const filename = `report_libro_${id}.pdf`;

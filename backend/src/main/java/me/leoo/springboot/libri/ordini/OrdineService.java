@@ -14,14 +14,14 @@ public class OrdineService {
     private OrdineRepository ordineRepository;
 
 
-    public Ordine getOrdineById(long id) {
+    public Ordine getOrdineById(long id) throws Exception {
         Ordine ordine = ordineRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ordine non trovato con ID: " + id));
 
         return init(ordine);
     }
 
-    public Ordine getOrdineById(Utente utente, long id) {
+    public Ordine getOrdineById(Utente utente, long id)  throws Exception {
         Ordine ordine = ordineRepository.findByIdAndUtente(id, utente)
                 .orElseThrow(() -> new RuntimeException("Ordine non trovato con ID: " + id));
 

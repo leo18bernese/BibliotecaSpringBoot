@@ -1,8 +1,13 @@
 package me.leoo.springboot.libri.ordini;
 
+import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.libri.Libro;
+import me.leoo.springboot.libri.libri.utils.PdfGeneratorService;
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,14 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/ordini")
+@RequiredArgsConstructor
 public class OrdineController {
 
-    @Autowired
-    private OrdineService ordineService;
+    private final OrdineService ordineService;
+    private final PdfGeneratorService pdfGeneratorService;
 
     @GetMapping("/{id}/exists")
     public ResponseEntity<?> checkOrdineExists(@AuthenticationPrincipal Utente utente,
@@ -63,4 +70,26 @@ public class OrdineController {
         }
     }
 
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> generateBookReport(@PathVariable Long id) {
+        try {
+            Ordine ordine = ordineService.getOrdineById(id);
+
+            byte[] pdfBytes = pdfGeneratorService.generateOrderPdf(ordine);
+            // 3. Imposta le intestazioni per il download del PDF
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            String filename = "order-" + ordine.getId() + ".pdf";
+            headers.setContentDispositionFormData("attachment", filename);
+
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

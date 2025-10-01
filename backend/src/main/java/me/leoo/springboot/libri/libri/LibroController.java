@@ -1,6 +1,5 @@
 package me.leoo.springboot.libri.libri;
 
-import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.carrello.CarrelloService;
@@ -427,7 +426,7 @@ public class LibroController {
                     .headers(headers)
                     .body(pdfBytes);
 
-        } catch (DocumentException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
