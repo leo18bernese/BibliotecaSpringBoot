@@ -15,6 +15,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.ordini.Ordine;
+import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -57,6 +58,7 @@ public class PdfGeneratorService {
 
             try {
                 addCompanyHeader(document);
+                addUserDetails(document, ordine);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -66,21 +68,17 @@ public class PdfGeneratorService {
     }
 
     private void addCompanyHeader(Document document) throws IOException {
-        Table headerTable = new Table(UnitValue.createPercentArray(new float[]{60, 40}))
+        Table table = new Table(UnitValue.createPercentArray(new float[]{60, 40}))
                 .useAllAvailableWidth();
 
         PdfFont bold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
-        // Left
         Paragraph header = new Paragraph()
                 .add(new Text("Dani Commerce\n")
                         .setFontSize(26)
                         .setFontColor(BLUE_PRIMARY)
                         .setFont(bold));
 
-        headerTable.addCell(new Cell().add(header).setBorder(null));
-
-        // Right
         Paragraph companyInfo = new Paragraph()
                 .add(new Text("Dani Commerce S.r.l.\n").setFont(bold))
                 .add("Via Roma, 123\n")
@@ -88,13 +86,55 @@ public class PdfGeneratorService {
                 .add("P.IVA: 12345678901\n")
                 .add("Email: info@danicommerce.store")
                 .add("Website: www.danicommerce.store")
-                        .setTextAlignment(TextAlignment.RIGHT)
+                .setTextAlignment(TextAlignment.RIGHT)
                 .setFontSize(9)
                 .setFontColor(GRAY_TEXT);
 
-        headerTable.addCell(new Cell().add(companyInfo).setBorder(null));
+        table.addCell(new Cell().add(header).setBorder(null));
+        table.addCell(new Cell().add(companyInfo).setBorder(null));
 
-        document.add(headerTable);
+        document.add(table);
+    }
+
+    private void addUserDetails(Document document, Ordine ordine) throws IOException {
+        Table table = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
+        PdfFont bold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        Utente utente = ordine.getUtente();
+
+        // Colonna utente
+        Cell userCell = new Cell().setBorder(null);
+        userCell.add(new Paragraph("INFORMAZIONI CLIENTE").setFont(bold).setFontColor(BLUE_PRIMARY).setFontSize(10));
+
+        userCell.add(getRow("Nome", utente.getNome(), bold));
+        userCell.add(getRow("Cognome", utente.getCognome(), bold));
+        userCell.add(getRow("Email", utente.getEmail(), bold));
+        userCell.add(getRow("Telefono", utente.getTelefono(), bold));
+
+        userCell.setFontSize(10).setFontColor(GRAY_TEXT);
+
+        // Colonna ordine
+        Cell orderCell = new Cell().setBorder(null);
+        orderCell.add(new Paragraph("DETTAGLI ORDINE").setFont(bold).setFontColor(BLUE_PRIMARY).setFontSize(10));
+
+        orderCell.add(getRow("Data invio", ordine.getDataCreazione().toString(), bold));
+        orderCell.add(getRow("Ultimo aggiornamento", ordine.wasDateUpdated() ? ordine.getUltimaModifica().toString() : "-", bold));
+        orderCell.add(getRow("Stato al momento della generazione del file", ordine.getStato().getDisplayName(), bold));
+
+        orderCell.setFontSize(10).setFontColor(GRAY_TEXT);
+
+        table.addCell(userCell);
+        table.addCell(orderCell);
+
+        document.add(table);
+    }
+
+    private Table getRow(String label, String value, PdfFont bold) {
+        Table row = new Table(UnitValue.createPercentArray(new float[]{35, 65})).setWidth(UnitValue.createPercentValue(100));
+
+        row.addCell(new Cell().add(new Paragraph(label + ":").setFont(bold)).setBorder(null).setFontSize(10).setFontColor(GRAY_TEXT));
+        row.addCell(new Cell().add(new Paragraph(value)).setBorder(null).setFontSize(10).setFontColor(GRAY_TEXT));
+
+        return row;
     }
 
     public ByteArrayOutputStream getBasePdf(Function<Document, Document> pdfContentFunction) throws IOException {

@@ -187,6 +187,10 @@ public class Ordine {
         return getStato().getNextStepOrInfo();
     }
 
+    public boolean wasDateUpdated(){
+        return !Objects.equals(dataCreazione, ultimaModifica);
+    }
+
     //Reso
     public boolean isResoAllowed() {
         return getStato() == StatoOrdine.CONSEGNATO;
