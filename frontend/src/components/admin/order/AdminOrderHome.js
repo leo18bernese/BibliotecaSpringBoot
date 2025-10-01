@@ -15,15 +15,15 @@ const AdminOrderHome = () => {
                       id={"orders"}
                       columns={[
                           {key: 'ID', value: 'id', function: (id) => `#${id}`},
-                          {key: 'Utente', value: 'utente', function: (utente) => utente?.nome ?? '-'},
-                          {key: 'Email', value: 'utente', function: (utente) => utente?.email ?? '-'},
+                          //{key: 'Utente', value: 'username'},
+                          {key: 'Email', value: 'email'},
                           {key: 'Data Creazione', value: 'dataCreazione', function: (d) => d ? new Date(d).toLocaleString() : '-'},
-                          {key: 'Data Modifica', value: 'dataModifica', function: (d) => d ? new Date(d).toLocaleString() : '-'},
-                          {key: 'Somma Totale', value: 'sommaTotale', function: (v) => v?.toFixed(2) ?? '-'},
+                          //{key: 'Data Modifica', value: 'dataModifica', function: (d) => d ? new Date(d).toLocaleString() : '-'},
+                          //{key: 'Somma Totale', value: 'sommaTotale', function: (v) => v?.toFixed(2) ?? '-'},
                           {key: 'Prezzo Finale', value: 'prezzoFinale', function: (v) => v?.toFixed(2) ?? '-'},
                           {key: 'Spese Spedizione', value: 'speseSpedizione', function: (v) => v?.toFixed(2) ?? '-'},
                           {key: 'Items', value: 'items'},
-                          {key: 'Coupon Usato', value: 'couponUsed', function: (c) => c ? 'Sì' : 'No'},
+                          //{key: 'Coupon Usato', value: 'couponUsed', function: (c) => c ? 'Sì' : 'No'},
                           {key: 'Stato', value: 'stato', function: (s) => s ?? '-'},
                       ]}
                       onRowClick={(order) => navigate(`/admin/order/${order.id}`)}

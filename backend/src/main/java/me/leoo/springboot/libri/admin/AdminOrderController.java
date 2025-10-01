@@ -26,7 +26,7 @@ public class AdminOrderController {
     private final OrdineRepository ordineRepository;
     private final OrdineService ordineService;
 
-    public record OrderResponse(Long id, Utente utente, Date dataCreazione, Date dataModifica,
+    public record OrderResponse(Long id, String username, String email, Date dataCreazione, Date dataModifica,
                                 double sommaTotale, double prezzoFinale, double speseSpedizione, int items,
                                 boolean couponUsed, StatoOrdine stato
     ) {
@@ -45,7 +45,8 @@ public class AdminOrderController {
 
             Page<OrderResponse> orderResponses = ordini.map(l -> new OrderResponse(
                     l.getId(),
-                    l.getUtente(),
+                    l.getUtente().getNomeCompleto(),
+                    l.getUtente().getEmail(),
                     l.getDataCreazione(),
                     l.getUltimaModifica(),
                     l.getSommaTotale(),
@@ -70,7 +71,7 @@ public class AdminOrderController {
         }
 
         try {
-            boolean exists = ordineService.existsOrdine(utente, Long.parseLong(id));
+            boolean exists = ordineService.existsOrdine( Long.parseLong(id));
             return ResponseEntity.ok(exists);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore nel recupero dell'ordine: " + e.getMessage());

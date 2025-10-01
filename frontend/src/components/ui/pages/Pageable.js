@@ -117,7 +117,6 @@ const Pageable = ({
                         Previous
                     </button>
 
-                    {/* CENTRO: selettore items per pagina e input pagina */}
                     <div className="flex flex-col items-center gap-1">
 
 
@@ -134,11 +133,15 @@ const Pageable = ({
                                     setInputPage(val);
                                 }}
                                 onBlur={() => setPage(inputPage - 1)}
-                                className="border rounded text-center no-spinner bg-gray-200 text-lg"
-                                style={{width: `${String(totalPages).length + 4}ch`, MozAppearance: 'textfield'}}
+                                className="border rounded text-center no-spinner bg-gray-300 text-lg"
+                                style={{width: `${String(totalPages).length + 2}ch`, MozAppearance: 'textfield'}}
                             />
 
-                            <span>/ {totalPages}</span>
+                            <span>/</span>
+
+                            <span className=" bg-gray-300 text-lg w-8 text-center rounded">
+                                {totalPages}
+                            </span>
                         </label>
                     </div>
 
@@ -146,7 +149,7 @@ const Pageable = ({
                     <button
                         onClick={() => {
                             setPage(old => (pagedData && !pagedData.last ? old + 1 : old));
-                            setInputPage(old => (pagedData && !pagedData.last ? old + 2 : old));
+                            setInputPage(old => (pagedData && !pagedData.last ? old + 1 : old));
                         }}
                         disabled={pagedData?.last}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400"

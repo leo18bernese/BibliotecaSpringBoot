@@ -41,6 +41,10 @@ public class OrdineService {
         return ordini;
     }
 
+    public boolean existsOrdine(long id){
+        return ordineRepository.existsById(id);
+    }
+
     public boolean existsOrdine(Utente utente, long id) {
         return ordineRepository.existsByIdAndUtente(id, utente);
     }

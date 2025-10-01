@@ -40,7 +40,7 @@ const ResoChat = () => {
                 <li>Il reso non esiste.</li>
                 <li>Hai inserito un ID errato.</li>
                 <li>Il server non è raggiungibile.</li>
-                <li>Il reso non apparte al tuo account.</li>
+                <li>Il reso non appartiene al tuo account.</li>
                 <li>La richiesta di reso non è stato ancora creata.</li>
             </ul>
 

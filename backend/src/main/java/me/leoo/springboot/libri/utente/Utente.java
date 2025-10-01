@@ -72,6 +72,11 @@ public class Utente implements UserDetails {
         return this;
     }
 
+    // Getter
+    public String getNomeCompleto() {
+        return nome + " " + cognome;
+    }
+
     // Ruoli
     public void addRuolo(UserRole ruolo) {
         ruoli.add(ruolo.getId());

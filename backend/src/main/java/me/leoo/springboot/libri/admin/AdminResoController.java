@@ -1,7 +1,6 @@
 package me.leoo.springboot.libri.admin;
 
 import lombok.RequiredArgsConstructor;
-import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.ordini.OrdineService;
 import me.leoo.springboot.libri.resi.Reso;
 import me.leoo.springboot.libri.resi.ResoController;
@@ -22,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/resi")
@@ -43,21 +40,25 @@ public class AdminResoController {
     }
 
     @GetMapping("/light-all")
-    public Set<AdminResoController.ResoResponse> getAllLightResos(@RequestParam(defaultValue = "0") int page,
-                                                                  @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ResponseEntity<Page<AdminResoController.ResoResponse>> getAllLightResos(@RequestParam(defaultValue = "0") int page,
+                                                                                   @RequestParam(defaultValue = "20") int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
 
-        Page<Reso> libros = resoRepository.findAll(pageable);
+            Page<Reso> libros = resoRepository.findAll(pageable);
+            Page<ResoResponse> resoResponses = libros.map(l -> new ResoResponse(
+                    l.getId(),
+                    l.getOrdine().getId(),
+                    l.getItems().size(),
+                    l.getStati().isEmpty() ? null :
+                            l.getStati().get(l.getStati().size() - 1).getStato()
+            ));
 
-        return libros.stream()
-                .map(l -> new AdminResoController.ResoResponse(
-                        l.getId(),
-                        l.getOrdine().getId(),
-                        l.getItems().size(),
-                        l.getStati().isEmpty() ? null :
-                                l.getStati().get(l.getStati().size() - 1).getStato()
-                ))
-                .collect(Collectors.toSet());
+            return ResponseEntity.ok(resoResponses);
+
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}/exists")
