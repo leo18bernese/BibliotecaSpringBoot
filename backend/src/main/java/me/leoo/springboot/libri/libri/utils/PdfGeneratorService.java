@@ -16,12 +16,14 @@ import com.itextpdf.layout.properties.UnitValue;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.ordini.Ordine;
+import me.leoo.springboot.libri.ordini.OrdineItem;
 import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
 import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.function.Function;
 
 @Service
@@ -63,6 +65,7 @@ public class PdfGeneratorService {
                 addUserDetails(document, ordine);
                 addDeliveryDetails(document, ordine);
                 addCouponDetails(document, ordine);
+                addItemsDetails(document, ordine);
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -83,13 +86,13 @@ public class PdfGeneratorService {
         headerCell.setFontSize(26).setFontColor(BLUE_PRIMARY).setFont(bold);
 
         Cell companyCell = new Cell().setBorder(null);
-        companyCell.add(getText("Dani Commerce S.r.l."));
-        companyCell.add(getText("Via Roma, 123"));
-        companyCell.add(getText("00100 Roma, Italia"));
-        companyCell.add(getText("P.IVA: 12345678901"));
-        companyCell.add(getText("Email: info@danicommerce.store"));
-        companyCell.add(getText("Website: www.danicommerce.store"));
-        companyCell.setTextAlignment(TextAlignment.RIGHT).setFontSize(9).setFontColor(GRAY_TEXT);
+        companyCell.add(new Paragraph("Dani Commerce S.r.l."));
+        companyCell.add(new Paragraph("Via Roma, 123"));
+        companyCell.add(new Paragraph("00100 Roma, Italia"));
+        companyCell.add(new Paragraph("P.IVA: 12345678901"));
+        companyCell.add(new Paragraph("Email: info@danicommerce.store"));
+        companyCell.add(new Paragraph("Website: www.danicommerce.store"));
+        companyCell.setTextAlignment(TextAlignment.RIGHT).setFontSize(8).setFontColor(GRAY_TEXT);
 
 
         table.addCell(headerCell);
@@ -182,19 +185,18 @@ public class PdfGeneratorService {
     }
 
     private void addCouponDetails(Document document, Ordine ordine) throws IOException {
-        Table table = new Table(UnitValue.createPercentArray(new float[]{100})).setMarginTop(20f)
-                .setBackgroundColor(GRAY_LIGHT);
+        Table table = new Table(UnitValue.createPercentArray(new float[]{100})).setMarginTop(20f);
 
         PdfFont bold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
         Cell mainCell = new Cell().setBorder(null);
 
+        mainCell.add(new Paragraph("BUONI APPLICATI").setFont(bold).setFontColor(BLUE_PRIMARY).setFontSize(10));
+        mainCell.add(getSeparator(BLUE_PRIMARY, 1, 0, 2, 2));
+
         if (ordine.getCouponCodes().isEmpty()) {
             mainCell.add(new Paragraph("Nessun buono applicato").setFontColor(GRAY_TEXT).setFontSize(10));
         } else {
-            mainCell.add(new Paragraph("BUONI APPLICATI").setFont(bold).setFontColor(BLUE_PRIMARY).setFontSize(10));
-            mainCell.add(getSeparator(BLUE_PRIMARY, 1, 0, 2, 2));
-
             for (Buono buono : ordine.getCouponCodes()) {
                 if (buono == null || buono.getSconto() == null) continue;
 
@@ -202,6 +204,124 @@ public class PdfGeneratorService {
             }
         }
 
+        mainCell.setFontSize(10).setFontColor(GRAY_TEXT);
+        table.addCell(mainCell);
+
+        document.add(table);
+    }
+
+    private void addItemsDetails(Document document, Ordine ordine) throws IOException {
+        Table table = new Table(UnitValue.createPercentArray(new float[]{100})).setMarginTop(20f);
+
+        PdfFont bold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+
+        Cell mainCell = new Cell().setBorder(null);
+
+        mainCell.add(new Paragraph("PRODOTTI ORDINATI").setFont(bold).setFontColor(BLUE_PRIMARY).setFontSize(10));
+        mainCell.add(getSeparator(BLUE_PRIMARY, 1, 0, 2, 2));
+
+        // Creo la tabella dei prodotti con 5 colonne
+        Table productsTable = new Table(UnitValue.createPercentArray(new float[]{40, 10,5, 15, 15, 15}))
+                .useAllAvailableWidth()
+                .setMarginTop(10f);
+
+        // Header della tabella
+        productsTable.addHeaderCell(getTableHeaderCell("Prodotto", bold));
+        productsTable.addHeaderCell(getTableHeaderCell("Id", bold).setTextAlignment(TextAlignment.CENTER));
+        productsTable.addHeaderCell(getTableHeaderCell("Qtà", bold).setTextAlignment(TextAlignment.CENTER));
+        productsTable.addHeaderCell(getTableHeaderCell("Prezzo Unit.", bold).setTextAlignment(TextAlignment.RIGHT));
+        productsTable.addHeaderCell(getTableHeaderCell("Sconto", bold).setTextAlignment(TextAlignment.RIGHT));
+        productsTable.addHeaderCell(getTableHeaderCell("Totale", bold).setTextAlignment(TextAlignment.RIGHT));
+
+
+        // Righe dei prodotti
+        for (OrdineItem item : ordine.getItems()) {
+            if (item == null) continue;
+
+            // Colonna Prodotto (con titolo, variante e data aggiunta)
+            Cell productCell = new Cell().setBorder(new SolidBorder(GRAY_TEXT, 0.5f)).setPadding(8f);
+            productCell.add(new Paragraph(item.getTitolo()).setFont(bold).setFontSize(9));
+
+            // Aggiungo il nome della variante se disponibile
+            productCell.add(new Paragraph("Variante: " + item.getVarianteNome())
+                    .setFontColor(BLUE_PRIMARY).setFontSize(8).setFont(bold));
+
+            if (item.getDataAggiunta() != null) {
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy, HH:mm");
+                String dataFormattata = dateFormat.format(item.getDataAggiunta());
+
+                productCell.add(new Paragraph("Aggiunto: " + dataFormattata)
+                        .setFontColor(GRAY_TEXT).setFontSize(8)
+                        .setMarginTop(4f));
+            }
+
+            Cell idCell = new Cell().setBorder(new SolidBorder(GRAY_TEXT, 0.5f))
+                    .setPadding(8f)
+                    .setTextAlignment(TextAlignment.CENTER);
+            idCell.add(new Paragraph(String.valueOf(item.getLibroId())).setFontSize(9));
+            idCell.add(new Paragraph(String.valueOf(item.getVarianteId())).setFontSize(7).setFontColor(GRAY_TEXT));
+
+
+            // Colonna Quantità
+            Cell quantityCell = new Cell().setBorder(new SolidBorder(GRAY_TEXT, 0.5f))
+                    .setPadding(8f)
+                    .setTextAlignment(TextAlignment.CENTER);
+            quantityCell.add(new Paragraph(String.valueOf(item.getQuantita())).setFontSize(9));
+
+            // Colonna Prezzo Unitario
+            Cell priceCell = new Cell().setBorder(new SolidBorder(GRAY_TEXT, 0.5f))
+                    .setPadding(8f)
+                    .setTextAlignment(TextAlignment.RIGHT);
+            priceCell.add(new Paragraph(String.format("%.2f €", item.getPrezzo())).setFontSize(9));
+
+            // Colonna Sconto
+            Cell discountCell = new Cell().setBorder(new SolidBorder(GRAY_TEXT, 0.5f))
+                    .setPadding(8f)
+                    .setTextAlignment(TextAlignment.RIGHT);
+
+            if (item.getSconto() != null && (item.getSconto().getPercentuale() > 0 || item.getSconto().getValore() > 0)) {
+                String scontoText;
+
+                if (item.getSconto().getPercentuale() > 0) {
+                    double scontoValore = item.getPrezzo() * item.getSconto().getPercentuale() / 100;
+                    scontoText = String.format("-%.2f €\n(%d%%)",
+                            scontoValore,
+                            item.getSconto().getPercentuale());
+                } else {
+                    scontoText = String.format("-%.2f €", item.getSconto().getValore());
+                }
+
+                discountCell.add(new Paragraph(scontoText)
+                        .setFontSize(8)
+                        .setFontColor(GREEN_SUCCESS));
+            } else {
+                discountCell.add(new Paragraph("-").setFontSize(9));
+            }
+
+            // Colonna Totale
+            Cell totalCell = new Cell().setBorder(new SolidBorder(GRAY_TEXT, 0.5f))
+                    .setPadding(8f)
+                    .setTextAlignment(TextAlignment.RIGHT);
+
+            double totale = item.getPrezzo() * item.getQuantita();
+            if (item.getSconto() != null) {
+                double scontoApplicato = item.getSconto().getSconto(item.getPrezzo());
+                totale = totale - (scontoApplicato * item.getQuantita());
+            }
+
+            totalCell.add(new Paragraph(String.format("%.2f €", totale)).setFontSize(9));
+
+            // Aggiungo le celle alla tabella
+            productsTable.addCell(productCell);
+            productsTable.addCell(idCell);
+            productsTable.addCell(quantityCell);
+            productsTable.addCell(priceCell);
+            productsTable.addCell(discountCell);
+            productsTable.addCell(totalCell);
+        }
+
+        mainCell.add(productsTable);
         mainCell.setFontSize(10).setFontColor(GRAY_TEXT);
         table.addCell(mainCell);
 
@@ -224,6 +344,14 @@ public class PdfGeneratorService {
         row.addCell(new Cell().add(new Paragraph(value)).setBorder(null).setFontSize(10).setFontColor(GRAY_TEXT));
 
         return row;
+    }
+
+    private Cell getTableHeaderCell(String text, PdfFont bold) {
+        return new Cell().add(new Paragraph(text).setFont(bold))
+                .setBackgroundColor(GRAY_LIGHT)
+                .setBorder(new SolidBorder(GRAY_TEXT, 0.5f))
+                .setPadding(8f)
+                .setFontSize(9);
     }
 
     private Table getSeparator(DeviceRgb color, float thickness, float padding, float topMargin, float bottomMargin) {

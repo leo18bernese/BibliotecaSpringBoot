@@ -45,7 +45,7 @@ public class Ordine {
     private final Set<Buono> couponCodes = new HashSet<>();
 
     @OneToMany(mappedBy = "ordine", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final Set<OrdineItem> items = new HashSet<>();
+    private final List<OrdineItem> items = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "ordine_stati", joinColumns = @JoinColumn(name = "ordine_id"))
@@ -102,6 +102,9 @@ public class Ordine {
             ordineItem.setOrdine(this); // Imposta l'ordine corrente
 
             items.add(ordineItem);
+
+            // Rimuovi quantità acquistata dallo stock
+            item.getVariante().getRifornimento().removeQuantita(item.getQuantita());
         }
 
         // Aggiungi i buoni del carrello all'ordine
@@ -115,12 +118,8 @@ public class Ordine {
         // Imposta l'utente dell'ordine
         this.utente = carrello.getUtente();
 
+        // Pulisci il carrello
         carrello.clear();
-
-        // Scala le quantità di stock e di prenotati
-        for (OrdineItem item : items) {
-            item.getVariante().getRifornimento().removeQuantita(item.getQuantita());
-        }
     }
 
     public String getNomeCorriere() {
@@ -156,7 +155,7 @@ public class Ordine {
             throw new IllegalArgumentException("Nuovo stato non può essere null");
         }
 
-        if (nuovoStato.ordinal() <= getStato().ordinal()) {
+        if (!stati.isEmpty() && (nuovoStato.ordinal() <= getStato().ordinal())) {
             throw new IllegalArgumentException("Non è possibile tornare a uno stato precedente");
         }
 
@@ -187,7 +186,7 @@ public class Ordine {
         return getStato().getNextStepOrInfo();
     }
 
-    public boolean wasDateUpdated(){
+    public boolean wasDateUpdated() {
         return !Objects.equals(dataCreazione, ultimaModifica);
     }
 

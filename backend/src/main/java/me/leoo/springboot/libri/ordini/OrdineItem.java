@@ -25,9 +25,9 @@ public class OrdineItem {
     @JsonIgnore
     private Ordine ordine;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variante_id", nullable = false)
-    private Variante variante;
+    private Long libroId;
+    private Long varianteId;
+    private String varianteNome;
 
     private String titolo;
     private int quantita;
@@ -37,7 +37,9 @@ public class OrdineItem {
     private Sconto sconto;
 
     public OrdineItem(Variante variante, int quantita, Date dataAggiunta) {
-        this.variante = variante;
+        this.libroId = variante.getLibro().getId();
+        this.varianteId = variante.getId();
+        this.varianteNome = variante.getNome();
         this.titolo = variante.getLibro().getTitolo();
         this.quantita = quantita;
         this.prezzo = variante.getPrezzo().getPrezzoTotale();
@@ -45,7 +47,5 @@ public class OrdineItem {
         this.dataAggiunta = dataAggiunta;
     }
 
-    public Long getLibroId() {
-        return variante != null ? variante.getId() : null;
-    }
+
 }

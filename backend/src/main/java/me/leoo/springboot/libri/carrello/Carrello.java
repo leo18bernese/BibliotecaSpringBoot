@@ -186,9 +186,9 @@ public class Carrello {
     }
 
     public double getSommaPrezzi() {
-        return items.stream()
+        return LibriUtils.round(items.stream()
                 .mapToDouble(i -> i.getQuantita() * i.getVariante().getPrezzo().getPrezzoTotale())
-                .sum();
+                .sum());
     }
 
     public void sortCoupons() {

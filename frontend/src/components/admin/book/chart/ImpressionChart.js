@@ -29,10 +29,10 @@ const defaultPeriods = {
     '3d': 3,
     '1w': 7,
     '2w': 14,
-    '1m': 30,
-    '3m': 90,
-    '6m': 180,
-    '12m': 365,
+    '1month': 30,
+    '3month': 90,
+    '6month': 180,
+    '1y': 365,
     'all': 10000
 };
 
@@ -51,10 +51,6 @@ const GenericTimeSeriesChart = ({
     useEffect(() => {
         setLoading(true);
         setError(null);
-
-        const formData = new FormData();
-        formData.append("resolution", resolution || "daily");
-        formData.append("period", period);
 
         Promise.all(
             metrics.map((metric, idx) =>

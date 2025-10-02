@@ -140,7 +140,7 @@ const AdminOrder = () => {
                         </div>
 
                         {ordine.items.map((item) => (
-                            <AdminOrderItem book={item} bookId={item.id} key={item.id}/>
+                            <AdminOrderItem book={item}  key={item.id}/>
                         ))}
 
                     </div>

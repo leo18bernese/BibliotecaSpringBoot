@@ -17,7 +17,9 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const AdminOrderItem = ({book, bookId}) => {
+const AdminOrderItem = ({book}) => {
+
+    const bookId = book?.libroId;
 
     const {data: bookImage, isLoading: isImageLoading, error: imageError} = useQuery({
         queryKey: ['bookFirst', bookId],
@@ -25,8 +27,20 @@ const AdminOrderItem = ({book, bookId}) => {
         enabled: !!bookId, // Only fetch if bookId is available
     });
 
+    if (!book) {
+        return <div className="text-red-500">Errore: Dettagli del libro non disponibili.</div>;
+    }
+
+    if (isImageLoading) {
+        return <div className="text-gray-500">Loading book details...</div>;
+    }
+
+    if (imageError) {
+        return <div className="text-red-500">Error loading book image. Please try again later.</div>;
+    }
+
     return (
-        <div key={book.id} className="bg-white border border-gray-300 rounded-xl p-4 flex items-center my-3">
+        <div key={bookId} className="bg-white border border-gray-300 rounded-xl p-4 flex items-center my-3">
 
             <img
                 src={`/api/images/${bookId}/first`}
@@ -35,9 +49,12 @@ const AdminOrderItem = ({book, bookId}) => {
 
             <div className="flex-1 flex justify-between items-start">
                 <div>
-                    <Link to={`/book/${book.libroId}`} className="text-xl font-semibold hover:underline">
+                    <Link to={`/book/${bookId}`} className="text-xl font-semibold hover:underline">
                         {book.titolo}
                     </Link>
+
+                    <p className="text-gray-600 mb-1">ID: {bookId}</p>
+                    <p className="text-gray-600">Variante: {book.varianteNome || "N/A"}</p>
 
                     <p className="text-gray-700">Quantità: {book.quantita}</p>
                 </div>

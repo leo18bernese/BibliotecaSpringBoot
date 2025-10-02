@@ -592,7 +592,7 @@ const BookInfo = () => {
 
                                 <button
                                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
-                                    onClick={() => navigate(`/admin/book/${book.id}`)}>
+                                    onClick={() => window.open(`/admin/book/${book.id}`, '_blank')}>
                                     Gestisci Libro
                                 </button>
                             </div>

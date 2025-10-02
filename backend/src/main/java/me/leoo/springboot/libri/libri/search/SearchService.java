@@ -10,6 +10,7 @@ import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzione;
 import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzioneRepository;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
+import me.leoo.springboot.libri.libri.variante.Variante;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,21 +82,44 @@ public class SearchService {
                     } else {
                         // Gestione per attributi dinamiche
                         spec = spec.and((root, query, cb) -> {
-                            Subquery<Long> subquery = query.subquery(Long.class);
-                            Root<Libro> subRoot = subquery.from(Libro.class);
-                            MapJoin<LibroInfo, String, String> caratteristicheJoin = subRoot.join("descrizione").joinMap("attributi");
-                            subquery.select(subRoot.get("id"));
-
-                            List<Predicate> orPredicates = new ArrayList<>();
+                            // Subquery per cercare libri che corrispondono ai filtri nelle caratteristiche della descrizione
+                            Subquery<Long> subqueryDesc = query.subquery(Long.class);
+                            Root<Libro> subRootDesc = subqueryDesc.from(Libro.class);
+                            MapJoin<LibroInfo, String, String> caratteristicheJoin = subRootDesc.join("descrizione").joinMap("caratteristiche");
+                            subqueryDesc.select(subRootDesc.get("id"));
+                            List<Predicate> orPredicatesDesc = new ArrayList<>();
                             for (String valore : valoriSelezionati) {
-                                orPredicates.add(cb.and(
+                                orPredicatesDesc.add(cb.and(
                                         cb.equal(caratteristicheJoin.key(), filtroNome),
                                         cb.equal(caratteristicheJoin.value(), valore)
                                 ));
                             }
-                            subquery.where(cb.or(orPredicates.toArray(new Predicate[0])));
+                            if (!orPredicatesDesc.isEmpty()) {
+                                subqueryDesc.where(cb.or(orPredicatesDesc.toArray(new Predicate[0])));
+                            }
 
-                            return root.get("id").in(subquery);
+                            // Subquery per cercare libri che hanno varianti corrispondenti ai filtri
+                            Subquery<Long> subqueryVar = query.subquery(Long.class);
+                            Root<Libro> subRootVar = subqueryVar.from(Libro.class);
+                            Join<Libro, Variante> varianteJoin = subRootVar.join("varianti");
+                            MapJoin<Variante, String, String> attributiSpecificiJoin = varianteJoin.joinMap("attributiSpecifici");
+                            subqueryVar.select(subRootVar.get("id"));
+                            List<Predicate> orPredicatesVar = new ArrayList<>();
+                            for (String valore : valoriSelezionati) {
+                                orPredicatesVar.add(cb.and(
+                                        cb.equal(attributiSpecificiJoin.key(), filtroNome),
+                                        cb.equal(attributiSpecificiJoin.value(), valore)
+                                ));
+                            }
+                            if (!orPredicatesVar.isEmpty()) {
+                                subqueryVar.where(cb.or(orPredicatesVar.toArray(new Predicate[0])));
+                            }
+
+                            // Il libro deve essere in una delle due subquery
+                            return cb.or(
+                                    root.get("id").in(subqueryDesc),
+                                    root.get("id").in(subqueryVar)
+                            );
                         });
                     }
                 }
@@ -224,7 +248,15 @@ public class SearchService {
                                                              CriteriaBuilder cb) {
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
         Root<Libro> root = cq.from(Libro.class);
-        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("attributi");
+
+        // Path per gli attributi della descrizione
+        Join<Libro, LibroInfo> descrizioneJoin = root.join("descrizione", JoinType.LEFT);
+        MapJoin<LibroInfo, String, String> attributiDescrizione = descrizioneJoin.joinMap("caratteristiche", JoinType.LEFT);
+
+        // Path per gli attributi delle varianti
+        Join<Libro, Variante> varianteJoin = root.join("varianti", JoinType.LEFT);
+        MapJoin<Variante, String, String> attributiVariante = varianteJoin.joinMap("attributiSpecifici", JoinType.LEFT);
+
 
         List<Predicate> predicates = new ArrayList<>();
         Predicate basePredicate = specParziale.toPredicate(root, cq, cb);
@@ -232,12 +264,16 @@ public class SearchService {
             predicates.add(basePredicate);
         }
 
-        cq.multiselect(caratteristicheJoin.value(), cb.count(root.get("id")))
-                .groupBy(caratteristicheJoin.value())
-                .orderBy(cb.asc(caratteristicheJoin.value()));
+        // Unione dei valori da entrambe le fonti
+        Expression<String> valueExpression = cb.coalesce(attributiDescrizione.value(), attributiVariante.value());
+        cq.multiselect(valueExpression, cb.countDistinct(root.get("id")))
+                .groupBy(valueExpression);
 
-        Predicate caratteristicaKeyPredicate = cb.equal(caratteristicheJoin.key(), caratteristicaNome);
-        predicates.add(caratteristicaKeyPredicate);
+        // Filtro per il nome della caratteristica su entrambe le fonti
+        Predicate keyPredicateDesc = cb.equal(attributiDescrizione.key(), caratteristicaNome);
+        Predicate keyPredicateVar = cb.equal(attributiVariante.key(), caratteristicaNome);
+        predicates.add(cb.or(keyPredicateDesc, keyPredicateVar));
+
         cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
         List<Tuple> results = entityManager.createQuery(cq).getResultList();
@@ -266,14 +302,23 @@ public class SearchService {
 
     private Set<String> ottieniCaratteristicheDisponibili() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<String> cq = cb.createQuery(String.class);
-        Root<Libro> root = cq.from(Libro.class);
-        MapJoin<LibroInfo, String, String> caratteristicheJoin = root.join("descrizione").joinMap("attributi");
+        Set<String> caratteristiche = new HashSet<>();
 
-        cq.select(caratteristicheJoin.key()).distinct(true);
+        // 1. Ottieni chiavi da libro.descrizione.attributi
+        CriteriaQuery<String> cqDesc = cb.createQuery(String.class);
+        Root<Libro> rootDesc = cqDesc.from(Libro.class);
+        MapJoin<LibroInfo, String, String> caratteristicheJoinDesc = rootDesc.join("descrizione").joinMap("caratteristiche");
+        cqDesc.select(caratteristicheJoinDesc.key()).distinct(true);
+        caratteristiche.addAll(entityManager.createQuery(cqDesc).getResultList());
 
-        List<String> caratteristiche = entityManager.createQuery(cq).getResultList();
+        // 2. Ottieni chiavi da libro.varianti.attributiSpecifici
+        CriteriaQuery<String> cqVar = cb.createQuery(String.class);
+        Root<Libro> rootVar = cqVar.from(Libro.class);
+        Join<Libro, Variante> varianteJoin = rootVar.join("varianti");
+        MapJoin<Variante, String, String> attributiSpecificiJoin = varianteJoin.joinMap("attributiSpecifici");
+        cqVar.select(attributiSpecificiJoin.key()).distinct(true);
+        caratteristiche.addAll(entityManager.createQuery(cqVar).getResultList());
 
-        return new HashSet<>(caratteristiche);
+        return caratteristiche;
     }
 }

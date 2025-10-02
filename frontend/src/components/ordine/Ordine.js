@@ -111,7 +111,7 @@ const Ordine = () => {
                     </div>
 
                     {ordine.items.map((item) => (
-                        <OrdineItem book={item} bookId={item.id} key={item.id}/>
+                        <OrdineItem book={item} key={item.id}/>
                     ))
                     }
                 </div>
