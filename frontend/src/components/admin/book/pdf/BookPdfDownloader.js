@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import axios from 'axios';
+import toast from "react-hot-toast";
 
 const BookPdfDownloader = () => {
     const {id} = useParams();
@@ -26,7 +27,12 @@ const BookPdfDownloader = () => {
 
                 } catch (error) {
                     console.error("Errore nel download automatico del PDF:", error);
-                    alert("Si è verificato un errore durante il download del report.");
+
+                    toast.error(error.message || "Errore nel download del PDF.",
+                        {
+                            duration: 6000,
+                        }
+                    );
                 }
             };
 

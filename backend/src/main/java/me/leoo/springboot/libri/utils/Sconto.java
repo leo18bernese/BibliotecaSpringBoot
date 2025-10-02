@@ -13,6 +13,18 @@ public class Sconto {
     private int percentuale;
     private double valore;
 
+    public String toString() {
+        if (percentuale > 0 && percentuale <= 100) {
+            return percentuale + "%";
+        }
+
+        if (valore > 0) {
+            return "€" + LibriUtils.round(valore);
+        }
+
+        return "Nessuno";
+    }
+
     public double getSconto(double prezzo) {
         if (percentuale > 0 && percentuale <= 100) {
             return LibriUtils.round(prezzo / 100 * percentuale);
