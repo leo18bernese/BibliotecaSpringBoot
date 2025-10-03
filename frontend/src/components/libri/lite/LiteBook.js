@@ -64,8 +64,8 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
     return (
         <>
-            <div className="bg-white shadow-md rounded-lg  mb-4">
-                <div className="book-card">
+            <div className="bg-white shadow-lg rounded-lg mb-4 flex flex-col h-full">
+                <div className="book-card flex flex-col flex-grow">
 
                     <Link to={`/book/${bookId}`}>
                         <div className="relative">
@@ -112,23 +112,34 @@ const LiteBook = ({bookID, book: providedBook}) => {
                     </Link>
 
 
-                    <div className="p-4">
-                        <h3>{book.titolo}</h3>
-                        <p>by {book.autore}</p>
+                    <div className="px-4 py-2 flex flex-col flex-grow">
+                        <div className="flex-grow">
+                            <h3 className="text-lg font-semibold text-gray-800">{book.titolo}</h3>
+                            <p className="text-gray-600 mb-1">by {book.autore}</p>
 
-                        <div className="mt-8 mb-4">Producted by {book.editore}</div>
+                            <p className=" mb-4 text-gray-600 text-sm">Producted by {book.editore}</p>
+                        </div>
 
-                        <h3 className="text-lg font-semibold">
-                            {hasSconto && (
-                                <span className="line-through mr-2 text-gray-400 text-base font-normal">
-                                  €{book.prezzoOriginale.toFixed(2)}
-                                </span>
-                            )}
-                            <span className="text-green-600 text-xl font-bold">
-                                {book.prezzo ? `€${book.prezzo.toFixed(2)}` : 'Price not available'}
-                              </span>
-                        </h3>
+                        <div className="mt-auto">
+                            <h3 className="text-lg font-semibold flex justify-between items-center">
+                                <div>
+                                    {hasSconto && (
+                                        <span className="line-through mr-2 text-gray-400 text-base font-normal">
+                                      €{book.prezzoOriginale.toFixed(2)}
+                                    </span>
+                                    )}
 
+                                    <span className="text-blue-600 text-xl font-bold">
+                                    {book.prezzo ? `€${book.prezzo.toFixed(2)}` : 'Price not available'}
+                                  </span>
+
+                                </div>
+
+                                <button className="bg-blue-100 rounded-full  hover:bg-blue-200 transition-colors">
+                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600' ></i>
+                                </button>
+                            </h3>
+                        </div>
                     </div>
 
                 </div>

@@ -8,7 +8,7 @@ nav {
 }
 
 nav ul {
-    list-style: none; /* Rimuove i pallini dalle liste */
+    list-style: none; /* Rimu   ove i pallini dalle liste */
     display: flex; /* Dispone gli elementi in orizzontale */
     margin: 0;
     padding: 0;
@@ -19,13 +19,7 @@ nav li {
     margin: 0 25px; /* Aggiunge spazio tra gli elementi */
 }
 
-nav a {
-    color: #e1e1e1; /* Testo bianco per i link */
-    text-decoration: none; /* Rimuove la sottolineatura dai link */
-    font-size: 20px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-nav a:hover {
-    text-decoration: underline; /* Sottolinea i link al passaggio del mouse */
+nav li:hover {
+    background-color: #f30d0d; /* Cambia il colore di sfondo al passaggio del mouse */
+    border-radius: 5px; /* Aggiunge angoli arrotondati */
 }

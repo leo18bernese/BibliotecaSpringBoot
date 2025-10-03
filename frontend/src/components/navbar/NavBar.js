@@ -38,27 +38,31 @@ const NavBar = () => {
         }
     };
 
+    const getLinkClass = (path, name, condition = true, separator = false) => {
+        if (!condition) return null;
+
+        return (
+            <>
+                {separator && <span className="mx-2 text-gray-800">|</span>}
+
+
+                <Link to={path} className="text-gray-800  font-medium p-2 rounded-md
+                border-2 border-transparent  hover:border-gray-500
+                 hover:bg-gray-300 transition-colors ">
+                    {name}
+                </Link>
+            </>
+        );
+    }
+
     return (
-        <nav className="bg-gray-800 text-white shadow-md ">
+        <nav className="bg-gray-100 text-white shadow-md ">
             <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                 {/* Left side - Navigation links */}
-                <ul className="flex space-x-2 list-none m-0 p-0">
-                    <li>
-                        <Link to="/" className="text-white hover:text-gray-300 font-medium">
-                            Home GG
-                        </Link>
-
-                        {
-                            user && user.ruoli.includes('ROLE_ADMIN') && (
-                                <>
-                                    <span className="mx-2">|</span>
-                                    <Link to="/admin" className="text-white hover:text-gray-300 font-medium">
-                                        Admin
-                                    </Link>
-                                </>
-                            )
-                        }
-                    </li>
+                <ul className="flex space-x-2 list-none m-0 p-0 items-center">
+                    {getLinkClass('/', 'Home')}
+                    {getLinkClass('/prodotti', 'Prodotti')}
+                    {getLinkClass('/admin', 'Admin', user && user.ruoli.includes('ROLE_ADMIN'), true)}
                 </ul>
 
                 {/* search bar */}

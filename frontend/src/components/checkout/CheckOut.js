@@ -417,7 +417,14 @@ const CheckOut = () => {
                         </div>
 
                         <div className="flex flex-col border-b py-2 text-md ">
-                            <h3 className="font-semibold text-gray-500 pb-4">Coupons</h3>
+
+                            <div className="flex justify-between">
+                                <h3 className="font-semibold text-gray-500 pb-4">Coupons</h3>
+
+                                {!(carrello.couponCodes && carrello.couponCodes.length > 0) && (
+                                    <h3 className="font-semibold text-right text-gray-800">Nessun coupon applicato</h3>
+                                )}
+                            </div>
 
                             {carrello.couponCodes && carrello.couponCodes.length > 0 ? (
                                 <h3 className="font-semibold text-right text-gray-700">

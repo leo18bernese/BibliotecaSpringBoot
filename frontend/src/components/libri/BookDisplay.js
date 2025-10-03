@@ -3,9 +3,11 @@ import React, {useContext, useEffect, useRef} from "react";
 import {UserContext} from "../user/UserContext";
 import {useAnalyticsMutation} from "../admin/book/chart/useAnalytics";
 
-function BookDisplay({idList, contentList, isLoading, error}) {
+function BookDisplay({idList, contentList, isLoading, error, gridCss}) {
     const list = idList || contentList;
     const {user} = useContext(UserContext);
+
+    const gridClass = gridCss || "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12";
 
     const {addEventMutation} = useAnalyticsMutation();
 
@@ -45,7 +47,7 @@ function BookDisplay({idList, contentList, isLoading, error}) {
     }
 
     return (
-        <div className="homepage-items grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 p-10">
+        <div className={`homepage-items grid ${gridClass} p-10`}>
             {idList ? (
                 idList.map(id => (
                     <LiteBook bookID={id} key={id}/>
