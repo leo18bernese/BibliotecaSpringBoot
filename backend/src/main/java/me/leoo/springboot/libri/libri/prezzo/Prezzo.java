@@ -30,7 +30,6 @@ public class Prezzo implements Cloneable{
 
     public Prezzo(double prezzo) {
         this.prezzo = prezzo;
-        this.sconto = Sconto.from(prezzo, 5);
     }
 
     public Prezzo(double prezzo, @Nullable Sconto sconto, Valuta valuta) {
