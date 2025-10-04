@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.leoo.springboot.libri.libri.autore.Autore;
+import me.leoo.springboot.libri.libri.category.Category;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
@@ -27,6 +28,9 @@ public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    private Category category;
 
     private String titolo;
 
@@ -54,8 +58,9 @@ public class Libro {
     private boolean hidden = false;
 
     // Costruttore con variante predefinita per compatibilità
-    public Libro(String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine,
+    public Libro(Category category, String titolo, Autore autore, String genere, int annoPubblicazione, int numeroPagine,
                  String editore, String lingua, String isbn, int quantita, double prezzo) {
+        this.category = category;
         this.titolo = titolo;
         this.autore = autore;
         this.genere = genere;
@@ -197,4 +202,24 @@ public class Libro {
                 .flatMap(v -> v.getRecensioni().stream())
                 .toList();
     }
+
+    // Category map
+    public Map<Long, String> getCategoryMap() {
+        List<Category> categories = new ArrayList<>();
+
+        Category c = this.getCategory();
+
+        while (c != null) {
+            categories.add(c);
+            c = c.getParent();
+        }
+
+        Collections.reverse(categories);
+
+        Map<Long, String> map = new LinkedHashMap<>();
+        categories.forEach(cat -> map.put(cat.getId(), cat.getName()));
+
+        return map;
+    }
+
 }

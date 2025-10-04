@@ -54,6 +54,7 @@ import AdminOrder from "./components/admin/order/AdminOrder";
 import AdminOrderHome from "./components/admin/order/AdminOrderHome";
 import AdminResoHome from "./components/admin/reso/AdminResoHome";
 import PersonalDetailsEdit from "./components/user/pages/edit/PersonalDetailsEdit";
+import HomepageSellers from "./components/utils/HomepageSellers";
 
 const queryClient = new QueryClient();
 
@@ -191,6 +192,10 @@ function Home() {
                     </div>
                 )}
             </header>
+
+            <HomepageSellers/>
+
+            <h3 className="text-2xl mt-10 mb-6 font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Products for you</h3>
 
             <BookDisplay idList={homepageIds} isLoading={isLoading} error={error}
                          gridCss={"grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8"}

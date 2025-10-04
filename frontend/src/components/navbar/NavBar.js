@@ -79,7 +79,7 @@ const NavBar = () => {
                 <div className="mx-2 flex items-center space-x-4">
                     <input
                         type="text"
-                        placeholder={" Cerca..."}
+                        placeholder={"Cerca..."}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handleSearchKeyDown}
@@ -101,8 +101,12 @@ const NavBar = () => {
                                 {user.username}
                             </Link>
                         ) : (
-                            <Link to="/login" state={{from: location}} className="border-2 border-transparent hover:border-gray-500
-                             hover:bg-gray-300 p-2 rounded-md transition-colors">
+                            <Link to="/login" state={{from: location}}
+                                    className={`border-2 p-2 rounded-md transition-colors
+                                    ${location.pathname === '/login'
+                                        ? 'border-gray-500 bg-gray-300 font-semibold'
+                                        : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
+                                `}>
                                 Login
                             </Link>
                         )}

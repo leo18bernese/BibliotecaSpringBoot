@@ -273,9 +273,15 @@ public class CarrelloController {
     }*/
 
     @GetMapping("/items/{libroId}/{varianteId}")
-    public ResponseEntity<?> getLibroVariante(@AuthenticationPrincipal Utente utente, @PathVariable Long libroId, @PathVariable Long varianteId) {
+    public ResponseEntity<?> getLibroVariante(@AuthenticationPrincipal Utente utente,
+                                              @PathVariable Long libroId, @PathVariable Long varianteId) {
         try {
             CarrelloItem item = carrelloService.getCarrelloItemByVariante(utente, varianteId);
+
+            if(item == null || !item.getLibro().getId().equals(libroId)) {
+                return ResponseEntity.noContent().build();
+            }
+
             Libro libro = item.getLibro();
 
             CarrelloItemResponse response = new CarrelloItemResponse(

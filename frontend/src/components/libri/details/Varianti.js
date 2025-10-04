@@ -79,7 +79,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
 
             <div className="space-y-1">
 
-                {(variante.prezzo.sconto.percentuale > 0 || variante.prezzo.sconto.valore > 0) && (
+                {variante.prezzo.sconto && (variante.prezzo.sconto.percentuale > 0 || variante.prezzo.sconto.valore > 0) && (
                     <span className="text-sm text-gray-500 line-through">
                         {variante.prezzo.prezzo.toFixed(2)} €
                     </span>

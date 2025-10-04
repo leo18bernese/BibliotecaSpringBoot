@@ -397,7 +397,26 @@ const BookInfo = () => {
         <>
             <div className="container mx-auto px-4 py-8">
                 <Toaster/>
+
+                <div>
+                    {Object.entries(book.categoryMap).map(([id, name], index) => (
+                        <>
+                            <button
+                                key={id}
+                                className="text-sm text-blue-600 hover:underline mr-2 mb-2"
+                                onClick={() => navigate(`/category/${id}`)}
+                            >
+                                {name}
+                            </button>
+
+                            {index < Object.entries(book.categoryMap).length - 1 && (
+                                <span className="text-gray-400 mr-2">/</span>
+                            )}
+                        </>))}
+                </div>
+
                 <div className="flex flex-col md:flex-row gap-6">
+
 
                     <div className="flex flex-col md:w-2/6 ">
 

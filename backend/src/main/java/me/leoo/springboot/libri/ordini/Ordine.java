@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import me.leoo.springboot.libri.buono.Buono;
 import me.leoo.springboot.libri.carrello.Carrello;
 import me.leoo.springboot.libri.carrello.item.CarrelloItem;
+import me.leoo.springboot.libri.libri.category.Category;
 import me.leoo.springboot.libri.spedizione.*;
 import me.leoo.springboot.libri.utente.Utente;
 
@@ -112,6 +113,13 @@ public class Ordine {
             if (buono.validate(utente, carrello)) {
                 couponCodes.add(buono);
                 buono.addUse();
+            }
+        }
+
+        // Incrementa starts
+        for (CarrelloItem item : carrello.getItems()) {
+            for (Category c = item.getLibro().getCategory(); c != null; c = c.getParent()) {
+                c.incrementPurchased();
             }
         }
 
