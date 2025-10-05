@@ -10,5 +10,6 @@ import org.springframework.stereotype.Component;
 public class ImageProperties {
     private String commonDir;
     private String ordersDir;
+    private String categoriesDir;
 
 }

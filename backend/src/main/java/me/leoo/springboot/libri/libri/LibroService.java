@@ -1,5 +1,7 @@
 package me.leoo.springboot.libri.libri;
 
+import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.image.FileImageUtils;
 import me.leoo.springboot.libri.image.ImageService;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,45 +14,16 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LibroService {
 
-    @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
 
     public List<Path> getBookAllImages(Long id) {
-        try {
-            String finalPath = imageService.getCommonImagesPath(id);
-            Path dirPath = Paths.get(finalPath);
-
-            if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-                return List.of();
-            }
-
-            return Files.list(dirPath)
-                    .filter(Files::isRegularFile)
-                    .toList();
-        } catch (Exception e) {
-            throw new RuntimeException("Error while getting all images for book with ID: " + id, e);
-        }
+        return FileImageUtils.getAllImages(id, imageService.getCommonImagesPath(id));
     }
 
     public ResponseEntity<byte[]> getPictureResponse(Long id, int index) {
-        List<Path> paths = getBookAllImages(id);
-
-        if (paths.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        if (index < 0 || index >= paths.size()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Path path = paths.get(index);
-
-        try {
-            return ImageUtils.getImageResponse(path);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return FileImageUtils.getPictureResponse(id, imageService.getCommonImagesPath(id), index);
     }
 }

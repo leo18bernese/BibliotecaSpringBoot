@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.libri.category;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,4 +38,15 @@ public class CategoryController {
             return ResponseEntity.status(500).build();
         }
     }
+
+    @GetMapping("/{categoryId}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long categoryId) {
+        try {
+            return categoryService.getPictureResponse(categoryId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

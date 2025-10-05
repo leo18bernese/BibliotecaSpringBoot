@@ -21,5 +21,9 @@ public class ImageService {
         return imageProperties.getOrdersDir() + "/" + fileName.toString();
     }
 
+    public String getCategoriesImagesPath(Object fileName) {
+        return imageProperties.getCategoriesDir() + "/" + fileName.toString();
+    }
+
     // Qui puoi aggiungere altri metodi come saveImage(), deleteImage(), ecc.
 }

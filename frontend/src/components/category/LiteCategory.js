@@ -6,6 +6,12 @@ const fetchCategoryById = async (categoryId) => {
     return data;
 }
 
+const fetchImageById = async (categoryId) => {
+    const {data} = await axios.get(`/api/categories/${categoryId}/image`);
+    return data;
+}
+
+
 const LiteCategory = ({categoryID, category: providedCategory}) => {
 
     const categoryId =  categoryID || (providedCategory?.id);
@@ -15,6 +21,12 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
         queryFn: () => fetchCategoryById(categoryId),
         enabled: !providedCategory && !!categoryId,
     });
+
+    const {data: imageData} = useQuery({
+        queryKey: ['categoryImage',   categoryId ],
+        queryFn: () => fetchImageById(categoryId),
+        enabled: !!categoryId,
+    } );
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -28,11 +40,39 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
 
     return (
         <>
-            <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col h-full">
-                <div className="flex flex-col flex-grow text-center">
-
-                    <h3 className="font-bold text-xl mb-5">{category.name}</h3>
-                    <p>{category.description}</p>
+            <div className="bg-white shadow-lg rounded-lg flex flex-col h-full">
+                <div
+                    className="flex flex-col flex-grow text-center relative overflow-hidden"
+                    style={imageData ? {
+                        backgroundImage: `url(/api/categories/${categoryId}/image)` ,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        minHeight: '12rem',
+                        borderRadius: '0.5rem',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: 0
+                    } : {padding: '1rem'}}
+                >
+                    {imageData && (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                background: 'rgba(0,0,0,0.55)',
+                                zIndex: 1,
+                                borderRadius: '0.5rem',
+                            }}
+                        />
+                    )}
+                    <div style={{position: 'relative', zIndex: 2, padding: '1rem', width: '100%'}}>
+                        <h3 className="font-bold text-xl mb-5" style={{color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.7)'}}>{category.name}</h3>
+                        <p style={{color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.7)'}}>{category.description}</p>
+                    </div>
                 </div>
             </div>
         </>
