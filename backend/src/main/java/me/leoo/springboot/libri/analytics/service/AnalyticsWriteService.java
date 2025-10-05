@@ -56,8 +56,8 @@ public class AnalyticsWriteService {
         );
 
         Update update = new Update().inc("counts." + eventType.name(), count);
-        System.out.println("Incrementing " + eventType.name() + " by " + count + " for productId: " + productId + " in collection: " + collection);
-        System.out.println("userId: " + userId);
+        //System.out.println("Incrementing " + eventType.name() + " by " + count + " for productId: " + productId + " in collection: " + collection);
+        //System.out.println("userId: " + userId);
         if (userId != null) {
             update.inc("uniqueUsers." + eventType.name(), 1);
         }

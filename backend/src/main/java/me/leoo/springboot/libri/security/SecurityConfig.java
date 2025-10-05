@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/index.html", "/static/**", "/css/**", "/js/**", "/images/**", "/assets/**", "/favicon.ico", "/ws/**").permitAll()
                         // Endpoints pubblici
-                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**", "/api/home/**", "/api/autori", "/h2-console/**", "/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/libri/**", "/api/categories/**", "/api/images/**", "/api/spedizione/**", "/api/recensioni/**", "/api/home/**", "/api/autori", "/h2-console/**", "/error").permitAll()
                         // Endpoints che richiedono autenticazione
                         .requestMatchers("/api/utenti/current", "/api/carrello/**", "/api/buono/**", "/api/ordini/**", "/api/resi/**", "/api/wishlist/**").authenticated()
                         // Endpoints per gli amministratori

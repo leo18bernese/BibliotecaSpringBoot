@@ -16,6 +16,7 @@ public class Category {
     private Long id;
 
     private String name;
+    private String description = "";
 
     //parent
     @ManyToOne(fetch = FetchType.EAGER)
@@ -30,12 +31,22 @@ public class Category {
         this.name = name;
     }
 
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+
     public Category(String name, Category parent) {
         this.name = name;
         this.parent = parent;
     }
 
-
+    public Category(String name, String description, Category parent) {
+        this.name = name;
+        this.description = description;
+        this.parent = parent;
+    }
 
     public void incrementPurchased() {
         this.purchasedCount++;

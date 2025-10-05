@@ -28,7 +28,7 @@ public class AnalyticsController {
             @RequestParam Long productId,
             @RequestParam(required = false) Long userId,
             @RequestParam InteractionEnum eventType) {
-        System.out.println("Recording event: " + eventType + " for productId: " + productId);
+        //System.out.println("Recording event: " + eventType + " for productId: " + productId);
         writeService.recordEvent(productId, userId, eventType, new Date());
         return ResponseEntity.ok("Event recorded");
     }

@@ -1,0 +1,40 @@
+package me.leoo.springboot.libri.libri.category;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/categories")
+@RequiredArgsConstructor
+public class CategoryController {
+
+    private final CategoryService categoryService;
+
+    @GetMapping("/homepage")
+    public List<Long> getTopCategories(@RequestParam(defaultValue = "5") int limit) {
+        List<Category> topCategories = categoryService.getTopCategories(limit);
+
+        return topCategories.stream()
+                .map(Category::getId)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+        try {
+            Category category = categoryService.getCategoryById(id.intValue());
+
+            if (category == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(category);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+}

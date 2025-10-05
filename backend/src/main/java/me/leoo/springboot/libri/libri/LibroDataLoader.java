@@ -41,40 +41,40 @@ public class LibroDataLoader implements CommandLineRunner {
         Autore autoriVari = autoreService.getOrCreate("AA.VV.", "Autori Vari - Raccolta di ricette della tradizione culinaria italiana");
         Autore carr = autoreService.getOrCreate("Caleb Carr", "Scrittore americano specializzato in thriller storici e psicologici");
 
-        Category libriCategory = new Category("Libri");
-        Category elettronicaCategory = new Category("Elettronica");
-        Category abbigliamentoCategory = new Category("Abbigliamento");
-        Category casaCategory = new Category("Casa");
+        Category libriCategory = new Category("Libri", "Categoria principale per tutti i libri");
+        Category elettronicaCategory = new Category("Elettronica", "Categoria principale per tutti i prodotti elettronici");
+        Category abbigliamentoCategory = new Category("Abbigliamento", "Categoria principale per tutti i vestiti e accessori");
+        Category casaCategory = new Category("Casa", "Categoria principale per tutti i prodotti per la casa");
 
         // Sottocategorie di Libri
-        Category fantasyCategory = new Category("Fantasy", libriCategory);
-        Category horrorCategory = new Category("Horror", libriCategory);
-        Category thrillerCategory = new Category("Thriller", libriCategory);
+        Category fantasyCategory = new Category("Fantasy", "Sottocategoria di libri fantasy", libriCategory);
+        Category horrorCategory = new Category("Horror", "Sottocategoria di libri horror", libriCategory);
+        Category thrillerCategory = new Category("Thriller", "Sottocategoria di libri thriller e suspense", libriCategory);
 
         // Sottocategorie di Elettronica
-        Category hardwareCategory = new Category("Hardware", elettronicaCategory);
-        Category softwareCategory = new Category("Software", elettronicaCategory);
+        Category hardwareCategory = new Category("Hardware", "Componenti hardware per computer e dispositivi elettronici", elettronicaCategory);
+        Category softwareCategory = new Category("Software", "Programmi e applicazioni per dispositivi elettronici", elettronicaCategory);
 
-        Category ramCategory = new Category("RAM", hardwareCategory);
-        Category cpuCategory = new Category("CPU", hardwareCategory);
-        Category gpuCategory = new Category("GPU", hardwareCategory);
-        Category monitorCategory = new Category("Monitor", hardwareCategory);
+        Category ramCategory = new Category("RAM", "Memorie ad accesso casuale per computer", hardwareCategory);
+        Category cpuCategory = new Category("CPU", "Processori centrali per computer", hardwareCategory);
+        Category gpuCategory = new Category("GPU", "Schede grafiche per computer", hardwareCategory);
+        Category monitorCategory = new Category("Monitor", "Schermi e monitor per computer", hardwareCategory);
 
-        Category productivitySoftwareCategory = new Category("Software di produttività", softwareCategory);
-        Category antivirusSoftwareCategory = new Category("Software antivirus", softwareCategory);
+        Category productivitySoftwareCategory = new Category("Software di produttività", "Software per aumentare la produttività personale e aziendale", softwareCategory);
+        Category antivirusSoftwareCategory = new Category("Software antivirus", "Programmi per la protezione da virus e malware", softwareCategory);
 
         // Sottocategorie di Abbigliamento
-        Category uomoCategory = new Category("Uomo", abbigliamentoCategory);
-        Category donnaCategory = new Category("Donna", abbigliamentoCategory);
+        Category uomoCategory = new Category("Uomo", "Abbigliamento e accessori per uomo", abbigliamentoCategory);
+        Category donnaCategory = new Category("Donna", "Abbigliamento e accessori per donna", abbigliamentoCategory);
 
-        Category traditionalCategory = new Category("Traditional", abbigliamentoCategory);
-        Category casualCategory = new Category("Casual", abbigliamentoCategory);
-        Category sportCategory = new Category("Sport", abbigliamentoCategory);
+        Category traditionalCategory = new Category("Traditional", "Abbigliamento tradizionale e classico", abbigliamentoCategory);
+        Category casualCategory = new Category("Casual", "Abbigliamento casual per tutti i giorni", abbigliamentoCategory);
+        Category sportCategory = new Category("Sport", "Abbigliamento e accessori sportivi", abbigliamentoCategory);
 
         // Sottocategorie di Casa
-        Category arredamentoCategory = new Category("Arredamento", casaCategory);
-        Category elettrodomesticiCategory = new Category("Elettrodomestici", casaCategory);
-        Category decorazioniCategory = new Category("Decorazioni", casaCategory);
+        Category arredamentoCategory = new Category("Arredamento", "Mobili e soluzioni d'arredo per la casa", casaCategory);
+        Category elettrodomesticiCategory = new Category("Elettrodomestici", "Apparecchi elettrici per la casa", casaCategory);
+        Category decorazioniCategory = new Category("Decorazioni", "Oggetti decorativi per la casa", casaCategory);
 
         // Salva tutte le categorie nel database
         categoryRepository.saveAll(List.of(

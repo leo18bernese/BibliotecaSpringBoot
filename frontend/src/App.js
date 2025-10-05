@@ -55,6 +55,7 @@ import AdminOrderHome from "./components/admin/order/AdminOrderHome";
 import AdminResoHome from "./components/admin/reso/AdminResoHome";
 import PersonalDetailsEdit from "./components/user/pages/edit/PersonalDetailsEdit";
 import HomepageSellers from "./components/utils/HomepageSellers";
+import CategoryDisplay from "./components/category/CategoryDisplay";
 
 const queryClient = new QueryClient();
 
@@ -99,8 +100,7 @@ function App() {
                                                 <Route path="/account/*" element={<AccountInfo/>}>
                                                     <Route index element={<Navigate to="personal-details" replace/>}/>
                                                     <Route path="personal-details" element={<PersonalDetails/>}/>
-                                                    <Route path="personal-details/edit"
-                                                           element={<PersonalDetailsEdit/>}/>
+                                                    <Route path="personal-details/edit" element={<PersonalDetailsEdit/>}/>
                                                     <Route path="orders" element={<OrderHistory/>}/>
                                                     <Route path="reviews" element={<ReviewHistory/>}/>
                                                     <Route path="wishlist" element={<Wishlist/>}/>
@@ -170,12 +170,23 @@ const fetchHomepageItems = async () => {
     return data;
 }
 
+const fetchHomepageCategories = async () => {
+    const {data} = await axios.get("/api/categories/homepage");
+    return data;
+}
+
 function Home() {
     const {user} = useContext(UserContext);
 
     const {data: homepageIds, isLoading, error} = useQuery({
         queryKey: ['homepageItems'],
         queryFn: fetchHomepageItems,
+        staleTime: Infinity, // Impedisce il refetch automatico
+    });
+
+     const {data: homepageCategories, isLoading: isLoadingCategories, error: errorCategories} = useQuery({
+        queryKey: ['homepageCategories'],
+        queryFn: fetchHomepageCategories,
         staleTime: Infinity, // Impedisce il refetch automatico
     });
 
@@ -194,6 +205,12 @@ function Home() {
             </header>
 
             <HomepageSellers/>
+
+            <h3 className="text-2xl mt-10 mb-6 font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Categories</h3>
+
+            <CategoryDisplay idList={homepageCategories} isLoading={isLoading} error={error}
+                         gridCss={"grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8"}
+            />
 
             <h3 className="text-2xl mt-10 mb-6 font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Products for you</h3>
 
