@@ -66,6 +66,9 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
     @Query("SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END FROM Variante v WHERE v.id = :varianteId")
     boolean existsVarianteById(@Param("varianteId") Long varianteId);
 
+    // limit book by categoria
+    @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.rifornimento.quantita > 0 AND l.category.id = :categoriaId AND l.hidden = false")
+    List<Libro> findLibriByCategoriaId(@Param("categoriaId") Long categoriaId, Pageable pageable);
 
     // Statistiche utili
 

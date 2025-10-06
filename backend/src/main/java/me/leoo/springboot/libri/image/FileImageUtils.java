@@ -32,17 +32,14 @@ public class FileImageUtils {
         List<Path> paths = getAllImages(id, generalPath );
 
         if (paths.isEmpty()) {
-            System.out.println( "Paths is empty for id: " + id + " at " + generalPath);
             return ResponseEntity.noContent().build();
         }
 
         if (index < 0 || index >= paths.size()) {
-            System.out.println( "Index out of bounds: " + index + " for id: " + id + " at " + generalPath);
             return ResponseEntity.notFound().build();
         }
 
         Path path = paths.get(index);
-        System.out.println( "Serving image: " + path + " for id: " + id + " at " + generalPath);
 
         try {
             return ImageUtils.getImageResponse(path);

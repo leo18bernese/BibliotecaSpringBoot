@@ -56,6 +56,7 @@ import AdminResoHome from "./components/admin/reso/AdminResoHome";
 import PersonalDetailsEdit from "./components/user/pages/edit/PersonalDetailsEdit";
 import HomepageSellers from "./components/utils/HomepageSellers";
 import CategoryDisplay from "./components/category/CategoryDisplay";
+import CategoryItems from "./components/category/CategoryItems";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ function App() {
                                             <Route path="/libri/:id" element={<RedirectToBook/>}/>
                                             <Route path="/libro/:id" element={<RedirectToBook/>}/>
                                             <Route path="/ordine/:id/pdf" element={<BookPdfDownloader/>}/>
+                                            <Route path="/category/:id" element={<CategoryItems/>}/>
 
                                             <Route element={<ProtectedRoute/>}>
 
