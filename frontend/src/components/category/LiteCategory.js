@@ -1,5 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const fetchCategoryById = async (categoryId) => {
     const {data} = await axios.get(`/api/categories/${categoryId}`);
@@ -14,6 +15,7 @@ const fetchImageById = async (categoryId) => {
 
 const LiteCategory = ({categoryID, category: providedCategory}) => {
 
+    const navigate = useNavigate();
     const categoryId =  categoryID || (providedCategory?.id);
 
     const {data: category, isLoading, error} = useQuery({
@@ -42,7 +44,7 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
         <>
             <div className="bg-white shadow-lg rounded-lg flex flex-col h-full">
                 <div
-                    className="flex flex-col flex-grow text-center relative overflow-hidden"
+                    className="flex flex-col flex-grow text-center relative overflow-hidden cursor-pointer"
                     style={imageData ? {
                         backgroundImage: `url(/api/categories/${categoryId}/image)` ,
                         backgroundSize: 'cover',
@@ -52,8 +54,10 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        padding: 0
+                        padding: 0,
                     } : {padding: '1rem'}}
+
+                    onClick={() => navigate(`/category/${categoryId}`)}
                 >
                     {imageData && (
                         <div

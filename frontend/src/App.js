@@ -86,7 +86,7 @@ function App() {
                                             <Route path="/libri/:id" element={<RedirectToBook/>}/>
                                             <Route path="/libro/:id" element={<RedirectToBook/>}/>
                                             <Route path="/ordine/:id/pdf" element={<BookPdfDownloader/>}/>
-                                            <Route path="/category/:id" element={<CategoryItems/>}/>
+                                            <Route path="/category/:catId" element={<CategoryItems/>}/>
 
                                             <Route element={<ProtectedRoute/>}>
 
