@@ -3,6 +3,7 @@ package me.leoo.springboot.libri.libri.category;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.image.FileImageUtils;
 import me.leoo.springboot.libri.image.ImageProperties;
+import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.images.ImageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,12 @@ public class CategoryService {
         return categories.stream().limit(limit).collect(Collectors.toList());
     }
 
-    public Category getCategoryById(int id) {
-        return categoryRepository.findById((long) id).orElse(null);
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id).orElse(null);
+    }
+
+    public List<Category> getSubcategories(Long id) {
+        return categoryRepository.findSubcategories(id);
     }
 
     public ResponseEntity<byte[]> getPictureResponse(Long id) {

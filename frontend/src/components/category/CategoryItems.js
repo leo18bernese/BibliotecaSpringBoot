@@ -1,9 +1,14 @@
 import axios from "axios";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 
 const fetchCategoryById = async (categoryId) => {
     const {data} = await axios.get(`/api/categories/${categoryId}`);
+    return data;
+}
+
+const fetchSubcategories = async (categoryId) => {
+    const {data} = await axios.get(`/api/categories/${categoryId}/subcategories`);
     return data;
 }
 
@@ -12,7 +17,7 @@ const fetchCategoryItems = async (categoryId) => {
     return data;
 }
 
-const CategoryItems = ({categoryID}) => {
+const CategoryItems = ({categoryID, isParent }) => {
     const {catId} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -22,6 +27,12 @@ const CategoryItems = ({categoryID}) => {
     const {data: category, isLoading: isCategoryLoading, error: categoryError} = useQuery({
         queryKey: ['liteCategory', id],
         queryFn: () => fetchCategoryById(id),
+        enabled: !!id,
+    });
+
+    const {data: subcategories} = useQuery({
+        queryKey: ['subcategories', id],
+        queryFn: () => fetchSubcategories(id),
         enabled: !!id,
     });
 
@@ -39,7 +50,7 @@ const CategoryItems = ({categoryID}) => {
         return <p>Error loading items: {error.message || categoryError.message}</p>;
     }
 
-    if (!items || items.length === 0) {
+    if ((!items || items.length === 0) && (!subcategories || subcategories.length === 0)) {
         return <div className="text-center my-auto ">
             <p className="text-2xl font-semibold">We couldn't find any items in this category.</p>
             <p className="text-gray-600">Please check back later or explore other categories.</p>
@@ -54,36 +65,73 @@ const CategoryItems = ({categoryID}) => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto py-4">
 
-                <span className="text-gray-700 text-2xl font-bold mb-6">
-                    {categoryID ? 'Parent Category: ' : ''} {category ? category.name : 'Category'}
-                </span>
+            <div>
 
-         <p className="text-gray-700 text-2xl font-bold mb-6"></p>
+                <p className="text-blue-600 underline text-2xl font-bold mb-6">
+                    {categoryID ? 'Parent: ' : ''} {category ? category.name : 'Category'}
+                </p>
 
-            <h3 className="text-lg font-bold mb-4 border-b-2 border-gray-600 inline-block pr-5 ">Category Items</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {items.map(item => (
-                    <div key={item.id} className="border p-4 rounded shadow hover:shadow-lg transition">
-                        <h4 className="text-lg font-semibold mb-2">{item.titolo}</h4>
+                {items.length > 0 && (
 
-                        <button
-                            onClick={() => navigate(`/book/${item.id}`)}
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        >
-                            View Details
-                        </button>
+                    isParent ? (
+                        <div className="mb-6">
+                            <Link to={`/category/${category.id}`}
+                                  className="text-gray-700 underline text-lg font-semibold">
+                               Click to see all items in category
+                            </Link>
+                        </div>
+                    ) : (
+
+                    <>
+                        <div className="text-lg font-bold mb-4 border-b-2 border-gray-600 inline-block pr-5 ">
+                            Category Items
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-2">
+                            {items.map(item => (
+                                <div key={item.id}
+                                     className="border p-4 rounded shadow hover:bg-gray-200 transition cursor-pointer"
+                                        onClick={() => navigate(`/book/${item.id}`)}
+                                >
+                                    <h4 className="text-lg font-semibold mb-2">{item.titolo}</h4>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                  )
+                )}
+
+                {subcategories.length > 0 && (
+                    <div className="mt-10 py-4 border-t">
+
+                        <div className="text-lg font-bold mb-4 border-b-2 border-gray-600 inline-block pr-5 ">
+                            Sub Categories
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-6 ml-2" >
+                            {subcategories.map(subcat => (
+                                <div key={subcat.id}
+                                     className="border p-4 rounded shadow hover:shadow-lg transition cursor-pointer"
+                                     onClick={() => navigate(`/category/${subcat.id}`)}>
+                                    <h4 className="text-lg font-semibold mb-2">{subcat.name}</h4>
+                                </div>
+                            ))}
+                        </div>
+
                     </div>
-                ))}
-            </div>
+                )}
 
-            {category.parent && (
-                <div className="mt-10 p-4 border-t">
-                <CategoryItems categoryID={category.parent.id}/>
-                </div>
-            )}
+                {category.parent && (
+                    <div className="mt-10 py-4 pl-6 border-t">
+                        <CategoryItems categoryID={category.parent.id} isParent={ true } />
+                    </div>
+                )}
+
+
+            </div>
 
         </div>
     );

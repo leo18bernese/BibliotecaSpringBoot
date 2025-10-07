@@ -69,6 +69,7 @@ const ImageGallery = ({id, images, API_URL, onView}) => {
                 <div
                     className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
                     onClick={closePopup}>
+
                     <div
                         className="relative bg-white p-4 rounded-lg shadow-lg max-w-4xl mx-4"
                         onClick={e => e.stopPropagation()}>

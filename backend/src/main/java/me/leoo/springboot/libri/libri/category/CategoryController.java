@@ -20,6 +20,8 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final LibroRepository libroRepository;
 
+    public record CategoryResponse(Long id, String name) {}
+
     @GetMapping("/homepage")
     public List<Long> getTopCategories(@RequestParam(defaultValue = "5") int limit) {
         List<Category> topCategories = categoryService.getTopCategories(limit);
@@ -32,13 +34,32 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
         try {
-            Category category = categoryService.getCategoryById(id.intValue());
+            Category category = categoryService.getCategoryById(id);
 
             if (category == null) {
                 return ResponseEntity.notFound().build();
             }
 
             return ResponseEntity.ok(category);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/{id}/subcategories")
+    public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long id) {
+        try {
+            List<Category> subcategories = categoryService.getSubcategories(id);
+
+            if (subcategories == null || subcategories.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            List<CategoryResponse> subcategoryIds = subcategories.stream()
+                    .map(subcategory -> new CategoryResponse(subcategory.getId(), subcategory.getName()))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(subcategoryIds );
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
@@ -57,7 +78,7 @@ public class CategoryController {
     @GetMapping("/{id}/items")
     public ResponseEntity<List<Libro>> getCategoryItems(@PathVariable Long id) {
         try {
-            Category category = categoryService.getCategoryById(id.intValue());
+            Category category = categoryService.getCategoryById(id);
             if (category == null) {
                 return ResponseEntity.notFound().build();
             }
