@@ -44,18 +44,14 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
         <>
             <div className="bg-white shadow-lg rounded-lg flex flex-col h-full">
                 <div
-                    className="flex flex-col flex-grow text-center relative overflow-hidden cursor-pointer
+                    className="flex flex-col flex-grow text-center relative overflow-hidden cursor-pointer rounded-md
                      hover:shadow-2xl transition-shadow duration-300"
                     style={imageData ? {
                         backgroundImage: `url(/api/categories/${categoryId}/image)` ,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         minHeight: '12rem',
-                        borderRadius: '0.5rem',
-                        display: 'flex',
                         justifyContent: 'center',
-                        alignItems: 'center',
-                        padding: 0,
                     } : {
                         backgroundColor: '#868686',
                         justifyContent: 'center',
