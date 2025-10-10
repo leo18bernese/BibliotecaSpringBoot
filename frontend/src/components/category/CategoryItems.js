@@ -17,7 +17,7 @@ const fetchCategoryItems = async (categoryId) => {
     return data;
 }
 
-const CategoryItems = ({categoryID, isParent}) => {
+const CategoryItems = ({categoryID, isParent, current}) => {
     const {catId} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -64,85 +64,100 @@ const CategoryItems = ({categoryID, isParent}) => {
         </div>;
     }
 
+    const hasSubcategories = (subcategories && subcategories.length > 0);
+    const hasItems = (items && items.length > 0);
+    const hasSomething = hasSubcategories || hasItems;
+
     return (
         <div className="container mx-auto py-4">
 
             <div>
 
-                <div
-                    className={`text-blue-600 underline text-2xl font-bold mb-6 ${!categoryID ? 'cursor-default' : 'cursor-pointer hover:text-blue-700'}`}
-                    onClick={() => navigate('/category/' + id)}
-                >
-                    {categoryID ? 'Parent: ' : ''} {category ? category.name : 'Category'}
-                </div>
+                {categoryID ? (
+                    <div className="text-2xl font-semibold cursor-pointer mb-4 flex flex-row items-center">
+                        <i className='bxr bxs-folder text-blue-700'></i>
 
-
-                {items.length > 0 ? (
-
-                    isParent ? (
-                        <div className="mb-6">
-                            <p>Click on category name to see items</p>
-                        </div>
-                    ) : (
-
-                        <>
-                            <div className="text-lg font-bold mb-4 border-b-2 border-gray-600 inline-block pr-5 ">
-                                Category Items
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-2">
-                                {items.map(item => (
-                                    <div key={item.id}
-                                         className="border p-4 rounded shadow hover:bg-gray-200 transition cursor-pointer"
-                                         onClick={() => navigate(`/book/${item.id}`)}
-                                    >
-                                        <h4 className="text-lg font-semibold mb-2">{item.titolo}</h4>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    )
+                        <span
+                            className="ml-2 text-gray-800 hover:text-blue-700"
+                            onClick={() => navigate('/category/' + id)}
+                        >
+                            {category ? category.name : 'Category'}
+                        </span>
+                    </div>
                 ) : (
-                    !isParent && (
-
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold">No items found</h3>
-                            <p>Unfortunately, there are no items available in this category. You can explore subcategories
-                                or parent categories for more options.</p>
-                        </div>
-                    )
+                    <div className="mb-6">
+                        <h2 className="text-3xl font-bold mb-2">{category.name}</h2>
+                        {category.description && (
+                            <p className="text-gray-600">{category.description}</p>
+                        )}
+                    </div>
                 )}
 
-                {subcategories.length > 0 && (
-                    <div className="mt-10 py-4 border-t">
+                {hasSomething && (
+                    <div className="bg-white rounded-md shadow p-4">
 
-                        <div className="text-lg font-bold mb-4 border-b-2 border-gray-600 inline-block pr-5 ">
-                            Sub Categories
-                        </div>
+                        {hasSubcategories && (
+                            <div className=" py-4">
 
-                        <div className="mt-4 grid grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-6 ml-2">
-                            {subcategories.map(subcat => (
-                                <div key={subcat.id}
-                                     className={"border p-4 rounded shadow hover:shadow-lg transition cursor-pointer"
-                                         + (subcat.id === parseFloat(catId) ? ' bg-gray-300' : ' bg-white')}
-                                     onClick={() => navigate(`/category/${subcat.id}`)}>
-                                    <h4 className="text-lg font-semibold mb-2">{subcat.name}</h4>
+                                <div className="text-lg font-semibold  mb-5  text-gray-700 inline-block pr-5 ">
+                                    Subcategories
+                                </div>
 
-                                    {(subcat.id === parseFloat(catId)) && (
-                                        <div className="mt-2 text-sm text-blue-600 font-bold">
-                                            SELECTED
-                                        </div>
+                                <div className="grid grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-6 ml-2">
+                                    {subcategories.map(subcat => {
+                                            const selected = subcat.id === parseFloat(current);
+
+                                            return (
+                                                <div key={subcat.id}
+                                                     className={"border p-2 rounded-lg shadow hover:shadow-lg transition-all cursor-pointer"
+                                                         + (selected ? ' bg-blue-100 font-semibold' : ' bg-gray-100')}
+                                                     onClick={() => navigate(`/category/${subcat.id}`)}>
+
+                                                    <span
+                                                        className={`text-lg mb-2 ${selected ? 'text-blue-700' : 'text-gray-500'}`}>
+                                                        {subcat.name}
+                                                    </span>
+                                                </div>
+                                            )
+                                        }
                                     )}
                                 </div>
-                            ))}
-                        </div>
 
+                            </div>
+                        )}
+
+                     
+                        {hasItems && (
+                            <div className=" py-4">
+
+                                <div className="text-lg font-semibold  mb-5  text-gray-700 inline-block pr-5 ">
+                                    Items
+                                </div>
+
+                                <div
+                                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-2">
+                                    {items.map(item => (
+                                        <div key={item.id}
+                                             className={"border p-2 rounded-lg shadow hover:shadow-lg transition-all cursor-pointer bg-gray-100"}
+                                             onClick={() => navigate(`/book/${item.id}`)}>
+
+                                                    <span
+                                                        className={`text-lg mb-2 text-gray-500`}>
+                                                        {item.titolo}
+                                                    </span>
+
+                                            <span className="text-sm text-gray-400 block">ID: {item.id}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {category.parent && (
-                    <div className="mt-10 py-4 pl-6 border-t">
-                        <CategoryItems categoryID={category.parent.id} isParent={true}/>
+                    <div className="mt-10  border-t-4">
+                        <CategoryItems categoryID={category.parent.id} isParent={true} current={id}/>
                     </div>
                 )}
 
