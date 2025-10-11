@@ -1,8 +1,6 @@
 package me.leoo.springboot.libri.analytics.repo;
 
-import me.leoo.springboot.libri.analytics.objects.AnalyticsDaily;
 import me.leoo.springboot.libri.analytics.objects.AnalyticsHourly;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

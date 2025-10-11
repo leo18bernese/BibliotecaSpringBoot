@@ -84,7 +84,7 @@ public class Buono {
         // Controlla se il buono è cumulabile
         System.out.println("cumulabile: " + cumulabile + ", carrello.coupons: " + carrello.getCouponCodes().size() +
                 ", anyMatch: " + carrello.getCouponCodes().stream().anyMatch(b -> !Objects.equals(b.getId(), this.id)));
-        if(!cumulabile && carrello.getCouponCodes().stream().anyMatch(b -> !Objects.equals(b.getId(), this.id))) {
+        if (!cumulabile && carrello.getCouponCodes().stream().anyMatch(b -> !Objects.equals(b.getId(), this.id))) {
             throw new IllegalStateException("Il buono non è cumulabile con altri buoni attivi.");
         }
 

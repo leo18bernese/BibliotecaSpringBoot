@@ -16,7 +16,7 @@ import me.leoo.springboot.libri.utils.Sconto;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Prezzo implements Cloneable{
+public class Prezzo implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

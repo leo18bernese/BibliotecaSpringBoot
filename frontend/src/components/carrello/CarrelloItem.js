@@ -101,7 +101,7 @@ const CarrelloItem = ({item}) => {
         );
     }
 
-    const imageSource = imageUrl ? `${API_URL}/${item.libroId}/first` : `${API_URL}/nf.jpg`;
+    const imageSource = imageUrl ? `${API_URL}/${item.libroId}/first` : `${API_URL}/nf.png`;
     const rifornimento = item.rifornimento;
     console.log("data libro", item);
 

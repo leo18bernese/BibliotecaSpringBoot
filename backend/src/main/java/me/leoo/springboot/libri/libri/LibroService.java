@@ -3,14 +3,10 @@ package me.leoo.springboot.libri.libri;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.image.FileImageUtils;
 import me.leoo.springboot.libri.image.ImageService;
-import me.leoo.springboot.libri.libri.images.ImageUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -24,6 +20,6 @@ public class LibroService {
     }
 
     public ResponseEntity<byte[]> getPictureResponse(Long id, int index) {
-        return FileImageUtils.getPictureResponse(id, imageService.getCommonImagesPath(id), index);
+        return FileImageUtils.getPictureResponse(id, imageService.getCommonImagesPath(id), imageService.getNotFoundPath(), index);
     }
 }

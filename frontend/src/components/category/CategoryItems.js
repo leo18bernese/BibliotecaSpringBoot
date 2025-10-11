@@ -156,7 +156,7 @@ const CategoryItems = ({categoryID, isParent, current}) => {
                 )}
 
                 {category.parent && (
-                    <div className="mt-10  border-t-4">
+                    <div className="mt-10 border-t-4">
                         <CategoryItems categoryID={category.parent.id} isParent={true} current={id}/>
                     </div>
                 )}

@@ -2,7 +2,6 @@ package me.leoo.springboot.libri.ordini;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.leoo.springboot.libri.resi.stato.StatoReso;
 
 import java.util.Arrays;
 
@@ -17,9 +16,9 @@ public enum StatoOrdine {
             "Maggiori informazioni sulla consegna potrebbero essere fornite dal corriere.", false),
     CONSEGNATO("Consegnato", "L'ordine è stato consegnato con successo.", "Grazie per aver acquistato da noi! Se hai domande o problemi, contattaci.", false),
 
-    ANNULLATO("Annullato", "L'ordine è stato annullato.", "Se hai domande sull'annullamento, contattaci per assistenza.",false ),
-    RIMBORSATO("Rimborsato", "L'ordine è stato rimborsato.", "Dettagli sulla pratica di restituzione sono disponibili nel tuo account.", false ),
-    ERRORE("Errore", "Si è verificato un errore durante l'elaborazione dell'ordine.", "Puoi vedere la causa dell'errore nel tuo ordine.", false );
+    ANNULLATO("Annullato", "L'ordine è stato annullato.", "Se hai domande sull'annullamento, contattaci per assistenza.", false),
+    RIMBORSATO("Rimborsato", "L'ordine è stato rimborsato.", "Dettagli sulla pratica di restituzione sono disponibili nel tuo account.", false),
+    ERRORE("Errore", "Si è verificato un errore durante l'elaborazione dell'ordine.", "Puoi vedere la causa dell'errore nel tuo ordine.", false);
 
     private final String displayName;
     private final String description;

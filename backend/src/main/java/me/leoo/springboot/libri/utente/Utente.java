@@ -10,7 +10,6 @@ import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.spedizione.SpedizioneIndirizzo;
 import me.leoo.springboot.libri.utente.role.UserRole;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;

@@ -15,8 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/order")
@@ -38,7 +36,7 @@ public class AdminOrderController {
 
     @GetMapping("/light-all")
     public ResponseEntity<Page<OrderResponse>> getAllLightOrders(@RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "20") int size) {
+                                                                 @RequestParam(defaultValue = "20") int size) {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Ordine> ordini = ordineRepository.findAll(pageable);
@@ -71,7 +69,7 @@ public class AdminOrderController {
         }
 
         try {
-            boolean exists = ordineService.existsOrdine( Long.parseLong(id));
+            boolean exists = ordineService.existsOrdine(Long.parseLong(id));
             return ResponseEntity.ok(exists);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore nel recupero dell'ordine: " + e.getMessage());

@@ -45,7 +45,7 @@ public class AnalyticsWriteService {
     }
 
     private void incrementMetric(String collection, Long productId, Long userId, InteractionEnum eventType, Date timeBucket) {
-        incrementMetric(collection, productId, userId,eventType, timeBucket, 1);
+        incrementMetric(collection, productId, userId, eventType, timeBucket, 1);
     }
 
     private void incrementMetric(String collection, Long productId, Long userId, InteractionEnum eventType, Date timeBucket, int count) {

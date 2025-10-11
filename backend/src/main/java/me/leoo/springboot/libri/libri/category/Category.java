@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.*;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -58,5 +60,23 @@ public class Category {
 
     public void incrementWishlist() {
         this.wishlistCount++;
+    }
+
+    public Map<Long, String> getCategoryMap() {
+        List<Category> categories = new ArrayList<>();
+
+        Category c = this;
+
+        while (c != null) {
+            categories.add(c);
+            c = c.getParent();
+        }
+
+        Collections.reverse(categories);
+
+        Map<Long, String> map = new LinkedHashMap<>();
+        categories.forEach(cat -> map.put(cat.getId(), cat.getName()));
+
+        return map;
     }
 }

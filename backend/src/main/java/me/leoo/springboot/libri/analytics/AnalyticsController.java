@@ -7,7 +7,6 @@ import me.leoo.springboot.libri.analytics.dto.ProductAnalyticsDTO;
 import me.leoo.springboot.libri.analytics.dto.TimeSeriesPointDTO;
 import me.leoo.springboot.libri.analytics.service.AnalyticsQueryService;
 import me.leoo.springboot.libri.analytics.service.AnalyticsWriteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,7 +46,7 @@ public class AnalyticsController {
             @PathVariable InteractionEnum metric,
             @RequestParam(defaultValue = "7d") String period,
             @RequestParam(defaultValue = "20min") String resolution) {
-        
+
         List<TimeSeriesPointDTO> data = queryService.getTimeSeriesData(productId, metric,
                 period, resolution);
 
@@ -59,7 +58,7 @@ public class AnalyticsController {
     public ResponseEntity<AnalyticsComparisonDTO> comparePerformance(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "7d") String period) {
-        
+
         return ResponseEntity.ok(queryService.comparePerformance(productId, period));
     }
 
@@ -68,7 +67,7 @@ public class AnalyticsController {
     public ResponseEntity<List<ProductAnalyticsDTO>> getMultiProductAnalytics(
             @RequestParam List<Long> productIds,
             @RequestParam(defaultValue = "7d") String period) {
-        
+
         return ResponseEntity.ok(queryService.getMultiProductAnalytics(productIds, period));
     }
 }

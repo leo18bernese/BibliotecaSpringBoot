@@ -203,23 +203,4 @@ public class Libro {
                 .toList();
     }
 
-    // Category map
-    public Map<Long, String> getCategoryMap() {
-        List<Category> categories = new ArrayList<>();
-
-        Category c = this.getCategory();
-
-        while (c != null) {
-            categories.add(c);
-            c = c.getParent();
-        }
-
-        Collections.reverse(categories);
-
-        Map<Long, String> map = new LinkedHashMap<>();
-        categories.forEach(cat -> map.put(cat.getId(), cat.getName()));
-
-        return map;
-    }
-
 }

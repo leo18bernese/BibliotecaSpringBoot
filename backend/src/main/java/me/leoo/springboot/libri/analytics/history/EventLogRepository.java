@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EventLogRepository extends MongoRepository<EventLog, String> {
 
-     Optional<EventLog> findByEventTypeAndProductId(InteractionEnum eventType, Long productId);
+    Optional<EventLog> findByEventTypeAndProductId(InteractionEnum eventType, Long productId);
 }

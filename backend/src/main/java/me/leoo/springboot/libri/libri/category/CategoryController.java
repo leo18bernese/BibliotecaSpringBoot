@@ -20,7 +20,8 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final LibroRepository libroRepository;
 
-    public record CategoryResponse(Long id, String name) {}
+    public record CategoryResponse(Long id, String name) {
+    }
 
     @GetMapping("/homepage")
     public List<Long> getTopCategories(@RequestParam(defaultValue = "5") int limit) {
@@ -59,7 +60,7 @@ public class CategoryController {
                     .map(subcategory -> new CategoryResponse(subcategory.getId(), subcategory.getName()))
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(subcategoryIds );
+            return ResponseEntity.ok(subcategoryIds);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }

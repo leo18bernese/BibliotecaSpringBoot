@@ -2,17 +2,11 @@ package me.leoo.springboot.libri.libri.category;
 
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.image.FileImageUtils;
-import me.leoo.springboot.libri.image.ImageProperties;
-import me.leoo.springboot.libri.libri.LibroRepository;
-import me.leoo.springboot.libri.libri.images.ImageUtils;
+import me.leoo.springboot.libri.image.ImageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.plaf.PanelUI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,7 +14,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ImageProperties imageProperties;
+    private final ImageService imageService;
 
     public List<Category> getTopCategories(int limit) {
         List<Category> categories = categoryRepository.findTop10ByOrderByPurchasedCountDesc();
@@ -40,6 +34,6 @@ public class CategoryService {
     }
 
     public ResponseEntity<byte[]> getPictureResponse(Long id) {
-      return FileImageUtils.getPictureResponse(id, imageProperties.getCategoriesDir() + "/" + id, 0);
+        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), imageService.getNotFoundPath(), 0);
     }
 }

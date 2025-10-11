@@ -221,7 +221,7 @@ public class PdfGeneratorService {
         mainCell.add(getSeparator(BLUE_PRIMARY, 1, 0, 2, 2));
 
         // Creo la tabella dei prodotti con 5 colonne
-        Table productsTable = new Table(UnitValue.createPercentArray(new float[]{40, 10,5, 115, 15, 15}))
+        Table productsTable = new Table(UnitValue.createPercentArray(new float[]{40, 10, 5, 115, 15, 15}))
                 .useAllAvailableWidth()
                 .setMarginTop(10f);
 

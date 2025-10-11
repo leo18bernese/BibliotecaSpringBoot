@@ -278,7 +278,7 @@ public class CarrelloController {
         try {
             CarrelloItem item = carrelloService.getCarrelloItemByVariante(utente, varianteId);
 
-            if(item == null || !item.getLibro().getId().equals(libroId)) {
+            if (item == null || !item.getLibro().getId().equals(libroId)) {
                 return ResponseEntity.noContent().build();
             }
 
@@ -327,7 +327,7 @@ public class CarrelloController {
     }
 
     @PutMapping("/confirm-notices/{varianteId}")
-    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente,@PathVariable Long varianteId) {
+    public ResponseEntity<?> confirmNotices(@AuthenticationPrincipal Utente utente, @PathVariable Long varianteId) {
         try {
             Utente user = utenteRepository.findById(utente.getId())
                     .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + utente.getId()));

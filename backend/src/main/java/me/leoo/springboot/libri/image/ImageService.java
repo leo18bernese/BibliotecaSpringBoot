@@ -13,6 +13,10 @@ public class ImageService {
         this.imageProperties = imageProperties;
     }
 
+    public String getNotFoundPath() {
+        return imageProperties.getCommonDir() + "/nf.png";
+    }
+
     public String getCommonImagesPath(Object fileName) {
         return imageProperties.getCommonDir() + "/" + fileName.toString();
     }

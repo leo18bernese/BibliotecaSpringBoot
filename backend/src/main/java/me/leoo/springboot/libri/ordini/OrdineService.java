@@ -21,7 +21,7 @@ public class OrdineService {
         return init(ordine);
     }
 
-    public Ordine getOrdineById(Utente utente, long id)  throws Exception {
+    public Ordine getOrdineById(Utente utente, long id) throws Exception {
         Ordine ordine = ordineRepository.findByIdAndUtente(id, utente)
                 .orElseThrow(() -> new RuntimeException("Ordine non trovato con ID: " + id));
 
@@ -41,7 +41,7 @@ public class OrdineService {
         return ordini;
     }
 
-    public boolean existsOrdine(long id){
+    public boolean existsOrdine(long id) {
         return ordineRepository.existsById(id);
     }
 

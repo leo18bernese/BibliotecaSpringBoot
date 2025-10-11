@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/admin/libri")
 @RequiredArgsConstructor
@@ -28,7 +25,7 @@ public class AdminBookController {
 
     @GetMapping("/light-all")
     public ResponseEntity<Page<BookResponse>> getAllLightBooks(@RequestParam(defaultValue = "0") int page,
-                                                              @RequestParam(defaultValue = "20") int size) {
+                                                               @RequestParam(defaultValue = "20") int size) {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Libro> libros = libroRepository.findAll(pageable);
