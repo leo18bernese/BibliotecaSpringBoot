@@ -41,28 +41,30 @@ const NavBar = () => {
     const getLinkClass = (path, name, condition = true, separator = false) => {
         if (!condition) return null;
         const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
-        return (
-            <>
+
+        return  (
+            <div className="hidden md:block   " key={name}>
                 {separator && <span className="mx-2 text-gray-800">|</span>}
+
                 <Link
                     to={path}
                     className={`font-medium p-2 rounded-md border-2 transition-colors 
-                        ${isActive
-                            ? 'border-gray-500 bg-gray-300 font-semibold'
-                            : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
-                    `}
+                    ${isActive
+                        ? 'border-gray-500 bg-gray-300 font-semibold'
+                        : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
+                `}
                 >
                     {name}
                 </Link>
-            </>
+            </div>
         );
-    }
+    };
 
     return (
         <nav className="bg-gray-100 text-gray-800 shadow-md ">
-            <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div className="container mx-auto  px-4 py-3 flex flex-col md:flex-row justify-between items-center">
 
-                <div className="text-2xl font-bold text-gray-700">
+                <div className="text-lg md:text-2xl font-bold text-gray-700">
                     <Link to="/">Dani Commerce</Link>
                 </div>
 

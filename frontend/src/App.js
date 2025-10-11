@@ -213,13 +213,13 @@ function Home() {
             <h3 className="text-2xl mt-10 mb-6 font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Categories</h3>
 
             <CategoryDisplay idList={homepageCategories} isLoading={isLoading} error={error}
-                         gridCss={"grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8"}
+                         gridCss={"grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-8 px-4 md:px-0"}
             />
 
             <h3 className="text-2xl mt-10 mb-6 font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Products for you</h3>
 
             <BookDisplay idList={homepageIds} isLoading={isLoading} error={error}
-                         gridCss={"grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8"}
+                         gridCss={"grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-8 px-4 md:px-0"}
             />
 
         </div>

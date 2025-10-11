@@ -64,13 +64,15 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
     return (
         <>
-            <div className="bg-white shadow-lg rounded-lg mb-4 flex flex-col h-full">
+            <div className="bg-white shadow-lg rounded-2xl mb-4 flex flex-col h-full">
                 <div className="flex flex-col flex-grow">
 
                     <Link to={`/book/${bookId}`}>
                         <div className="relative">
                             <div
-                                className={`w-full rounded-md mb-5 h-64 ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : bookImage ? '' : 'bg-gray-200 flex items-center justify-center'}`}
+                                className={`w-full rounded-md h-64 
+                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : bookImage ? '' : 
+                                    'bg-gray-200 flex items-center justify-center'}`}
                                 style={{height: '250px'}}
                             >
                                 {isImageLoading ? (
@@ -112,15 +114,15 @@ const LiteBook = ({bookID, book: providedBook}) => {
                     </Link>
 
 
-                    <div className="px-4 py-2 flex flex-col flex-grow">
+                    <div className="px-4 pt-3 pb-1 flex flex-col flex-grow">
                         <div className="flex-grow">
-                            <h3 className="text-lg font-semibold text-gray-800">{book.titolo}</h3>
-                            <p className="text-gray-600 mb-1">by {book.autore}</p>
+                            <h3 className="sm:text-lg font-semibold text-gray-800">{book.titolo}</h3>
+                            <p className=" text-gray-600 mb-1">by {book.autore}</p>
 
-                            <p className=" mb-4 text-gray-600 text-sm">Producted by {book.editore}</p>
+                            <p className="text-gray-600 text-sm">Producted by {book.editore}</p>
                         </div>
 
-                        <div className="mt-auto">
+                        <div className="mt-auto hidden sm:block">
                             <h3 className="text-lg font-semibold flex justify-between items-center">
                                 <div>
                                     {hasSconto && (
