@@ -57,6 +57,7 @@ import PersonalDetailsEdit from "./components/user/pages/edit/PersonalDetailsEdi
 import HomepageSellers from "./components/utils/HomepageSellers";
 import CategoryDisplay from "./components/category/CategoryDisplay";
 import CategoryItems from "./components/category/CategoryItems";
+import CategoryForUser from "./components/category/CategoryForUser";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ function App() {
                                             <Route path="/libro/:id" element={<RedirectToBook/>}/>
                                             <Route path="/ordine/:id/pdf" element={<BookPdfDownloader/>}/>
                                             <Route path="/category/:catId" element={<CategoryItems/>}/>
+                                            <Route path="/category/:catId/user" element={<CategoryForUser/>}/>
 
                                             <Route element={<ProtectedRoute/>}>
 

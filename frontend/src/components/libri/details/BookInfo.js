@@ -1,7 +1,7 @@
 // src/components/BookInfo.js
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useContext, useEffect, useRef, useState} from 'react';
 import axios from 'axios';
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import ImageGallery from "../images/ImageGallery";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import toast, {Toaster} from "react-hot-toast";
@@ -398,21 +398,21 @@ const BookInfo = () => {
             <div className="container mx-auto px-4 py-8">
                 <Toaster/>
 
-                <div>
-                    {Object.entries(book.categoryMap).map(([id, name], index) => (
-                        <>
-                            <button
-                                key={id}
-                                className="text-sm text-blue-600 hover:underline mr-2 mb-2"
-                                onClick={() => navigate(`/category/${id}`)}
+                <div className="mb-4">
+                    {Object.entries(book.category.categoryMap).map(([id, name], index) => (
+                        <Fragment key={id}>
+                            <Link
+                                className="text-sm text-blue-600 hover:underline mr-2 inline-block"
+                                to={`/category/${id}`}
                             >
                                 {name}
-                            </button>
+                            </Link>
 
-                            {index < Object.entries(book.categoryMap).length - 1 && (
+                            {index < Object.entries(book.category.categoryMap).length - 1 && (
                                 <span className="text-gray-400 mr-2">/</span>
                             )}
-                        </>))}
+                        </Fragment>
+                    ))}
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-6">
