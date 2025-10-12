@@ -8,7 +8,7 @@ const AdminHome = () => {
     const getLink = (link, color, emoji, text) => {
         return (
             <NavLink to={link}
-                     className={`inline-block mb-4 ml-4 px-4 py-2 bg-${color}-500 text-white rounded hover:bg-${color}-600`}>
+                     className={`inline-block mb-4 ml-4 px-4 py-2  bg-${color}-500 text-white rounded hover:bg-${color}-600`}>
                 <div className="flex items-center">
                     <i className={`bxr ${emoji} mr-2`}></i> {text}
                 </div>

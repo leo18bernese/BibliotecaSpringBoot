@@ -34,6 +34,11 @@ public class CategoryService {
     }
 
     public ResponseEntity<byte[]> getPictureResponse(Long id) {
-        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), imageService.getNotFoundPath(), 0);
+        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), null, 0);
+        //return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), imageService.getNotFoundPath(), 0);
+    }
+
+    public List<Category> getRootCategories() {
+        return categoryRepository.findByParentIsNull();
     }
 }

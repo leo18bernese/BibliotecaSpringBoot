@@ -609,11 +609,11 @@ const BookInfo = () => {
                             <div className="bg-white shadow-md rounded-lg p-4 mt-4">
                                 <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
 
-                                <button
+                                <Link
                                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition mr-2"
-                                    onClick={() => window.open(`/admin/book/${book.id}`, '_blank')}>
+                                    to={`/admin/book/${book.id}/`}>
                                     Gestisci Libro
-                                </button>
+                                </Link>
                             </div>
                         )}
                     </div>

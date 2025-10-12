@@ -58,6 +58,7 @@ import HomepageSellers from "./components/utils/HomepageSellers";
 import CategoryDisplay from "./components/category/CategoryDisplay";
 import CategoryItems from "./components/category/CategoryItems";
 import CategoryForUser from "./components/category/CategoryForUser";
+import CategoryList from "./components/category/list/CategoryList";
 
 const queryClient = new QueryClient();
 
@@ -77,7 +78,7 @@ function App() {
                                 <div className="flex flex-col min-h-screen">
                                     <NavBar/>
 
-                                    <main className="flex-1 flex flex-col ">
+                                    <main className="flex-1 flex flex-col">
 
                                         <Routes>
                                             <Route path="/" element={<Home/>}/>
@@ -87,6 +88,8 @@ function App() {
                                             <Route path="/libri/:id" element={<RedirectToBook/>}/>
                                             <Route path="/libro/:id" element={<RedirectToBook/>}/>
                                             <Route path="/ordine/:id/pdf" element={<BookPdfDownloader/>}/>
+
+                                            <Route path="/categories" element={<CategoryList/>}/>
                                             <Route path="/category/:catId" element={<CategoryItems/>}/>
                                             <Route path="/category/:catId/user" element={<CategoryForUser/>}/>
 

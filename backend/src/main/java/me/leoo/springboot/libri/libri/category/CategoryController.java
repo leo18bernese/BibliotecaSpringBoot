@@ -23,6 +23,15 @@ public class CategoryController {
     public record CategoryResponse(Long id, String name) {
     }
 
+    public record CategoryResponseFirstLevel(Long id, String name, String descrizione, List<CategoryResponse> subcategories) {
+    }
+
+    private List<CategoryResponse> toCategoryResponseList(List<Category> categories) {
+        return categories.stream()
+                .map(c -> new CategoryResponse(c.getId(), c.getName()))
+                .collect(Collectors.toList());
+    }
+
     @GetMapping("/homepage")
     public List<Long> getTopCategories(@RequestParam(defaultValue = "5") int limit) {
         List<Category> topCategories = categoryService.getTopCategories(limit);
@@ -47,6 +56,7 @@ public class CategoryController {
         }
     }
 
+
     @GetMapping("/{id}/subcategories")
     public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long id) {
         try {
@@ -63,6 +73,30 @@ public class CategoryController {
             return ResponseEntity.ok(subcategoryIds);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/roots")
+    public ResponseEntity<List<CategoryResponseFirstLevel>> getRootCategories() {
+        try {
+            List<Category> roots = categoryService.getRootCategories();
+
+            if (roots == null || roots.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            List<CategoryResponseFirstLevel> response = roots.stream()
+                    .map(root -> new CategoryResponseFirstLevel(
+                            root.getId(),
+                            root.getName(),
+                            root.getDescription(),
+                            toCategoryResponseList(categoryService.getSubcategories(root.getId()))
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
