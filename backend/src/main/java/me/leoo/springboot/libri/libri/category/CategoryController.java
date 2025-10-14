@@ -57,6 +57,7 @@ public class CategoryController {
     }
 
 
+
     @GetMapping("/{id}/subcategories")
     public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long id) {
         try {

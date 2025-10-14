@@ -19,6 +19,14 @@ const AdminBar = () => {
         </li>
     );
 
+    const renderSeparator = () => (
+        <div className="border-t border-red-200 mb-2"></div>
+    );
+
+    const renderEmptyLine = () => (
+        <div className="mb-4"></div>
+    );
+
     return (
         <div className="flex flex-col md:flex-row ">
 
@@ -33,10 +41,10 @@ const AdminBar = () => {
                 ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:static md:translate-x-0 md:w-5/12 lg:w-3/12 `}>
 
                 <h3 className="text-2xl font-semibold">Admin Panel</h3>
-                <div className="border-t border-red-200 my-2"></div>
-                <ul className="text-xl">
+                {renderSeparator()}
+                <ul className="text-xl ">
 
-                    <li className="hover:underline mb-4">
+                    <li className="hover:underline mb-8">
                         <NavLink
                             to="/admin"
                         >
@@ -44,7 +52,9 @@ const AdminBar = () => {
                         </NavLink>
                     </li>
 
+                    {renderMenuItem("/admin/category", "Manage Categories", 'bxr bxs-folder')}
                     {renderMenuItem("/admin/book", "Manage Books", 'bxr bxs-book')}
+                    {renderEmptyLine()}
                     {renderMenuItem("/admin/order", "Manage Orders", 'bxr bxs-cart')}
                     {renderMenuItem("/admin/reso", "Manage Returns", 'bxr bxs-package')}
                     {renderMenuItem("/admin/user", "Manage Users", 'bxr bxs-user')}

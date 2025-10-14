@@ -6,7 +6,8 @@ import {useQuery} from "@tanstack/react-query";
 const Pageable = ({
                       id, endpoint, columns,
                       noneFound, foundMessage,
-                      onRowClick
+                      onRowClick,
+                      filterableFields
                   }) => {
 
     const {user} = useContext(UserContext);
@@ -14,15 +15,26 @@ const Pageable = ({
     const [size, setSize] = useState(10);
     const [inputPage, setInputPage] = useState(1);
 
+    const [filters, setFilters] = useState(() => {
+        const initialFilters = {};
+        if (filterableFields) {
+            filterableFields.forEach(field => {
+                initialFilters[field.value] = '';
+            });
+        }
+        return initialFilters;
+    });
+
     const fetchContent = async (page = 0, size = 10) => {
         const {data} = await axios.get(endpoint, {
             params: {page, size}
         });
+
         return data;
     }
 
     const {data: pagedData, isLoading: isLoading, error: isError} = useQuery({
-        queryKey: [`content-${id}`, user.id, page, size],
+        queryKey: [`content-${id}`, user.id, page, size, filters],
         queryFn: () => fetchContent(page, size),
         keepPreviousData: true, // Utile per non mostrare uno stato di caricamento durante il cambio pagina
     });
@@ -35,7 +47,7 @@ const Pageable = ({
         return <div className="text-center text-red-500">Error loading page content. Please try again later.</div>;
     }
 
-    if(!pagedData.pageable ) {
+    if (!pagedData.pageable) {
         return <div className="text-center text-red-500">Error for developer: pageable missing in response, make sure
             backend is returning a Page object.</div>;
     }
@@ -55,21 +67,63 @@ const Pageable = ({
             <div>
                 {foundMessage}
 
-                <div className="flex items-center gap-2">
-                    Items per pagina:
-                    <select
-                        className="border rounded px-2 py-1"
-                        value={size}
-                        onChange={e => {
-                            setSize(Number(e.target.value));
-                            setPage(0);
-                            setInputPage(1);
-                        }}
-                    >
-                        {[5, 10, 20, 50].map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
+                <div className="mt-4 flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                        Items per pagina:
+                        <select
+                            className="border rounded px-2 py-1"
+                            value={size}
+                            onChange={e => {
+                                setSize(Number(e.target.value));
+                                setPage(0);
+                                setInputPage(1);
+                            }}
+                        >
+                            {[5, 10, 20, 50].map(opt => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        {filterableFields && filterableFields.map(field => (
+                            <div key={field.value} className="flex items-center gap-2">
+
+                                <label htmlFor={`filter-${field.value}`} className="font-medium">
+                                    {field.key}:
+                                </label>
+
+                                {field.type === 'boolean' ? (
+                                    <select
+                                        id={`filter-${field.value}`}
+                                        className="border rounded px-2 py-1"
+                                        value={filters[field.value]}
+                                        onChange={e => {
+                                            setFilters(prev => ({...prev, [field.value]: e.target.value}));
+                                            setPage(0);
+                                            setInputPage(1);
+                                        }}
+                                    >
+                                        <option value="">All</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        id={`filter-${field.value}`}
+                                        className="border rounded px-2 py-1"
+                                        value={filters[field.value]}
+                                        onChange={e => {
+                                            setFilters(prev => ({...prev, [field.value]: e.target.value}));
+                                            setPage(0);
+                                            setInputPage(1);
+                                        }}
+                                    />
+                                )}
+                            </div>
                         ))}
-                    </select>
+                    </div>
                 </div>
 
                 <table className="min-w-full divide-y divide-gray-200 mt-8">

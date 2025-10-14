@@ -38,9 +38,11 @@ const NavBar = () => {
         }
     };
 
-    const getLinkClass = (path, name, condition = true, separator = false) => {
+    const getLinkClass = (path,   name, otherPaths, condition = true, separator = false) => {
         if (!condition) return null;
-        const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
+
+        const paths = otherPaths ? [path, ...otherPaths] : [path];
+        const isActive = paths.some(p => location.pathname === p || location.pathname.startsWith(p + '/'));
 
         return  (
             <div className="hidden md:block   " key={name}>
@@ -72,9 +74,9 @@ const NavBar = () => {
                 <ul className="flex space-x-2 list-none m-0 p-0 items-center">
                     {getLinkClass('/', 'Home')}
                     {getLinkClass('/prodotti', 'Prodotti')}
-                    {getLinkClass('/categorie', 'Categorie')}
+                    {getLinkClass('/categories', 'Categorie', ['/category'])}
                     {getLinkClass('/contatti', 'Contatti')}
-                    {getLinkClass('/admin', 'Admin', user && user.ruoli.includes('ROLE_ADMIN'), true)}
+                    {getLinkClass('/admin', 'Admin',null, user && user.ruoli.includes('ROLE_ADMIN'), true)}
                 </ul>
 
                 {/* Right side - Search bar and user/cart links */}
