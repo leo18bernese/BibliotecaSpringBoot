@@ -16,7 +16,10 @@ import me.leoo.springboot.libri.analytics.repo.AnalyticsHourlyRepository;
 import me.leoo.utils.common.time.TimeUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -186,14 +189,8 @@ public class AnalyticsQueryService {
     // ===== UTILITY =====
 
     private Date calculateStartTime(Date endTime, String period) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(endTime);
-
         long millis = TimeUtil.millisFromTimeString(period);
-        if (millis > 0) {
-            cal.add(Calendar.MILLISECOND, (int) -millis);
-        }
 
-        return cal.getTime();
+        return TimeUtil.getCalendar(endTime.getTime() - millis).getTime();
     }
 }

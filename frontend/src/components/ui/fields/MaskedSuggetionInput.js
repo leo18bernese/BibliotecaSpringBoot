@@ -9,6 +9,7 @@ const MaskedSuggestionInput = ({
                                    type = 'text',
                                    maskOptions,
                                    fetchSuggestions,
+                                   requirement,
                                    description,
                                    onChange,
                                    minChars = 0,
@@ -17,6 +18,7 @@ const MaskedSuggestionInput = ({
 
     const [editing, setEditing] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
+    const [warning, setWarning] = useState(null);
 
     useEffect(() => {
         // Nascondi i suggerimenti se il campo non è in focus
@@ -37,6 +39,16 @@ const MaskedSuggestionInput = ({
         return () => clearTimeout(handler);
 
     }, [value, fetchSuggestions, minChars, editing]); // Aggiungi 'editing' alle dipendenze
+
+    const setBlur = () => {
+        setEditing(false);
+
+        if(!requirement(value)) {
+            setWarning(`You must choose an option from the list or leave the field empty.`);
+        } else {
+            setWarning(null);
+        }
+    }
 
     const handleValueChange = (e) => {
         const newValue = e.target.value;
@@ -82,14 +94,19 @@ const MaskedSuggestionInput = ({
 
                     onFocus={() => setEditing(true)}
                     onBlur={() => {
+
+                        setTimeout(() => {setBlur()}, 150);
+
                         // Ritarda la perdita del focus per permettere il click sul suggerimento
-                        setTimeout(() => setEditing(false), 150);
                     }}
 
                     onChange={handleValueChange}
                     className="flex-1 bg-transparent outline-none text-lg"
                 />
             </div>
+
+            {warning && <div className="text-red-500 text-sm">{warning}</div>}
+
 
             {suggestions.length > 0 && (
                 <ul className="absolute z-10 w-full bg-gray-300 border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto shadow-lg transition-all">

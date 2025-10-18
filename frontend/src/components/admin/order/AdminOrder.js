@@ -75,6 +75,7 @@ const AdminOrder = () => {
         La preghiamo di assicurarsi che l'ID sia corretto e che il reso sia stato effettuato con il suo account. <br/>
         Se il problema persiste, contatti il supporto clienti.
     </div>;
+
     if (queryError || error) return <div>Error: {error || queryError.message}</div>;
 
     const colors = {

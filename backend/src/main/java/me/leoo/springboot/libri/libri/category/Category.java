@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.leoo.springboot.libri.admin.AdminCategoryController;
+import org.hibernate.annotations.Parent;
 
 import java.util.*;
 
@@ -78,5 +80,16 @@ public class Category {
         categories.forEach(cat -> map.put(cat.getId(), cat.getName()));
 
         return map;
+    }
+
+
+
+    public Category updateFrom(AdminCategoryController.UpdateCategoryRequest request, Category parent) {
+        this.setName(request.name());
+        this.setDescription(request.description());
+
+        this.setParent(parent);
+
+        return this;
     }
 }

@@ -60,6 +60,7 @@ import CategoryItems from "./components/category/CategoryItems";
 import CategoryForUser from "./components/category/CategoryForUser";
 import CategoryList from "./components/category/list/CategoryList";
 import AdminCategoryHome from "./components/admin/category/AdminCategoryHome";
+import AdminCategory from "./components/admin/category/AdminCategory";
 
 const queryClient = new QueryClient();
 
@@ -145,6 +146,7 @@ function App() {
                                                     <Route path="/admin/order/:id" element={<AdminOrder/>}/>
 
                                                     <Route path="/admin/category" element={<AdminCategoryHome/>}/>
+                                                  <Route path="/admin/category/:id" element={<AdminCategory/>}/>
 
                                                 </Route>
                                             </Route>

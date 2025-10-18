@@ -1,6 +1,7 @@
 package me.leoo.springboot.libri.libri.category;
 
 import lombok.RequiredArgsConstructor;
+import me.leoo.springboot.libri.admin.AdminCategoryController;
 import me.leoo.springboot.libri.image.FileImageUtils;
 import me.leoo.springboot.libri.image.ImageService;
 import org.springframework.http.ResponseEntity;
@@ -41,4 +42,9 @@ public class CategoryService {
     public List<Category> getRootCategories() {
         return categoryRepository.findByParentIsNull();
     }
+
+    public boolean exists(Long id) {
+        return categoryRepository.existsById(id);
+    }
+
 }

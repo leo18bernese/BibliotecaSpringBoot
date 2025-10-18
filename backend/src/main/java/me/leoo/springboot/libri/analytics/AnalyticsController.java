@@ -47,6 +47,11 @@ public class AnalyticsController {
             @RequestParam(defaultValue = "7d") String period,
             @RequestParam(defaultValue = "20min") String resolution) {
 
+        System.out.println("Fetching time series data for productId: " + productId +
+                ", metric: " + metric +
+                ", period: " + period +
+                ", resolution: " + resolution);
+
         List<TimeSeriesPointDTO> data = queryService.getTimeSeriesData(productId, metric,
                 period, resolution);
 

@@ -99,7 +99,7 @@ const CategoryItems = ({categoryID, isParent, current}) => {
                         {hasSubcategories && (
                             <div className=" py-4">
 
-                                <div className="text-lg font-semibold  mb-5  text-gray-700 inline-block pr-5 ">
+                                <div className="text-lg font-semibold  mb-2  text-gray-700 inline-block pr-5 ">
                                     Subcategories
                                 </div>
 
@@ -128,9 +128,9 @@ const CategoryItems = ({categoryID, isParent, current}) => {
 
                      
                         {hasItems && (
-                            <div className=" py-4">
+                            <div className=" py-2">
 
-                                <div className="text-lg font-semibold  mb-5  text-gray-700 inline-block pr-5 ">
+                                <div className="text-lg font-semibold  mb-2  text-gray-700 inline-block pr-5 ">
                                     Items
                                 </div>
 

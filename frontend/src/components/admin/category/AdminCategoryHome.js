@@ -1,15 +1,36 @@
 import {useNavigate} from "react-router-dom";
 import {usePageTitle} from "../../utils/usePageTitle";
 import Pageable from "../../ui/pages/Pageable";
+import React, {useState} from "react";
+import CreateCategory from "./create/CreateCategory";
 
 const AdminCategoryHome = () => {
     const navigate = useNavigate();
+
+    const [showAddVariantPopup, setShowAddVariantPopup] = useState(false);
 
     usePageTitle('Admin Home - Categories');
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Admin Home - Category List</h1>
+
+            <button
+                className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
+                 bg-green-100 hover:bg-green-200 w-1/3 transition"
+                onClick={() => setShowAddVariantPopup(true)}
+            >
+
+                <i className='bx bx-plus-circle text-2xl text-green-600'></i>
+                <span className="ml-2 font-semibold text-green-700">
+                    Aggiungi Nuova Categoria</span>
+
+            </button>
+
+            <CreateCategory
+                showAddCategoryPopup={showAddVariantPopup}
+                setShowAddCategoryPopup={setShowAddVariantPopup}
+            />
 
             <Pageable endpoint={`/api/admin/category/light-all`}
                       id={"books"}

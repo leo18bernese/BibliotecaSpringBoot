@@ -48,6 +48,8 @@ const GenericTimeSeriesChart = ({
     const periods = customPeriods || defaultPeriods;
     const [period, setPeriod] = useState(selectedPeriod || Object.keys(periods)[0]);
 
+    console.log(selectedPeriod, period);
+
     useEffect(() => {
         setLoading(true);
         setError(null);

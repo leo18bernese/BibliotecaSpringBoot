@@ -3,10 +3,12 @@ package me.leoo.springboot.libri.libri.category;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
+import me.leoo.springboot.libri.utente.Utente;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +25,8 @@ public class CategoryController {
     public record CategoryResponse(Long id, String name) {
     }
 
-    public record CategoryResponseFirstLevel(Long id, String name, String descrizione, List<CategoryResponse> subcategories) {
+    public record CategoryResponseFirstLevel(Long id, String name, String descrizione,
+                                             List<CategoryResponse> subcategories) {
     }
 
     private List<CategoryResponse> toCategoryResponseList(List<Category> categories) {
@@ -56,7 +59,20 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<?> existsReso(@AuthenticationPrincipal Utente utente,
+                                        @PathVariable Long id) {
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
 
+        try {
+            boolean exists = categoryService.exists(id);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il controllo dell'esistenza del reso: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/{id}/subcategories")
     public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long id) {
