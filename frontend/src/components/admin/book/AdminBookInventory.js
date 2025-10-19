@@ -5,6 +5,7 @@ import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import {usePageTitle} from "../../utils/usePageTitle";
 import CreateVariant from "./variant/CreateVariant";
+import CreateForm from "../category/create/CreateForm";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/${id}`);
@@ -208,9 +209,25 @@ const AdminBookInventory = () => {
                     ))}</div>
             </div>
 
+
+
             <CreateVariant bookId={id}
                            setShowAddVariantPopup={setShowAddVariantPopup}
                            showAddVariantPopup={showAddVariantPopup}
+            />
+
+            <CreateForm
+                endpoint={`/api/libri/${id}/variante`}
+                showAddCategoryPopup={showAddVariantPopup}
+                setShowAddCategoryPopup={setShowAddVariantPopup}
+                data={[
+                    ['nome', 'Nome Variante', '', 'Name is required'],
+                    ['dimensioni.length', 'Lunghezza (cm)', '', 'Length is required'],
+                    ['dimensioni.width', 'Larghezza (cm)', '', 'Width is required'],
+                    ['dimensioni.height', 'Altezza (cm)', '', 'Height is required'],
+                    ['dimensioni.weight', 'Peso (kg)', '', 'Weight is required'],
+                    ['prezzo', 'Prezzo (€)', '', 'Price is required'],
+                ]}
             />
 
             <div className="fixed bottom-4 right-4">

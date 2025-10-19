@@ -2,7 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {usePageTitle} from "../../utils/usePageTitle";
 import Pageable from "../../ui/pages/Pageable";
 import React, {useState} from "react";
-import CreateCategory from "./create/CreateCategory";
+import CreateForm from "./create/CreateForm";
 
 const AdminCategoryHome = () => {
     const navigate = useNavigate();
@@ -27,9 +27,15 @@ const AdminCategoryHome = () => {
 
             </button>
 
-            <CreateCategory
-                showAddCategoryPopup={showAddVariantPopup}
-                setShowAddCategoryPopup={setShowAddVariantPopup}
+            <CreateForm endpoint={`/api/categories/new`}
+                        showAddCategoryPopup={showAddVariantPopup}
+                        setShowAddCategoryPopup={setShowAddVariantPopup}
+                        data={[
+                            ['name', 'Nome Categoria', '', 'Name is required'],
+                            ['description', 'Descrizione Categoria', '', 'Description is required'],
+                            ['parentId', 'ID Categoria Parent', null, '', 'Parent ID must be a number or null']
+                        ]}
+
             />
 
             <Pageable endpoint={`/api/admin/category/light-all`}
@@ -41,9 +47,9 @@ const AdminCategoryHome = () => {
                           {key: 'Description', value: 'description'},
                       ]}
                       filterableFields={
-                            [
-                                {key: 'Has Parent', value: 'hasParent', type: 'boolean'},
-                            ]
+                          [
+                              {key: 'Has Parent', value: 'hasParent', type: 'boolean'},
+                          ]
                       }
                       onRowClick={(book) => navigate(`/admin/category/${book.id}`)}
                       noneFound={<div className="text-center text-gray-500">
