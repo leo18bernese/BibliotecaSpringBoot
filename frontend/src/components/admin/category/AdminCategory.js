@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import EditableField from "../../ui/fields/EditableField";
 import React, {useEffect, useState} from "react";
@@ -59,6 +59,8 @@ const AdminCategory = () => {
         staleTime: 5 * 60 * 1000, // 5 minutes
     });
 
+    const [subCategories, setSubCategories] = useState([]);
+
     // Inizializza gli stati quando category è disponibile
     useEffect(() => {
         if (category) {
@@ -67,8 +69,19 @@ const AdminCategory = () => {
 
             setParentId(category.parent ? category.parent.id : null);
             setParentName(category.parent ? category.parent.name : '');
+
+            if (categoryList) {
+
+                const subCats = categoryList.content.filter(cat => {
+                    return cat.parentId === category.id
+                });
+
+                setSubCategories(subCats);
+            }
+
         }
-    }, [category]);
+
+    }, [category, categoryList]);
 
 
     /* const {data: images, isLoading: areImagesLoading} = useQuery({
@@ -139,8 +152,27 @@ const AdminCategory = () => {
                 <h2 className="text-md font-semibold">Parent of categories</h2>
 
                 <p className="text-sm text-gray-500">
-                    Current Parent Category: {category.parent ? `${category.parent.name} (#${category.parent.id})` : 'None'}
+                    Current Parent
+                    Category: {category.parent ? `${category.parent.name} (#${category.parent.id})` : 'None'}
                 </p>
+
+                <p className="text-sm text-gray-500 mt-2">
+                    Subcategories:
+                </p>
+
+                {subCategories.length > 0 ? (
+                    <ul className="list-disc list-inside">
+                        {subCategories.map((subCat) => (
+                            <li key={subCat.id}>
+                                <Link to={`/admin/category/${subCat.id}`} className="hover:underline">
+                                {subCat.name} (#{subCat.id})
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-sm text-gray-500">No subcategories.</p>
+                )}
             </div>
 
             <div className="mt-8 p-4">

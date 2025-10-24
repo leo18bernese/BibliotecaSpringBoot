@@ -18,7 +18,7 @@ public class AdminCategoryController {
     private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
 
-    public record CategoryResponse(Long id, String name, String description, boolean hasParent) {
+    public record CategoryResponse(Long id, String name, String description, Long parentId) {
 
     }
 
@@ -36,7 +36,7 @@ public class AdminCategoryController {
                     l.getId(),
                     l.getName(),
                     l.getDescription(),
-                    l.getParent() != null
+                    l.getParent() != null ? l.getParent().getId() : null
             ));
 
             return ResponseEntity.ok(bookResponses);
