@@ -22,6 +22,11 @@ public class Category {
     private String name;
     private String description = "";
 
+    private Date creationDate = new Date();
+    private Date lastUpdateDate = new Date();
+
+    private boolean hidden = false;
+
     //parent
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
@@ -39,7 +44,6 @@ public class Category {
         this.name = name;
         this.description = description;
     }
-
 
     public Category(String name, Category parent) {
         this.name = name;
@@ -82,11 +86,11 @@ public class Category {
         return map;
     }
 
-
-
     public Category updateFrom(AdminCategoryController.UpdateCategoryRequest request, Category parent) {
         this.setName(request.name());
         this.setDescription(request.description());
+
+        this.setLastUpdateDate(new Date());
 
         this.setParent(parent);
 

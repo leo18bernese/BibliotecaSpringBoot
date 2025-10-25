@@ -25,7 +25,7 @@ const updateCategory = async ({id, categoryData}) => {
 }
 
 const fetchCategoryList = async () => {
-    const {data} = await axios.get('/api/admin/category/light-all');
+    const {data} = await axios.get('/api/admin/category/all-names');
     return data;
 }
 
@@ -72,7 +72,7 @@ const AdminCategory = () => {
 
             if (categoryList) {
 
-                const subCats = categoryList.content.filter(cat => {
+                const subCats = categoryList.filter(cat => {
                     return cat.parentId === category.id
                 });
 
@@ -118,7 +118,7 @@ const AdminCategory = () => {
         if (!categoryList || query.length < 2) {
             return [];
         }
-        return categoryList.content.filter(cat =>
+        return categoryList.filter(cat =>
             cat.name.toLowerCase().includes(query.toLowerCase()) && (cat.id !== Number(id))
         ).map(cat => ({
             label: `${cat.name} (#${cat.id})`,
@@ -140,10 +140,27 @@ const AdminCategory = () => {
         return <div className="p-4">Category not found or does not exist.</div>;
     }
 
+    const prevCategoryId = Number(id) - 1;
+    const nextCategoryId = Number(id) + 1;
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-lg font-semibold">Category Editor</h1>
+
+            <div className="flex justify-between items-center mb-8">
+                <Link to={`/admin/category/${prevCategoryId}`} className="text-blue-500 hover:underline font-semibold">
+                    ← Previous Category #{prevCategoryId}
+                </Link>
+
+                <Link to={`/admin/category/${nextCategoryId}`} className="text-blue-500 hover:underline font-semibold">
+                    Next Category #{nextCategoryId} →
+                </Link>
+            </div>
+
+
+
+
+
+            <h1 className="text-lg font-semibold">Category Editor - #{category.id}</h1>
             <p className="text-sm text-gray-500">
                 You can edit the category details, such as name and description.
             </p>
@@ -171,7 +188,7 @@ const AdminCategory = () => {
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-sm text-gray-500">No subcategories.</p>
+                    <p className="text-sm text-gray-500 pl-4">No subcategories.</p>
                 )}
             </div>
 
@@ -211,7 +228,7 @@ const AdminCategory = () => {
                                            if (!catName) return true; // Campo vuoto è valido (nessun genitore)
 
                                            // Se il nome corrisponde a una categoria esistente, è valido
-                                           if (categoryList && categoryList.content.some(cat => cat.name === catName)) {
+                                           if (categoryList && categoryList.some(cat => cat.name === catName )) {
                                                return true;
                                            }
 
@@ -219,7 +236,7 @@ const AdminCategory = () => {
                                            return false;
                                        }}
                                        onChange={(newParentName) => {
-                                           const matchedCategory = categoryList.content.find(cat => cat.name === newParentName);
+                                           const matchedCategory = categoryList.find(cat => cat.name === newParentName);
 
                                            if (matchedCategory) {
                                                setParentId(matchedCategory.id);
@@ -232,35 +249,62 @@ const AdminCategory = () => {
                 />
             </div>
 
+            <div className="mt-8 pt-5 flex justify-between transition-all duration-200">
+                <div>
+                    <button
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this category? This action cannot be undone.")) {
+                                axios.delete(`/api/admin/category/${id}`)
+                                    .then(() => {
+                                        toast.success('Category deleted successfully');
+                                        navigate("/admin/category");
+                                    })
+                                    .catch((error) => {
+                                        toast.error(`Error deleting category: ${error.message}`);
+                                    });
+                            }
+                        }}
+                        className="bg-red-300 hover:bg-red-400 text-red-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                        >
+                        Delete Category
+                    </button>
+                </div>
+
+                <div>
+                    <button
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to discard changes?")) {
+                                navigate("/admin/category/" + id);
+                            }
+                        }}
+                        className="bg-red-300 hover:bg-red-400 text-red-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                    >
+                        Discard Changes
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            if ((!name || name.length < 2) || (!description || description.length < 2)) {
+                                toast.error('Please fill in all required fields (2 chars min).');
+                                return;
+                            }
+
+                            if (window.confirm("Are you sure you want to save changes?")) {
+                                handleSave();
+                            }
+                        }}
+                        disabled={mutation.isPending}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400"
+                    >
+                        {mutation.isPending ? 'Saving...' : 'Save Changes'}
+                    </button>
+                </div>
+
+            </div>
+
             <div className="mt-8 pt-5 flex justify-end">
 
-                <button
-                    onClick={() => {
-                        if (window.confirm("Are you sure you want to discard changes?")) {
-                            navigate("/admin/category/" + id);
-                        }
-                    }}
-                    className="bg-red-300 hover:bg-red-400 text-red-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
-                >
-                    Discard Changes
-                </button>
 
-                <button
-                    onClick={() => {
-                        if (!name || name.length < 2 || !description || description.length < 2) {
-                            toast.error('Please fill in all required fields.');
-                            return;
-                        }
-
-                        if (window.confirm("Are you sure you want to save changes?")) {
-                            handleSave();
-                        }
-                    }}
-                    disabled={mutation.isPending}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400"
-                >
-                    {mutation.isPending ? 'Saving...' : 'Save Changes'}
-                </button>
             </div>
         </div>
     );

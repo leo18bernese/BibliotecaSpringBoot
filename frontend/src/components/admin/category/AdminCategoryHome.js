@@ -15,25 +15,12 @@ const AdminCategoryHome = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Admin Home - Category List</h1>
 
-            <button
-                className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
-                 bg-green-100 hover:bg-green-200 w-1/3 transition"
-                onClick={() => setShowAddVariantPopup(true)}
-            >
-
-                <i className='bx bx-plus-circle text-2xl text-green-600'></i>
-                <span className="ml-2 font-semibold text-green-700">
-                    Aggiungi Nuova Categoria</span>
-
-            </button>
-
-            <CreateForm endpoint={`/api/admin/category/`}
-                        showAddCategoryPopup={showAddVariantPopup}
-                        setShowAddCategoryPopup={setShowAddVariantPopup}
+            <CreateForm endpoint={`/api/admin/category`}
+                        showAddMessage={"Aggiungi Nuova Categoria"}
                         data={[
-                            ['name', 'Nome Categoria', '', 'Name is required'],
-                            ['description', 'Descrizione Categoria', '', 'Description is required'],
-                            ['parentId', 'ID Categoria Parent', null, '', 'Parent ID must be a number or null']
+                            ['name', 'Nome Categoria', '', 'Name is required', false, 'text'],
+                            ['description', 'Descrizione Categoria', '', 'Description is required', false, 'text'],
+                            ['parentId', 'ID Categoria Parent', null, 'Parent ID must be a number or null', true, 'number']
                         ]}
 
             />
@@ -43,8 +30,9 @@ const AdminCategoryHome = () => {
                       columns={[
                           {key: 'ID', value: 'id', function: (id) => `#${id}`},
                           {key: 'Name', value: 'name'},
-                          {key: 'Has Parent', value: 'hasParent', function: (hasParent) => hasParent ? 'Yes' : 'No'},
+                          {key: 'Has Parent', value: 'parentId', function: (parent) => parent ? ("#" + parent) : '/'},
                           {key: 'Description', value: 'description'},
+                          {key: 'Updated At', value: 'updatedAt', function: (date) => new Date(date).toLocaleString()}
                       ]}
                       filterableFields={
                           [
@@ -57,7 +45,6 @@ const AdminCategoryHome = () => {
                           <p>Anomalo che non ci siano categorie nel sistema.</p>
                       </div>}
                       foundMessage={<div>
-                          <p>Queste sono le categorie presenti nel sistema.</p>
                           <p>Clicca su una categoria per gestirne i dettagli.</p>
                       </div>}
             />

@@ -8,14 +8,18 @@ import toast from "react-hot-toast";
  * @constructor
  */
 const CreateForm = ({
-                        endpoint, showAddCategoryPopup, setShowAddCategoryPopup, data,
+                        endpoint, data,
+                        showAddMessage = "Create New Item",
                         globalSuccessMessage = "Created successfully!",
                         addMessage = "Add New Item",
                         abortMessage = "Cancel",
-                        confirmMessage = "Add Item"
+                        confirmMessage = "Add Item",
                     }) => {
 
     const queryClient = useQueryClient();
+
+
+    const [showPopup, setShowPopup] = useState(false);
 
     const [newData, setNewData] = useState({});
     const [errors, setErrors] = useState({});
@@ -57,12 +61,11 @@ const CreateForm = ({
         console.log("Data:", data );
         console.log("New Data:", newData );
 
-        data.forEach(([id, , , missingErrorMessage, nullable]) => {
+        data.forEach(([id, , , missingErrorMessage]) => {
 
 console.log("data id:", id, "value:", newData[id] );
 
             if (!newData[id] || newData[id].toString().trim() === '') {
-                if (nullable) return;
 
                 validationErrors[id] = missingErrorMessage || 'This field is required';
             }
@@ -77,7 +80,7 @@ console.log("data id:", id, "value:", newData[id] );
             await axios.post(endpoint, newData);
 
             toast.success(globalSuccessMessage);
-            setShowAddCategoryPopup(false);
+            setShowPopup(false);
 
             setDefaultValues();
             setErrors({});
@@ -91,7 +94,19 @@ console.log("data id:", id, "value:", newData[id] );
     }
 
     return <>
-        {showAddCategoryPopup && (
+        <button
+            className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
+                 bg-green-100 hover:bg-green-200 w-1/3 transition"
+            onClick={() => setShowPopup(true)}
+        >
+
+            <i className='bx bx-plus-circle text-2xl text-green-600'></i>
+            <span className="ml-2 font-semibold text-green-700">
+                {showAddMessage}
+            </span>
+        </button>
+
+        {showPopup && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-4">
@@ -100,7 +115,7 @@ console.log("data id:", id, "value:", newData[id] );
                         <button
                             className="text-gray-500 hover:text-gray-700 text-2xl"
                             onClick={() => {
-                                setShowAddCategoryPopup(false);
+                                setShowPopup(false);
 
                                 setDefaultValues();
                                 setErrors({});
@@ -112,14 +127,15 @@ console.log("data id:", id, "value:", newData[id] );
 
 
                     <div className="space-y-4">
-                        {data.map(([id, name]) =>
+                        {data.map(([id, name, , , nullable, type]) =>
                             <div key={id}>
                                 <label className="block text-sm font-medium text-gray-700">{name}</label>
                                 <input
-                                    type="text"
+                                    type={type || 'text'}
                                     name={id}
                                     value={newData[id] || ''}
                                     onChange={handleChange}
+                                    required={!nullable}
                                     className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors[id] ? 'border-red-500' : ''}`}
                                     ref={node => {
                                         if (errors[id]) errorRef.current = node;
@@ -137,7 +153,7 @@ console.log("data id:", id, "value:", newData[id] );
                         <button
                             className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded transition-colors"
                             onClick={() => {
-                                setShowAddCategoryPopup(false);
+                                setShowPopup(false);
 
                                 setDefaultValues();
 
