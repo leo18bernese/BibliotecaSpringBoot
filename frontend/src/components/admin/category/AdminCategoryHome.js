@@ -27,7 +27,7 @@ const AdminCategoryHome = () => {
 
             </button>
 
-            <CreateForm endpoint={`/api/categories/new`}
+            <CreateForm endpoint={`/api/admin/category/`}
                         showAddCategoryPopup={showAddVariantPopup}
                         setShowAddCategoryPopup={setShowAddVariantPopup}
                         data={[
