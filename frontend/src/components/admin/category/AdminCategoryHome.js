@@ -47,6 +47,7 @@ const AdminCategoryHome = () => {
                       foundMessage={<div>
                           <p>Clicca su una categoria per gestirne i dettagli.</p>
                       </div>}
+                      compactLevel={1}
             />
         </div>
     );

@@ -157,15 +157,12 @@ const AdminCategory = () => {
             </div>
 
 
-
-
-
             <h1 className="text-lg font-semibold">Category Editor - #{category.id}</h1>
             <p className="text-sm text-gray-500">
                 You can edit the category details, such as name and description.
             </p>
 
-            <div className="mt-8 p-4">
+            <div className="mt-8 pl-4">
                 <h2 className="text-md font-semibold">Parent of categories</h2>
 
                 <p className="text-sm text-gray-500">
@@ -192,7 +189,7 @@ const AdminCategory = () => {
                 )}
             </div>
 
-            <div className="mt-8 p-4">
+            <div className="mt-8 pl-4">
                 <h2 className="text-md font-semibold">Category Details</h2>
 
                 <EditableField key={`name-${category?.id || 'new'}`}
@@ -257,7 +254,7 @@ const AdminCategory = () => {
                                 axios.delete(`/api/admin/category/${id}`)
                                     .then(() => {
                                         toast.success('Category deleted successfully');
-                                        navigate("/admin/category");
+                                        navigate(`/admin/category/${Number(id) - 1}`);
                                     })
                                     .catch((error) => {
                                         toast.error(`Error deleting category: ${error.message}`);

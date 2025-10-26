@@ -7,7 +7,7 @@ const Pageable = ({
                       id, endpoint, columns,
                       noneFound, foundMessage,
                       onRowClick,
-                      filterableFields
+                      filterableFields, compactLevel = 0
                   }) => {
 
     const {user} = useContext(UserContext);
@@ -56,6 +56,12 @@ const Pageable = ({
 
     const content = pagedData?.content || [];
     const totalPages = pagedData?.totalPages || 1;
+
+    const compactLevels = {
+        0: ["py-4", "text-lg"],
+        1: ["py-2", "text-base"],
+        2: ["py-1", "text-sm"]
+    }
 
     return (
 
@@ -144,7 +150,7 @@ const Pageable = ({
                             onClick={() => onRowClick && onRowClick(row)}>
 
                             {columns.map((col) => (
-                                <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900">
+                                <td className={`px-6 whitespace-nowrap text-gray-900 ${compactLevels[compactLevel][0]} ${compactLevels[compactLevel][1]}`}>
                                     {col.function ?
                                         (col.value ?
                                                 col.function(row[col.value]) :
