@@ -13,6 +13,7 @@ import {usePageTitle} from "../../utils/usePageTitle";
 import Varianti from "./Varianti";
 import RecensioneInfo from "../../recensioni/RecensioneInfo";
 import {useAnalyticsMutation} from "../../admin/book/chart/useAnalytics";
+import CategoryMap from "../../category/CategoryMap";
 
 const API_URL = '/api/images';
 
@@ -398,22 +399,7 @@ const BookInfo = () => {
             <div className="container mx-auto px-4 py-8">
                 <Toaster/>
 
-                <div className="mb-4">
-                    {Object.entries(book.category.categoryMap).map(([id, name], index) => (
-                        <Fragment key={id}>
-                            <Link
-                                className="text-sm text-blue-600 hover:underline mr-2 inline-block"
-                                to={`/category/${id}`}
-                            >
-                                {name}
-                            </Link>
-
-                            {index < Object.entries(book.category.categoryMap).length - 1 && (
-                                <span className="text-gray-400 mr-2">/</span>
-                            )}
-                        </Fragment>
-                    ))}
-                </div>
+                <CategoryMap map={book.category.categoryMap}/>
 
                 <div className="flex flex-col md:flex-row gap-6">
 
@@ -659,24 +645,7 @@ const BookInfo = () => {
                     </div>
                 </div>
             </div>
-            <div key="book-navigation" className="flex justify-center gap-4 my-8">
-                {previousBookExists && (
-                    <button
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition"
-                        onClick={handlePreviousBook}
-                    >
-                        Precedente
-                    </button>
-                )}
-                {nextBookExists && (
-                    <button
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded transition"
-                        onClick={handleNextBook}
-                    >
-                        Successivo
-                    </button>
-                )}
-            </div>
+
         </>
     )
         ;

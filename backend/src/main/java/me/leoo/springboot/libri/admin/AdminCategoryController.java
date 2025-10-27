@@ -24,19 +24,52 @@ public class AdminCategoryController {
     public record NameResponse(Long id, String name, Long parentId) {
     }
 
-    public record CategoryResponse(Long id, String name, String description, Long parentId, Date updatedAt){
+    public record CategoryResponse(Long id, String name, String description, Long parentId,
+                                   Date updatedAt) {
+    }
+
+    public record AdminCategoryResponse(Long id, String name, String description, Long parentId,
+                                       Long previousId, Long nextId) {
     }
 
     public record UpdateCategoryRequest(String name, String description, Long parentId) {
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AdminCategoryResponse> getCategoryById(@PathVariable Long id) {
+        try {
+            Category category = categoryRepository.findById(id).orElse(null);
+
+            if (category == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Long previousId = categoryService.getPreviousCategory(id);
+            Long nextId = categoryService.getNextCategory(id);
+
+            AdminCategoryResponse response = new AdminCategoryResponse(
+                    category.getId(),
+                    category.getName(),
+                    category.getDescription(),
+                    category.getParentId(),
+                    previousId,
+                    nextId
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @GetMapping("/all-names")
-    public ResponseEntity<List<NameResponse>> getAllCategoryNames(){
+    public ResponseEntity<List<NameResponse>> getAllCategoryNames() {
         try {
             List<Category> categories = categoryRepository.findAll();
 
             List<NameResponse> nameResponses = categories.stream()
-                    .map(c -> new NameResponse(c.getId(), c.getName(), c.getParent() != null ? c.getParent().getId() : null))
+                    .map(c -> new NameResponse(c.getId(), c.getName(), c.getParentId()))
                     .toList();
 
             return ResponseEntity.ok(nameResponses);
@@ -56,7 +89,7 @@ public class AdminCategoryController {
                     l.getId(),
                     l.getName(),
                     l.getDescription(),
-                    l.getParent() != null ? l.getParent().getId() : null,
+                    l.getParentId(),
                     l.getLastUpdateDate()
             ));
 

@@ -56,6 +56,10 @@ public class Category {
         this.parent = parent;
     }
 
+    public Long getParentId() {
+        return parent != null ? parent.getId() : null;
+    }
+
     public void incrementPurchased() {
         this.purchasedCount++;
     }

@@ -30,6 +30,14 @@ public class CategoryService {
         return categoryRepository.findById(id).orElse(null);
     }
 
+    public Long getPreviousCategory(Long id) {
+        return categoryRepository.findPreviousCategory(id);
+    }
+
+    public Long getNextCategory(Long id) {
+        return categoryRepository.findNextCategory(id);
+    }
+
     public List<Category> getSubcategories(Long id) {
         return categoryRepository.findSubcategories(id);
     }

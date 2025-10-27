@@ -8,7 +8,7 @@ import MaskedSuggestionInput from "../../ui/fields/MaskedSuggetionInput";
 import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchCategoryById = async (id) => {
-    const {data} = await axios.get(`/api/categories/${id}`);
+    const {data} = await axios.get(`/api/admin/category/${id}`);
     console.log("fetched category data:", data);
     return data;
 };
@@ -140,20 +140,24 @@ const AdminCategory = () => {
         return <div className="p-4">Category not found or does not exist.</div>;
     }
 
-    const prevCategoryId = Number(id) - 1;
-    const nextCategoryId = Number(id) + 1;
+    const prevCategoryId = category.previousId;
+    const nextCategoryId = category.nextId;
 
     return (
         <div className="container mx-auto p-4">
 
             <div className="flex justify-between items-center mb-8">
+                { prevCategoryId &&
                 <Link to={`/admin/category/${prevCategoryId}`} className="text-blue-500 hover:underline font-semibold">
                     ← Previous Category #{prevCategoryId}
                 </Link>
+                }
 
+                {nextCategoryId &&
                 <Link to={`/admin/category/${nextCategoryId}`} className="text-blue-500 hover:underline font-semibold">
                     Next Category #{nextCategoryId} →
                 </Link>
+                }
             </div>
 
 
