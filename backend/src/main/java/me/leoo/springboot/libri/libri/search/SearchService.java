@@ -33,10 +33,10 @@ public class SearchService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public RicercaLibriResponse cercaLibri(String q, Double prezzoMin, Double prezzoMax,
+    public RicercaLibriResponse cercaLibri(String q, Long categoriaId, Double prezzoMin, Double prezzoMax,
                                            Map<String, List<String>> filtriMultipli, Pageable pageable) {
 
-        Specification<Libro> spec = buildLibroSpecificationMultiple(q, prezzoMin, prezzoMax, filtriMultipli);
+        Specification<Libro> spec = buildLibroSpecificationMultiple(q, categoriaId, prezzoMin, prezzoMax, filtriMultipli);
 
         Page<Libro> risultatiLibri = libroRepository.findAll(spec, pageable);
         Page<LibroController.LiteBookResponse> libriResponse = risultatiLibri.map(Libro::toLiteBookResponse);
@@ -46,13 +46,14 @@ public class SearchService {
         return new RicercaLibriResponse(libriResponse, filtriDisponibili, filtriMultipli);
     }
 
-    private Specification<Libro> buildLibroSpecificationMultiple(String q, Double prezzoMin, Double prezzoMax,
+    private Specification<Libro> buildLibroSpecificationMultiple(String q, Long categoriaId, Double prezzoMin, Double prezzoMax,
                                                                  Map<String, List<String>> filtriMultipli) {
         Specification<Libro> spec = Specification.where(null);
 
         if (q != null && !q.isEmpty()) {
             spec = spec.and((root, query, cb) -> {
                 Join<Libro, LibroInfo> descrizioneJoin = root.join("descrizione"); // Join con LibroInfo
+
                 return cb.or(
                         cb.like(cb.lower(root.get("titolo")), "%" + q.toLowerCase() + "%"),
                         cb.like(cb.lower(root.get("autore").get("nome")), "%" + q.toLowerCase() + "%"), // Ricerca nell'autore
@@ -60,6 +61,10 @@ public class SearchService {
                         cb.like(cb.lower(root.get("isbn")), "%" + q.toLowerCase() + "%") // Ricerca nell'ISBN
                 );
             });
+        }
+
+        if (categoriaId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("id"), categoriaId));
         }
 
         if (prezzoMin != null) {
@@ -85,15 +90,19 @@ public class SearchService {
                             // Subquery per cercare libri che corrispondono ai filtri nelle caratteristiche della descrizione
                             Subquery<Long> subqueryDesc = query.subquery(Long.class);
                             Root<Libro> subRootDesc = subqueryDesc.from(Libro.class);
+
                             MapJoin<LibroInfo, String, String> caratteristicheJoin = subRootDesc.join("descrizione").joinMap("caratteristiche");
                             subqueryDesc.select(subRootDesc.get("id"));
+
                             List<Predicate> orPredicatesDesc = new ArrayList<>();
+
                             for (String valore : valoriSelezionati) {
                                 orPredicatesDesc.add(cb.and(
                                         cb.equal(caratteristicheJoin.key(), filtroNome),
                                         cb.equal(caratteristicheJoin.value(), valore)
                                 ));
                             }
+
                             if (!orPredicatesDesc.isEmpty()) {
                                 subqueryDesc.where(cb.or(orPredicatesDesc.toArray(new Predicate[0])));
                             }
@@ -104,14 +113,17 @@ public class SearchService {
                             Join<Libro, Variante> varianteJoin = subRootVar.join("varianti");
                             MapJoin<Variante, String, String> attributiSpecificiJoin = varianteJoin.joinMap("attributiSpecifici");
                             subqueryVar.select(subRootVar.get("id"));
+
                             List<Predicate> orPredicatesVar = new ArrayList<>();
+
                             for (String valore : valoriSelezionati) {
                                 orPredicatesVar.add(cb.and(
                                         cb.equal(attributiSpecificiJoin.key(), filtroNome),
                                         cb.equal(attributiSpecificiJoin.value(), valore)
                                 ));
                             }
-                            if (!orPredicatesVar.isEmpty()) {
+
+                           if (!orPredicatesVar.isEmpty()) {
                                 subqueryVar.where(cb.or(orPredicatesVar.toArray(new Predicate[0])));
                             }
 
@@ -125,6 +137,7 @@ public class SearchService {
                 }
             }
         }
+
         return spec;
     }
 
@@ -183,7 +196,7 @@ public class SearchService {
             // Rimuovi temporaneamente i filtri per questa caratteristica per vedere tutte le opzioni
             filtriParziali.remove(caratteristicaNome);
 
-            Specification<Libro> specParziale = buildLibroSpecificationMultiple(null, null, null, filtriParziali);
+            Specification<Libro> specParziale = buildLibroSpecificationMultiple(null, 0L,  null, null, filtriParziali);
 
             List<FiltroOpzione> opzioni;
 

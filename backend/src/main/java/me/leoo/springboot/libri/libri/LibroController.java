@@ -345,6 +345,7 @@ public class LibroController {
     @GetMapping("/ricerca")
     public ResponseEntity<RicercaLibriResponse> cercaLibri(
             @RequestParam(required = false) String q,
+             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Double prezzoMin,
             @RequestParam(required = false) Double prezzoMax,
             @RequestParam(defaultValue = "popolaritaDesc") String ordinamento,
@@ -359,7 +360,7 @@ public class LibroController {
 
         Pageable pageable = PageRequest.of(pagina, elementiPerPagina, getSort(ordinamento));
         RicercaLibriResponse risultati = searchService.cercaLibri(
-                q, prezzoMin, prezzoMax, filtriMultipli, pageable);
+                q, categoriaId, prezzoMin, prezzoMax, filtriMultipli, pageable);
 
         return ResponseEntity.ok(risultati);
     }
