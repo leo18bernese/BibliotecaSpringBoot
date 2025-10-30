@@ -4,8 +4,9 @@ import SearchPageTemplate from "./SearchPageTemplate";
 function SearchPage() {
 
     return (
-        <SearchPageTemplate
-        />
+        <div className="container mx-auto py-12">
+        <SearchPageTemplate/>
+        </div>
     );
 }
 

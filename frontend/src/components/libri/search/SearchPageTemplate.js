@@ -157,7 +157,7 @@ function SearchPageTemplate({initSearchParams, endpoint = '/api/libri/ricerca'})
     return (
         <div className="flex items-start">
             {/* Sidebar dei Filtri */}
-            <div className="w-1/4 p-5 mt-8 ml-8 mr-4 bg-white self-start">
+            <div className="w-1/4 p-5 mr-4 bg-white self-start">
                 <h2 className="font-semibold text-xl text-gray-700">FILTRI</h2>
 
                 {loadingResults && Object.keys(stableFilters).length === 0 && <p>Caricamento filtri...</p>}
@@ -252,7 +252,7 @@ function SearchPageTemplate({initSearchParams, endpoint = '/api/libri/ricerca'})
             </div>
 
             {/* Area Principale dei Risultati */}
-            <div className="w-3/4 p-5">
+            <div className="w-3/4 px-5">
 
                 <input
                     type="text"

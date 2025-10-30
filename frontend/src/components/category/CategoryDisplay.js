@@ -5,7 +5,7 @@ import LiteCategory from "./LiteCategory";
 function CategoryDisplay({idList, contentList, isLoading, error, gridCss}) {
     const list = idList || contentList;
 
-    const gridClass = gridCss || "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 p-10";
+    const gridClass = gridCss || "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-8";
 
     if (isLoading || !list) {
         return <h2 className="text-center">We are loading the categories...</h2>;

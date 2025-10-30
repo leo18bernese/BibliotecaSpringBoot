@@ -17,7 +17,7 @@ const fetchBookById = async (id) => {
 
 const fetchBookExists = async (id) => {
     if (!id || id <= 0) return false;
-    const {data} = await axios.get(`/api/libri/exists/${id}`);
+    const {data} = await axios.get(`/api/libri/${id}/exists`);
     return data;
 }
 

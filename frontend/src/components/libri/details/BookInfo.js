@@ -25,7 +25,7 @@ const fetchBookById = async (id) => {
 
 const fetchBookExists = async (id) => {
     if (!id || id <= 0) return false;
-    const {data} = await axios.get(`/api/libri/exists/${id}`);
+    const {data} = await axios.get(`/api/libri/${id}/exists`);
     return data;
 };
 
@@ -591,7 +591,7 @@ const BookInfo = () => {
                             )}
                         </div>
 
-                        {user && isAdmin && (
+                        {user && isAdmin() && (
                             <div className="bg-white shadow-md rounded-lg p-4 mt-4">
                                 <h3 className="text-xl font-semibold mb-4">Admin Actions</h3>
 

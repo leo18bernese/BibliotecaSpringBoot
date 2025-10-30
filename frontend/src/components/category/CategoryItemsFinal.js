@@ -5,6 +5,8 @@ import CategoryMap from "./CategoryMap";
 import LiteCategory2 from "./LiteCategory2";
 import LiteBook from "../libri/lite/LiteBook";
 import CategorySearchPage from "../libri/search/CategorySearchPage";
+import {useContext} from "react";
+import {UserContext} from "../user/UserContext";
 
 const fetchCategoryById = async (categoryId) => {
     const {data} = await axios.get(`/api/categories/${categoryId}`);
@@ -22,6 +24,7 @@ const fetchCategoryItems = async (categoryId) => {
 }
 
 const CategoryItemsFinal = ({categoryID, isParent, current}) => {
+    const {user, isAdmin} = useContext(UserContext);
     const {catId} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -92,7 +95,17 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                     </div>
                 ) : (
                     <div className="mb-6">
-                        <h2 className="text-3xl font-bold mb-2">{category.name}</h2>
+
+                        <div className="flex items-center mb-2 space-x-4">
+                            <h2 className="text-3xl font-bold mb-2">{category.name}</h2>
+
+                            {(user && isAdmin()) && (
+                                <i className='bxr bx-edit text-2xl cursor-pointer'
+                                   onClick={() => navigate('/admin/category/' + id)}
+                                ></i>
+                            )}
+                        </div>
+
                         {category.description && (
                             <p className="text-gray-600">{category.description}</p>
                         )}
@@ -117,7 +130,9 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                         </div>
                     )}
 
-                    <CategorySearchPage categoryId={ id} hideCategoryTitle={true} />
+                    {!subcategories && (
+                        <CategorySearchPage categoryId={id} hideCategoryTitle={true}/>
+                    )}
 
                     {hasItems && (
                         <div className=" py-2">
@@ -133,7 +148,7 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                                          className={"hover:shadow-lg transition-all cursor-pointer bg-gray-100"}
                                          onClick={() => navigate(`/book/${item.id}`)}>
 
-                                            <LiteBook bookID={item.id}/>
+                                        <LiteBook bookID={item.id}/>
                                     </div>
                                 ))}
                             </div>

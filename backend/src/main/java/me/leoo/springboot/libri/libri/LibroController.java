@@ -164,12 +164,12 @@ public class LibroController {
         }
     }
 
-    @GetMapping("/exists/{id}")
+    @GetMapping("/{id}/exists")
     public boolean existsLibro(@PathVariable Long id) {
         return libroRepository.existsById(id);
     }
 
-    @GetMapping("/exists/variante/{id}")
+    @GetMapping("/variante/{id}/exists")
     public boolean existsVariante(@PathVariable Long id) {
         return libroRepository.existsVarianteById(id);
     }

@@ -54,7 +54,7 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
                         minHeight: '12rem',
                         justifyContent: 'center',
                     } : {
-                        backgroundImage : 'linear-gradient(135deg, #dfebfb 10%, #a6c2e3 100%)',
+                        backgroundImage : 'linear-gradient(135deg, #e0e0e0 10%, #bdbdbd 100%)',
                         justifyContent: 'center',
                     }
                 }

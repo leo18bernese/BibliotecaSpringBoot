@@ -66,8 +66,6 @@ export const UserProvider = ({children}) => {
     };
 
     const hasRole = (role) => {
-        console.log("Verifica del ruolo:", role, user, user.ruoli);
-
         if (!user || !user.ruoli) return false;
         return user.ruoli.includes(role);
     };
