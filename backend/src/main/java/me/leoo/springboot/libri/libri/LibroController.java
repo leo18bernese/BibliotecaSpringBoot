@@ -345,7 +345,7 @@ public class LibroController {
     @GetMapping("/ricerca")
     public ResponseEntity<RicercaLibriResponse> cercaLibri(
             @RequestParam(required = false) String q,
-             @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Double prezzoMin,
             @RequestParam(required = false) Double prezzoMax,
             @RequestParam(defaultValue = "popolaritaDesc") String ordinamento,
@@ -362,6 +362,8 @@ public class LibroController {
         RicercaLibriResponse risultati = searchService.cercaLibri(
                 q, categoriaId, prezzoMin, prezzoMax, filtriMultipli, pageable);
 
+        System.out.println("Risultati trovati: " + risultati.libri().getSize());
+
         return ResponseEntity.ok(risultati);
     }
 
@@ -369,7 +371,7 @@ public class LibroController {
         Map<String, List<String>> filtriMultipli = new HashMap<>();
 
         // Parametri standard da escludere
-        Set<String> parametriStandard = Set.of("q", "prezzoMin", "prezzoMax",
+        Set<String> parametriStandard = Set.of("q", "prezzoMin", "prezzoMax", "categoriaId",
                 "ordinamento", "pagina", "elementiPerPagina");
 
         for (Map.Entry<String, String> entry : allParams.entrySet()) {

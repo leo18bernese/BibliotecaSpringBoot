@@ -3,6 +3,8 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import CategoryMap from "./CategoryMap";
 import LiteCategory2 from "./LiteCategory2";
+import LiteBook from "../libri/lite/LiteBook";
+import CategorySearchPage from "../libri/search/CategorySearchPage";
 
 const fetchCategoryById = async (categoryId) => {
     const {data} = await axios.get(`/api/categories/${categoryId}`);
@@ -75,7 +77,7 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
 
             <div>
 
-                <CategoryMap map={category.categoryMap}/>
+                <CategoryMap map={category.categoryMap} considerLast={false}/>
 
                 {categoryID ? (
                     <div className="text-2xl font-semibold cursor-pointer mb-4 flex flex-row items-center">
@@ -97,52 +99,47 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                     </div>
                 )}
 
-                    <div className="py-4">
+                <div className="py-4">
 
-                        {hasSubcategories && (
-                            <div className=" py-4">
+                    {hasSubcategories && (
+                        <div className=" py-4">
 
-                                <div className="grid grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-6 ml-2">
-                                    {subcategories.map(subcat => {
+                            <div className="grid grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-6 ml-2">
+                                {subcategories.map(subcat => {
 
-                                            return (
-                                                <LiteCategory2 categoryID={subcat.id} key={subcat.id}/>
-                                            )
-                                        }
-                                    )}
-                                </div>
-
+                                        return (
+                                            <LiteCategory2 categoryID={subcat.id} key={subcat.id}/>
+                                        )
+                                    }
+                                )}
                             </div>
-                        )}
 
-                     
-                        {hasItems && (
-                            <div className=" py-2">
+                        </div>
+                    )}
 
-                                <div className="text-lg font-semibold  mb-2  text-gray-700 inline-block pr-5 ">
-                                    Items
-                                </div>
+                    <CategorySearchPage categoryId={ id} hideCategoryTitle={true} />
 
-                                <div
-                                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-2">
-                                    {items.map(item => (
-                                        <div key={item.id}
-                                             className={"border p-2 rounded-lg shadow hover:shadow-lg transition-all cursor-pointer bg-gray-100"}
-                                             onClick={() => navigate(`/book/${item.id}`)}>
+                    {hasItems && (
+                        <div className=" py-2">
 
-                                                    <span
-                                                        className={`text-lg mb-2 text-gray-500`}>
-                                                        {item.titolo}
-                                                    </span>
-
-                                            <span className="text-sm text-gray-400 block">ID: {item.id}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="text-lg font-semibold  mb-2  text-gray-700 inline-block pr-5 ">
+                                Items
                             </div>
-                        )}
-                    </div>
 
+                            <div
+                                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-2">
+                                {items.map(item => (
+                                    <div key={item.id}
+                                         className={"hover:shadow-lg transition-all cursor-pointer bg-gray-100"}
+                                         onClick={() => navigate(`/book/${item.id}`)}>
+
+                                            <LiteBook bookID={item.id}/>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
 
 
             </div>

@@ -38,6 +38,15 @@ const uploadImages = async (bookId, files) => {
     return data;
 };
 
+const uploadImageByUrl = async (bookId, imageUrl) => {
+
+    const formData = new FormData();
+    formData.append('imageUrl', imageUrl);
+
+    const {data} = await axios.post(`/api/images/${bookId}/imageUrl`, formData);
+    return data;
+}
+
 const API_URL = '/api/images';
 
 const AdminBookImages = () => {
@@ -168,6 +177,32 @@ const AdminBookImages = () => {
             {/* Upload Section */}
             <div className="mb-8">
                 <h2 className="text-lg font-semibold text-gray-700 mb-4">Carica Nuove Immagini</h2>
+
+                <div className="text-sm text-gray-600 mb-4">
+                    Carica con URL
+
+                    <input
+                        type="text"
+                        placeholder="Inserisci URL immagine"
+                        className="ml-2 p-2 border border-gray-300 rounded w-1/2"
+                        onKeyDown={async (e) => {
+                            if (e.key === 'Enter') {
+                                const imageUrl = e.target.value;
+                                if (imageUrl) {
+                                    try {
+                                        await uploadImageByUrl(id, imageUrl);
+                                        queryClient.invalidateQueries(['images', id]);
+                                        toast.success('Immagine caricata con successo');
+                                        e.target.value = '';
+                                    } catch (error) {
+                                        toast.error('Errore durante il caricamento dell\'immagine');
+                                        }
+                                }
+                            }
+                        }}
+                    />
+                </div>
+
 
                 <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${

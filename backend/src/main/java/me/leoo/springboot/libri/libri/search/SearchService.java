@@ -36,10 +36,14 @@ public class SearchService {
     public RicercaLibriResponse cercaLibri(String q, Long categoriaId, Double prezzoMin, Double prezzoMax,
                                            Map<String, List<String>> filtriMultipli, Pageable pageable) {
 
+        System.out.println("fond  " + categoriaId);
         Specification<Libro> spec = buildLibroSpecificationMultiple(q, categoriaId, prezzoMin, prezzoMax, filtriMultipli);
 
+        System.out.println("spec built " + spec + " with filters " + filtriMultipli + " pageable " + pageable);
         Page<Libro> risultatiLibri = libroRepository.findAll(spec, pageable);
         Page<LibroController.LiteBookResponse> libriResponse = risultatiLibri.map(Libro::toLiteBookResponse);
+
+        System.out.println("found " + risultatiLibri.getTotalElements() + " "  + libriResponse.getTotalElements() + " books");
 
         Map<String, List<FiltroOpzione>> filtriDisponibili = calcolaFiltriDinamici(filtriMultipli);
 

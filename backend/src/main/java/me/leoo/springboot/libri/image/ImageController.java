@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,27 +32,26 @@ public class ImageController {
         }
 
         try {
-            String finalPath = imageService.getCommonImagesPath(productId);
-
-            Path dirPath = Paths.get(finalPath);
-            if (!Files.exists(dirPath)) {
-                Files.createDirectories(dirPath);
-            }
-
-            int uploadedCount = 0;
-
-            for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    Path path = Paths.get(finalPath, file.getOriginalFilename());
-                    Files.write(path, file.getBytes());
-                    uploadedCount++;
-                }
-            }
+            int uploadedCount = imageService.saveImage(productId, files);
 
             return ResponseEntity.ok("Successfully uploaded " + uploadedCount + " images");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Cannot upload images");
+        }
+    }
+
+    @PostMapping("/{productId}/imageUrl")
+    public ResponseEntity<String> uploadImages(@PathVariable Long productId,
+                                               @RequestParam("imageUrl") String imageUrl) {
+        System.out.println("Uploading image from URL: " + imageUrl);
+
+        try {
+            imageService.saveImageFromUrl(productId, imageUrl);
+            return ResponseEntity.ok("Image uploaded successfully from URL");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Cannot upload image from URL");
         }
     }
 
