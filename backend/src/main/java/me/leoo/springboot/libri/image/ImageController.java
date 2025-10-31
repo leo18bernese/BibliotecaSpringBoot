@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.libri.Libro;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.LibroService;
+import me.leoo.springboot.libri.libri.category.Category;
+import me.leoo.springboot.libri.libri.category.CategoryRepository;
+import me.leoo.springboot.libri.libri.category.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +23,10 @@ import java.util.Optional;
 public class ImageController {
 
     private final LibroRepository libroRepository;
+    private final CategoryRepository categoryRepository;
     private final ImageService imageService;
     private final LibroService libroService;
+    private final CategoryService categoryService;
 
     @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
     @PostMapping("/{productId}")
@@ -32,7 +37,7 @@ public class ImageController {
         }
 
         try {
-            int uploadedCount = imageService.saveImage(productId, files);
+            int uploadedCount = imageService.saveImage(productId, imageService.getCommonImagesPath(productId), files);
 
             return ResponseEntity.ok("Successfully uploaded " + uploadedCount + " images");
         } catch (Exception e) {
@@ -47,7 +52,7 @@ public class ImageController {
         System.out.println("Uploading image from URL: " + imageUrl);
 
         try {
-            imageService.saveImageFromUrl(productId, imageUrl);
+            imageService.saveImageFromUrl(productId, imageService.getCategoriesImagesPath(productId), imageUrl);
             return ResponseEntity.ok("Image uploaded successfully from URL");
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,22 +124,68 @@ public class ImageController {
         }
     }
 
-    private ResponseEntity<byte[]> getImageResponse(byte[] image, String fileName) {
-        String contentType = determineContentType(fileName);
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<?> getCategoryImage(@PathVariable Long categoryId) {
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+        if (optionalCategory.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-        return ResponseEntity.ok()
-                .header("Content-Type", contentType)
-                .body(image);
+        try {
+            List<Path> paths = categoryService.getCategoryAllImages(categoryId);
+
+            if (paths.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(paths.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.noContent().build();
+        }
     }
 
-    private String determineContentType(String fileName) {
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-
-        return switch (extension) {
-            case "jpg", "jpeg" -> "image/jpeg";
-            case "png" -> "image/png";
-            case "gif" -> "image/gif";
-            default -> "application/octet-stream"; // Default
-        };
+    @GetMapping("/category/{categoryId}/index/{index}")
+    public ResponseEntity<byte[]> getCategoryImage(@PathVariable Long categoryId, @PathVariable int index) {
+        try {
+            return categoryService.getPictureResponse(categoryId, index);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
+    @DeleteMapping("/category/{categoryId}/index/{index}")
+    public ResponseEntity<String> deleteCategoryImage(@PathVariable Long categoryId, @PathVariable int index) {
+        List<Path> paths = categoryService.getCategoryAllImages(categoryId);
+
+        if (paths.isEmpty()) {
+            return ResponseEntity.badRequest().body("No images to delete");
+        }
+        if (index < 0 || index >= paths.size()) {
+            return ResponseEntity.badRequest().body("Invalid image index");
+        }
+        Path path = paths.get(index);
+
+        try {
+            Files.deleteIfExists(path);
+            return ResponseEntity.ok("Image deleted successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting image");
+        }
+    }
+
+    @PostMapping("/category/{categoryId}/imageUrl")
+    public ResponseEntity<String> uploadCategoryImage(@PathVariable Long categoryId,
+                                                      @RequestParam("imageUrl") String imageUrl) {
+        try {
+            imageService.saveImageFromUrl(categoryId, imageService.getCategoriesImagesPath(categoryId), imageUrl);
+            return ResponseEntity.ok("Category image uploaded successfully from URL");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Cannot upload category image from URL");
+        }
+    }
+
 }

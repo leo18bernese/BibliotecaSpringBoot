@@ -55,6 +55,7 @@ import NotFound from "./components/utils/NotFound";
 import Footer from "./components/footer/Footer";
 import {WishlistProvider} from "./components/libri/wishlist/WishlistContext";
 import CategoryItemsFinal from "./components/category/CategoryItemsFinal";
+import AdminCategoryImages from "./components/admin/category/AdminCategoryImages";
 
 function RedirectToBook() {
     const {id} = useParams();
@@ -123,12 +124,16 @@ export default function Layout() {
                                             <Route path="/admin/book/:id/inventory" element={<AdminBookInventory/>}/>
                                             <Route path="/admin/book/:id/inventory/variante/:varianteId"
                                                    element={<AdminBookVariant/>}/>
+
                                             <Route path="/admin/user" element={<AdminUserHome/>}/>
                                             <Route path="/admin/user/:id" element={<AdminUser/>}/>
+
                                             <Route path="/admin/order" element={<AdminOrderHome/>}/>
                                             <Route path="/admin/order/:id" element={<AdminOrder/>}/>
+
                                             <Route path="/admin/category" element={<AdminCategoryHome/>}/>
                                             <Route path="/admin/category/:id" element={<AdminCategory/>}/>
+                                            <Route path="/admin/category/:id/images" element={<AdminCategoryImages/>}/>
                                         </Route>
                                     </Route>
 

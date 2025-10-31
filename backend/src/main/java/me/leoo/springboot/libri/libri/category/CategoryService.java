@@ -7,6 +7,7 @@ import me.leoo.springboot.libri.image.ImageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,4 +56,13 @@ public class CategoryService {
         return categoryRepository.existsById(id);
     }
 
+
+    // images
+    public List<Path> getCategoryAllImages(Long id) {
+        return FileImageUtils.getAllImages(id, imageService.getCategoriesImagesPath(id));
+    }
+
+    public ResponseEntity<byte[]> getPictureResponse(Long id, int index) {
+        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), imageService.getNotFoundPath(), index);
+    }
 }

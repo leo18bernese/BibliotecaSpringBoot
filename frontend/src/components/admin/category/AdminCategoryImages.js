@@ -4,14 +4,14 @@ import ImageEditorTemplate from "../../ui/template/ImageEditorTemplate";
 
 const API_URL = '/api/images';
 
-const AdminBookImages = () => {
+const AdminCategoryImages = () => {
     const {id} = useParams();
     const navigate = useNavigate();
 
     return (
         <ImageEditorTemplate
-            apiEndpoint={`/api/images/category`}
-            existsEndpoint={`/api/category/exists`}
+            endpoint={`/api/images/category`}
+            existsEndpoint={`/api/categories`}
             title={`Category #${id} - Manage Images`}
             description={"Gestisci le immagini della categoria. Puoi caricare nuove immagini trascinandole qui sotto o cliccando sul " +
                 "pulsante di caricamento."}
@@ -28,4 +28,4 @@ const AdminBookImages = () => {
     )
 }
 
-export default AdminBookImages;
+export default AdminCategoryImages;

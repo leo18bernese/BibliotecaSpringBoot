@@ -7,11 +7,13 @@ import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookExists = async (endpoint, id) => {
     if (!id || id <= 0) return false;
-    const {data} = await axios.get(endpoint + `/${id}/exists`);
+    const {data} = await axios.get( `${endpoint}/${id}/exists`);
     return data;
 }
 
 const fetchImageIds = async (endpoint, id) => {
+    console.log("getting images for", `${endpoint}/${id}`);
+
     try {
         const {data} = await axios.get(`${endpoint}/${id}`);
         return data;
@@ -48,7 +50,7 @@ const uploadImageByUrl = async (endpoint, id, imageUrl) => {
 }
 
 const deleteImage = async (endpoint, id, imageIndex) => {
-    const {data} = await axios.delete(`/${endpoint}/${id}/index/${imageIndex}`);
+    const {data} = await axios.delete(`${endpoint}/${id}/index/${imageIndex}`);
     return data;
 };
 

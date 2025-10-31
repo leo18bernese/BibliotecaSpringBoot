@@ -38,9 +38,8 @@ public class ImageService {
         return imageProperties.getCategoriesDir() + "/" + fileName.toString();
     }
 
-
-    public int saveImage(Long productId, MultipartFile[] files) {
-        String finalPath = getCommonImagesPath(productId);
+    public int saveImage(Long productId, String finalPath, MultipartFile[] files) {
+        //String finalPath = getCommonImagesPath(productId);
         int uploadedCount = 0;
 
         try {
@@ -62,6 +61,7 @@ public class ImageService {
                         extension = originalFilename.substring(originalFilename.lastIndexOf("."));
                     }
                     String newFilename = (existingFilesCount + uploadedCount + 1) + extension;
+
                     Path path = Paths.get(finalPath, newFilename);
                     Files.write(path, file.getBytes());
                     uploadedCount++;
@@ -73,8 +73,10 @@ public class ImageService {
         return uploadedCount;
     }
 
-    public void saveImageFromUrl(Long productId, String imageUrl) {
-        String finalPath = getCommonImagesPath(productId);
+    public void saveImageFromUrl(Long productId, String finalPath,String imageUrl) {
+        //String finalPath = getCommonImagesPath(productId);
+
+        //todo fix request for image here because now returns 403 sometimes
 
         try (InputStream in = new URL(imageUrl).openStream()) {
             Path dirPath = Paths.get(finalPath);
