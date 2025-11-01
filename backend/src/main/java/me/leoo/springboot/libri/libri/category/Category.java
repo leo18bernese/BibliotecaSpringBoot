@@ -60,6 +60,10 @@ public class Category {
         return parent != null ? parent.getId() : null;
     }
 
+    public String getParentName() {
+        return parent != null ? parent.getName() : null;
+    }
+
     public void incrementPurchased() {
         this.purchasedCount++;
     }

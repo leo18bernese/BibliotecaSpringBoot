@@ -210,6 +210,7 @@ const AdminBookInventory = () => {
             </div>
 
 
+
             <CreateVariant bookId={id}
                            setShowAddVariantPopup={setShowAddVariantPopup}
                            showAddVariantPopup={showAddVariantPopup}

@@ -71,7 +71,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
                         <div className="relative">
                             <div
                                 className={`w-full rounded-md h-64 
-                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : bookImage ? '' :
+                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : bookImage ? '' : 
                                     'bg-gray-200 flex items-center justify-center'}`}
                                 style={{height: '250px'}}
                             >
@@ -138,7 +138,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                 </div>
 
                                 <button className="bg-blue-100 rounded-full  hover:bg-blue-200 transition-colors">
-                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600'></i>
+                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600' ></i>
                                 </button>
                             </h3>
                         </div>

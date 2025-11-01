@@ -1,7 +1,6 @@
 package me.leoo.springboot.libri.libri.category;
 
 import lombok.RequiredArgsConstructor;
-import me.leoo.springboot.libri.admin.AdminCategoryController;
 import me.leoo.springboot.libri.image.FileImageUtils;
 import me.leoo.springboot.libri.image.ImageService;
 import org.springframework.http.ResponseEntity;
@@ -43,11 +42,6 @@ public class CategoryService {
         return categoryRepository.findSubcategories(id);
     }
 
-    public ResponseEntity<byte[]> getPictureResponse(Long id) {
-        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), null, 0);
-        //return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), imageService.getNotFoundPath(), 0);
-    }
-
     public List<Category> getRootCategories() {
         return categoryRepository.findByParentIsNull();
     }
@@ -60,6 +54,10 @@ public class CategoryService {
     // images
     public List<Path> getCategoryAllImages(Long id) {
         return FileImageUtils.getAllImages(id, imageService.getCategoriesImagesPath(id));
+    }
+
+    public ResponseEntity<byte[]> getPictureResponse(Long id) {
+        return getPictureResponse(id, 0);
     }
 
     public ResponseEntity<byte[]> getPictureResponse(Long id, int index) {

@@ -49,6 +49,7 @@ public class FileImageUtils {
         }
 
         System.out.println("Serving image: " + path);
+
         try {
             return ImageUtils.getImageResponse(path);
         } catch (Exception e) {

@@ -17,11 +17,7 @@ const AdminOrderHome = () => {
                           {key: 'ID', value: 'id', function: (id) => `#${id}`},
                           //{key: 'Utente', value: 'username'},
                           {key: 'Email', value: 'email'},
-                          {
-                              key: 'Data Creazione',
-                              value: 'dataCreazione',
-                              function: (d) => d ? new Date(d).toLocaleString() : '-'
-                          },
+                          {key: 'Data Creazione', value: 'dataCreazione', function: (d) => d ? new Date(d).toLocaleString() : '-'},
                           //{key: 'Data Modifica', value: 'dataModifica', function: (d) => d ? new Date(d).toLocaleString() : '-'},
                           //{key: 'Somma Totale', value: 'sommaTotale', function: (v) => v?.toFixed(2) ?? '-'},
                           {key: 'Prezzo Finale', value: 'prezzoFinale', function: (v) => v?.toFixed(2) ?? '-'},

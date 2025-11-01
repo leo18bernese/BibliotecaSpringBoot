@@ -141,7 +141,7 @@ const AdminOrder = () => {
                         </div>
 
                         {ordine.items.map((item) => (
-                            <AdminOrderItem book={item} key={item.id}/>
+                            <AdminOrderItem book={item}  key={item.id}/>
                         ))}
 
                     </div>

@@ -21,7 +21,7 @@ const OrdineItem = ({book}) => {
 
     const bookId = book?.libroId;
 
-    const {isLoading: isImageLoading, error: imageError} = useQuery({
+    const { isLoading: isImageLoading, error: imageError} = useQuery({
         queryKey: ['bookFirst', bookId],
         queryFn: () => fetchBookImage(bookId),
         enabled: !!bookId, // Only fetch if bookId is available
@@ -31,13 +31,14 @@ const OrdineItem = ({book}) => {
         return <div className="text-red-500">Errore: Dettagli del libro non disponibili.</div>;
     }
 
-    if (isImageLoading) {
+    if(isImageLoading) {
         return <div className="text-gray-500">Loading book details...</div>;
     }
 
-    if (imageError) {
+    if(imageError) {
         return <div className="text-red-500">Error loading book image. Please try again later.</div>;
     }
+
 
 
     return (

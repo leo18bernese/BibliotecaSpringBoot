@@ -28,7 +28,7 @@ public class AdminCategoryController {
                                    Date updatedAt) {
     }
 
-    public record AdminCategoryResponse(Long id, String name, String description, Long parentId,
+    public record AdminCategoryResponse(Long id, String name, String description, Long parentId, String parentName,
                                        Long previousId, Long nextId) {
     }
 
@@ -52,6 +52,7 @@ public class AdminCategoryController {
                     category.getName(),
                     category.getDescription(),
                     category.getParentId(),
+                    category.getParentName(),
                     previousId,
                     nextId
             );

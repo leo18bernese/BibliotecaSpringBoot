@@ -16,7 +16,7 @@ const fetchImageById = async (categoryId) => {
 const LiteCategory = ({categoryID, category: providedCategory}) => {
 
     const navigate = useNavigate();
-    const categoryId = categoryID || (providedCategory?.id);
+    const categoryId =  categoryID || (providedCategory?.id);
 
     const {data: category, isLoading, error} = useQuery({
         queryKey: ['liteCategory', categoryId],
@@ -25,10 +25,10 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
     });
 
     const {data: imageData} = useQuery({
-        queryKey: ['categoryImage', categoryId],
+        queryKey: ['categoryImage',   categoryId ],
         queryFn: () => fetchImageById(categoryId),
         enabled: !!categoryId,
-    });
+    } );
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -48,16 +48,16 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
                      rounded-md transition-shadow duration-300
                       ${!imageData ? '  hover:shadow-xl' : 'hover:shadow-2xl'}`}
                     style={imageData ? {
-                        backgroundImage: `url(/api/categories/${categoryId}/image)`,
+                        backgroundImage: `url(/api/categories/${categoryId}/image)` ,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         minHeight: '12rem',
                         justifyContent: 'center',
                     } : {
-                        backgroundImage: 'linear-gradient(135deg, #e0e0e0 10%, #bdbdbd 100%)',
+                        backgroundImage : 'linear-gradient(135deg, #e0e0e0 10%, #bdbdbd 100%)',
                         justifyContent: 'center',
                     }
-                    }
+                }
 
                     onClick={() => navigate(`/category/${categoryId}`)}
                 >
@@ -76,8 +76,7 @@ const LiteCategory = ({categoryID, category: providedCategory}) => {
                         />
                     )}
                     <div style={{position: 'relative', zIndex: 2, padding: '1rem', width: '100%'}}>
-                        <h3 className="font-bold text-xl mb-5"
-                            style={{color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.7)'}}>{category.name}</h3>
+                        <h3 className="font-bold text-xl mb-5" style={{color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.7)'}}>{category.name}</h3>
                         <p style={{color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.7)'}}>{category.description}</p>
                     </div>
                 </div>

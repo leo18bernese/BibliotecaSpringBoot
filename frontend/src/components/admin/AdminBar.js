@@ -11,7 +11,7 @@ const AdminBar = () => {
 
             <NavLink
                 to={path}
-                className={(location.pathname.startsWith(path) ? "underline" : "")}
+                className={(location.pathname.startsWith(path) ? "underline" : "" )}
                 onClick={() => setShowSidebar(false)}
             >
                 {label}

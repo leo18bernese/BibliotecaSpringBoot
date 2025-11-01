@@ -122,7 +122,7 @@ const CarrelloItem = ({item}) => {
                         <p className="text-gray-700">di {item.autore.nome}</p>
                         <p className="text-gray-700 mb-4">Edizione anno {item.annoPubblicazione}</p>
 
-                        <p className="text-gray-500 text-sm mb-0.5"> Aggiunto al carrello
+                        <p className="text-gray-500 text-sm mb-0.5" > Aggiunto al carrello
                             il: {new Date(item.dataAggiunta).toLocaleString()}</p>
 
                         {item.varianteNome && item.varianteNome.length > 0 && (

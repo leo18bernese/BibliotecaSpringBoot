@@ -99,9 +99,15 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                             <h2 className="text-3xl font-bold mb-2">{category.name}</h2>
 
                             {(user && isAdmin()) && (
-                                <i className='bxr bx-edit text-2xl cursor-pointer'
-                                   onClick={() => navigate('/admin/category/' + id)}
-                                ></i>
+                                <>
+                                    <i className='bxr bx-edit text-2xl cursor-pointer'
+                                       onClick={() => navigate('/admin/category/' + id)}
+                                    ></i>
+
+                                    <i className='bxr bx-image text-2xl cursor-pointer'
+                                       onClick={() => navigate('/admin/category/' + id + '/images')}
+                                    ></i>
+                                </>
                             )}
                         </div>
 

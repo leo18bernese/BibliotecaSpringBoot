@@ -51,12 +51,9 @@ const Footer = () => {
                     <div>
                         <h3 className="font-bold mb-4">Seguici su</h3>
                         <div className="flex space-x-4">
-                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
-                               className="hover:underline">Facebook</a>
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
-                               className="hover:underline">Instagram</a>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
-                               className="hover:underline">LinkedIn</a>
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:underline">Facebook</a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</a>
+                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:underline">LinkedIn</a>
                         </div>
                     </div>
                 </div>

@@ -6,12 +6,12 @@ const CategoryMap = ({map, considerLast = true}) => {
         <div className="mb-8">
             {Object.entries(map).map(([id, name], index) => {
 
-                const last = index === Object.entries(map).length - 1;
+                const last = index === Object.entries(map).length - 1 ;
 
                 return (
                     <Fragment key={id}>
 
-                        {(last && !considerLast) ? <a className="mr-2 inline-block font-bold text-black">{name}</a> :
+                        {(last&& !considerLast) ? <a className="mr-2 inline-block font-bold text-black">{name}</a> :
                             <Link
                                 className={`text-sm mr-2 inline-block text-gray-700 underline hover:text-blue-700`}
                                 to={`/category/${id}`}
