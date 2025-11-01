@@ -45,7 +45,7 @@ const LiteCategory2 = ({categoryID, category: providedCategory}) => {
             >
 
                 <img src={`/api/categories/${categoryId}/image`}
-                    className="w-full h-48 object-cover "
+                    className="w-full h-48 object-cover mb-4 "
                     alt={category.name}
                 />
 

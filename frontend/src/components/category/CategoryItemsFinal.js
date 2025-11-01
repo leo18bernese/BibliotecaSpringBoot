@@ -3,7 +3,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import CategoryMap from "./CategoryMap";
 import LiteCategory2 from "./LiteCategory2";
-import LiteBook from "../libri/lite/LiteBook";
 import CategorySearchPage from "../libri/search/CategorySearchPage";
 import {useContext} from "react";
 import {UserContext} from "../user/UserContext";
@@ -126,7 +125,6 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                                     }
                                 )}
                             </div>
-
                         </div>
                     )}
 
@@ -134,26 +132,6 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                         <CategorySearchPage categoryId={id} hideCategoryTitle={true}/>
                     )}
 
-                    {hasItems && (
-                        <div className=" py-2">
-
-                            <div className="text-lg font-semibold  mb-2  text-gray-700 inline-block pr-5 ">
-                                Items
-                            </div>
-
-                            <div
-                                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ml-2">
-                                {items.map(item => (
-                                    <div key={item.id}
-                                         className={"hover:shadow-lg transition-all cursor-pointer bg-gray-100"}
-                                         onClick={() => navigate(`/book/${item.id}`)}>
-
-                                        <LiteBook bookID={item.id}/>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
 

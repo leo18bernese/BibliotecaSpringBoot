@@ -1,13 +1,14 @@
 import React from 'react';
 import SearchPageTemplate from "./SearchPageTemplate";
 
-function SearchPage({categoryId}) {
+function CategorySearchPage({categoryId}) {
 
     return (
         <SearchPageTemplate
             initSearchParams={new URLSearchParams(`categoriaId=${categoryId}`)}
+            enableSearchBar={false}
         />
     );
 }
 
-export default SearchPage;
+export default CategorySearchPage;

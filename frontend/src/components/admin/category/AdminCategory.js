@@ -61,14 +61,20 @@ const AdminCategory = () => {
 
     const [subCategories, setSubCategories] = useState([]);
 
+    const getCategoryName = (catId) => {
+        if (!categoryList) return '';
+
+        return categoryList.find(c => c.id === catId) ? category.name : '';
+    }
+
     // Inizializza gli stati quando category è disponibile
     useEffect(() => {
         if (category) {
             setName(category.name || '');
             setDescription(category.description || '');
 
-            setParentId(category.parent ? category.parent.id : null);
-            setParentName(category.parent ? category.parent.name : '');
+            setParentId(category.parentId);
+            setParentName(category.parentName);
 
             if (categoryList) {
 
@@ -147,16 +153,18 @@ const AdminCategory = () => {
         <div className="container mx-auto p-4">
 
             <div className="flex justify-between items-center mb-8">
-                { prevCategoryId &&
-                <Link to={`/admin/category/${prevCategoryId}`} className="text-blue-500 hover:underline font-semibold">
-                    ← Previous Category #{prevCategoryId}
-                </Link>
+                {prevCategoryId &&
+                    <Link to={`/admin/category/${prevCategoryId}`}
+                          className="text-blue-500 hover:underline font-semibold">
+                        ← Previous Category #{prevCategoryId}
+                    </Link>
                 }
 
                 {nextCategoryId &&
-                <Link to={`/admin/category/${nextCategoryId}`} className="text-blue-500 hover:underline font-semibold">
-                    Next Category #{nextCategoryId} →
-                </Link>
+                    <Link to={`/admin/category/${nextCategoryId}`}
+                          className="text-blue-500 hover:underline font-semibold">
+                        Next Category #{nextCategoryId} →
+                    </Link>
                 }
             </div>
 
@@ -167,30 +175,39 @@ const AdminCategory = () => {
             </p>
 
             <div className="mt-8 pl-4">
-                <h2 className="text-md font-semibold">Parent of categories</h2>
+                <h2 className="text-md font-semibold">Category Relationships</h2>
 
-                <p className="text-sm text-gray-500">
-                    Current Parent
-                    Category: {category.parent ? `${category.parent.name} (#${category.parent.id})` : 'None'}
-                </p>
+                <div className="pl-4">
+                    <p className="text-sm text-gray-500 mb-1 ">
+                        Current Parent:
+                    </p>
 
-                <p className="text-sm text-gray-500 mt-2">
-                    Subcategories:
-                </p>
+                    {parentId ? (
+                        <Link to={`/admin/category/${parentId}`} className="hover:underline pl-4">
+                            {parentName} (#{parentId})
+                        </Link>
+                    ) : (
+                        <p className="text-sm text-gray-500 pl-4">No parent category.</p>
+                    )}
 
-                {subCategories.length > 0 ? (
-                    <ul className="list-disc list-inside">
-                        {subCategories.map((subCat) => (
-                            <li key={subCat.id}>
-                                <Link to={`/admin/category/${subCat.id}`} className="hover:underline">
-                                {subCat.name} (#{subCat.id})
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-sm text-gray-500 pl-4">No subcategories.</p>
-                )}
+                    <p className="text-sm text-gray-500 mt-6 mb-1">
+                        Subcategories:
+                    </p>
+
+                    {subCategories.length > 0 ? (
+                        <ul className="list-disc list-inside pl-4">
+                            {subCategories.map((subCat) => (
+                                <li key={subCat.id}>
+                                    <Link to={`/admin/category/${subCat.id}`} className="hover:underline">
+                                        {subCat.name} (#{subCat.id})
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-500 pl-4">No subcategories.</p>
+                    )}
+                </div>
             </div>
 
             <div className="mt-8 pl-4">
@@ -229,7 +246,7 @@ const AdminCategory = () => {
                                            if (!catName) return true; // Campo vuoto è valido (nessun genitore)
 
                                            // Se il nome corrisponde a una categoria esistente, è valido
-                                           if (categoryList && categoryList.some(cat => cat.name === catName )) {
+                                           if (categoryList && categoryList.some(cat => cat.name === catName)) {
                                                return true;
                                            }
 
@@ -266,7 +283,7 @@ const AdminCategory = () => {
                             }
                         }}
                         className="bg-red-300 hover:bg-red-400 text-red-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
-                        >
+                    >
                         Delete Category
                     </button>
                 </div>

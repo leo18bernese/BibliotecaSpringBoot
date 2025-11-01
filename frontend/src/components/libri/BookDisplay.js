@@ -7,7 +7,7 @@ function BookDisplay({idList, contentList, isLoading, error, gridCss}) {
     const list = idList || contentList;
     const {user} = useContext(UserContext);
 
-    const gridClass = gridCss || "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-8 ";
+    const gridClass = gridCss || "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 ";
 
     const {addEventMutation} = useAnalyticsMutation();
 

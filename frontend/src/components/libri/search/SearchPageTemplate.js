@@ -4,7 +4,10 @@ import axios from 'axios';
 import MetadataDisplay from "./MetadataDisplay";
 import BookDisplay from "../BookDisplay";
 
-function SearchPageTemplate({initSearchParams, endpoint = '/api/libri/ricerca'}) {
+function SearchPageTemplate({
+                                initSearchParams, endpoint = '/api/libri/ricerca',
+                                enableSearchBar = true
+                            }) {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -156,7 +159,6 @@ function SearchPageTemplate({initSearchParams, endpoint = '/api/libri/ricerca'})
 
     return (
         <div className="flex items-start">
-            {/* Sidebar dei Filtri */}
             <div className="w-1/4 p-5 mr-4 bg-white self-start">
                 <h2 className="font-semibold text-xl text-gray-700">FILTRI</h2>
 
@@ -251,17 +253,18 @@ function SearchPageTemplate({initSearchParams, endpoint = '/api/libri/ricerca'})
                 )}
             </div>
 
-            {/* Area Principale dei Risultati */}
             <div className="w-3/4 px-5">
 
-                <input
-                    type="text"
-                    placeholder="Cerca per titolo o descrizione..."
-                    defaultValue={searchParams.get('q') || ''}
-                    onBlur={(e) => handleFilterChange('q', e.target.value)}
-                    onKeyDown={(e) => handleEnterKey(e, 'q')}
-                    style={{width: '100%', padding: '10px', marginBottom: '20px'}}
-                />
+                {enableSearchBar && (
+                    <input
+                        type="text"
+                        placeholder="Cerca per titolo o descrizione..."
+                        defaultValue={searchParams.get('q') || ''}
+                        onBlur={(e) => handleFilterChange('q', e.target.value)}
+                        onKeyDown={(e) => handleEnterKey(e, 'q')}
+                        style={{width: '100%', padding: '10px', marginBottom: '20px'}}
+                    />
+                )}
 
                 {/*<h2 className="text-lg  mb-4">
                     Risultati per la ricerca: <span
