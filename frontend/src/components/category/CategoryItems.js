@@ -126,7 +126,7 @@ const CategoryItems = ({categoryID, isParent, current}) => {
                             </div>
                         )}
 
-                     
+
                         {hasItems && (
                             <div className=" py-2">
 

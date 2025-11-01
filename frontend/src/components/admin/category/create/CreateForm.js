@@ -33,12 +33,12 @@ const CreateForm = ({
     const handleChange = (e) => {
         const {name, value} = e.target;
 
-        console.log("Handle Change:", name, value );
-        console.log("Before New Data:", newData );
+        console.log("Handle Change:", name, value);
+        console.log("Before New Data:", newData);
 
         setNewData(prev => ({...prev, [name]: value}));
 
-        console.log("After New Data:", newData );
+        console.log("After New Data:", newData);
         if (errors[name]) {
             setErrors(prev => ({...prev, [name]: null}));
         }
@@ -58,12 +58,12 @@ const CreateForm = ({
         // Basic validation
         const validationErrors = {};
 
-        console.log("Data:", data );
-        console.log("New Data:", newData );
+        console.log("Data:", data);
+        console.log("New Data:", newData);
 
         data.forEach(([id, , , missingErrorMessage]) => {
 
-console.log("data id:", id, "value:", newData[id] );
+            console.log("data id:", id, "value:", newData[id]);
 
             if (!newData[id] || newData[id].toString().trim() === '') {
 
@@ -148,8 +148,7 @@ console.log("data id:", id, "value:", newData[id] );
                     </div>
 
 
-
-                            <div className="flex gap-3 mt-6">
+                    <div className="flex gap-3 mt-6">
                         <button
                             className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded transition-colors"
                             onClick={() => {

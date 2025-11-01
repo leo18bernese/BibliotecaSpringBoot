@@ -7,7 +7,7 @@ import {usePageTitle} from "../../utils/usePageTitle";
 
 const fetchBookExists = async (endpoint, id) => {
     if (!id || id <= 0) return false;
-    const {data} = await axios.get( `${endpoint}/${id}/exists`);
+    const {data} = await axios.get(`${endpoint}/${id}/exists`);
     return data;
 }
 

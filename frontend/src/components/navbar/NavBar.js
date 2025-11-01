@@ -38,13 +38,13 @@ const NavBar = () => {
         }
     };
 
-    const getLinkClass = (path,   name, otherPaths, condition = true, separator = false) => {
+    const getLinkClass = (path, name, otherPaths, condition = true, separator = false) => {
         if (!condition) return null;
 
         const paths = otherPaths ? [path, ...otherPaths] : [path];
         const isActive = paths.some(p => location.pathname === p || location.pathname.startsWith(p + '/'));
 
-        return  (
+        return (
             <div className="hidden md:block   " key={name}>
                 {separator && <span className="mx-2 text-gray-800">|</span>}
 
@@ -76,7 +76,7 @@ const NavBar = () => {
                     {getLinkClass('/prodotti', 'Prodotti')}
                     {getLinkClass('/categories', 'Categorie', ['/category'])}
                     {getLinkClass('/contatti', 'Contatti')}
-                    {getLinkClass('/admin', 'Admin',null, user && user.ruoli.includes('ROLE_ADMIN'), true)}
+                    {getLinkClass('/admin', 'Admin', null, user && user.ruoli.includes('ROLE_ADMIN'), true)}
                 </ul>
 
                 {/* Right side - Search bar and user/cart links */}
@@ -98,18 +98,18 @@ const NavBar = () => {
                                 to="/account"
                                 className={`border-2 p-2 rounded-md transition-colors 
                                     ${location.pathname.startsWith('/account')
-                                        ? 'border-gray-500 bg-gray-300  font-semibold'
-                                        : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
+                                    ? 'border-gray-500 bg-gray-300  font-semibold'
+                                    : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
                                 `}
                             >
                                 {user.username}
                             </Link>
                         ) : (
                             <Link to="/login" state={{from: location}}
-                                    className={`border-2 p-2 rounded-md transition-colors
+                                  className={`border-2 p-2 rounded-md transition-colors
                                     ${location.pathname === '/login'
-                                        ? 'border-gray-500 bg-gray-300 font-semibold'
-                                        : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
+                                      ? 'border-gray-500 bg-gray-300 font-semibold'
+                                      : 'border-transparent hover:border-gray-500 hover:bg-gray-300'}
                                 `}>
                                 Login
                             </Link>

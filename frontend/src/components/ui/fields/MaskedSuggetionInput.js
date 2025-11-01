@@ -43,7 +43,7 @@ const MaskedSuggestionInput = ({
     const setBlur = () => {
         setEditing(false);
 
-        if(!requirement(value)) {
+        if (!requirement(value)) {
             setWarning(`You must choose an option from the list or leave the field empty.`);
         } else {
             setWarning(null);
@@ -95,7 +95,9 @@ const MaskedSuggestionInput = ({
                     onFocus={() => setEditing(true)}
                     onBlur={() => {
 
-                        setTimeout(() => {setBlur()}, 150);
+                        setTimeout(() => {
+                            setBlur()
+                        }, 150);
 
                         // Ritarda la perdita del focus per permettere il click sul suggerimento
                     }}

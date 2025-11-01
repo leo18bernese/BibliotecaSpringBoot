@@ -1,5 +1,4 @@
-import React, {useContext} from "react";
-import {UserContext} from "../user/UserContext";
+import React from "react";
 import LiteCategory from "./LiteCategory";
 
 function CategoryDisplay({idList, contentList, isLoading, error, gridCss}) {
