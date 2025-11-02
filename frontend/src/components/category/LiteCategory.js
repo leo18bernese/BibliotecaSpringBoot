@@ -8,7 +8,9 @@ const fetchCategoryById = async (categoryId) => {
 }
 
 const fetchImageById = async (categoryId) => {
-    const {data} = await axios.get(`/api/categories/${categoryId}/image`);
+    const {data} = await axios.get(`/api/categories/${categoryId}/image`, {
+        params: { nullIfNotFound: true }
+    });
     return data;
 }
 

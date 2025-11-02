@@ -56,11 +56,13 @@ public class CategoryService {
         return FileImageUtils.getAllImages(id, imageService.getCategoriesImagesPath(id));
     }
 
-    public ResponseEntity<byte[]> getPictureResponse(Long id) {
-        return getPictureResponse(id, 0);
+    public ResponseEntity<byte[]> getPictureResponse(Long id, boolean nullIfNotFound) {
+        return getPictureResponse(id, 0, nullIfNotFound);
     }
 
-    public ResponseEntity<byte[]> getPictureResponse(Long id, int index) {
-        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id), imageService.getNotFoundPath(), index);
+    public ResponseEntity<byte[]> getPictureResponse(Long id, int index, boolean nullIfNotFound) {
+        return FileImageUtils.getPictureResponse(id, imageService.getCategoriesImagesPath(id),
+                nullIfNotFound ? null : imageService.getNotFoundPath(),
+                index);
     }
 }

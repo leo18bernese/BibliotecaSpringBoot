@@ -45,7 +45,9 @@ public class SearchService {
 
         System.out.println("found " + risultatiLibri.getTotalElements() + " "  + libriResponse.getTotalElements() + " books");
 
-        Map<String, List<FiltroOpzione>> filtriDisponibili = calcolaFiltriDinamici(filtriMultipli);
+        Map<String, List<FiltroOpzione>> filtriDisponibili = calcolaFiltriDinamici(q, categoriaId, prezzoMin, prezzoMax, filtriMultipli);
+
+        System.out.println("calculated " + filtriDisponibili.size() + " filters");
 
         return new RicercaLibriResponse(libriResponse, filtriDisponibili, filtriMultipli);
     }
@@ -175,7 +177,7 @@ public class SearchService {
         };
     }
 
-    private Map<String, List<FiltroOpzione>> calcolaFiltriDinamici(Map<String, List<String>> filtriAttivi) {
+    private Map<String, List<FiltroOpzione>> calcolaFiltriDinamici(String q, Long categoriaId, Double prezzoMin, Double prezzoMax, Map<String, List<String>> filtriAttivi) {
         Map<String, List<FiltroOpzione>> filtri = new HashMap<>();
 
         Map<String, CaratteristicaOpzione> metadatiMap = caratteristicheRepository.findAll().stream()
@@ -185,9 +187,13 @@ public class SearchService {
                 ));
 
         System.out.println("got " + metadatiMap.size() + " metadati");
+        System.out.println(metadatiMap.entrySet().stream().map( e -> e.getKey() + " -> " + e.getValue().getMetadata())
+                .collect(Collectors.toList()));
 
         // Prima ottieni tutte le attributi disponibili dinamicamente
         Set<String> caratteristicheDisponibili = ottieniCaratteristicheDisponibili();
+
+        System.out.println("found " + caratteristicheDisponibili.size() + " dynamic characteristics: " + caratteristicheDisponibili);
 
         // Aggiungi i campi diretti del Libro
         caratteristicheDisponibili.addAll(Arrays.asList("genere", "annoPubblicazione", "numeroPagine", "lingua"));
@@ -200,17 +206,24 @@ public class SearchService {
             // Rimuovi temporaneamente i filtri per questa caratteristica per vedere tutte le opzioni
             filtriParziali.remove(caratteristicaNome);
 
-            Specification<Libro> specParziale = buildLibroSpecificationMultiple(null, 0L,  null, null, filtriParziali);
+            System.out.println("alculatying " + caratteristicaNome);
+
+            Specification<Libro> specParziale = buildLibroSpecificationMultiple(q, categoriaId, prezzoMin, prezzoMax, filtriParziali);
 
             List<FiltroOpzione> opzioni;
 
             if (isDirectLibroField(caratteristicaNome)) {
+                System.out.println("calculating direct field " );
                 opzioni = calcolaFiltriCampiDiretti(caratteristicaNome, specParziale, filtriAttivi, cb);
             } else {
+                System.out.println("calculating dynamic field " );
                 opzioni = calcolaFiltriCaratteristiche(caratteristicaNome, specParziale, filtriAttivi, metadatiMap, cb);
             }
 
+            System.out.println("A calculated " + opzioni.size() + " options for " + caratteristicaNome);
+
             if (!opzioni.isEmpty()) {
+                System.out.println("B calculated " + opzioni.size() + " options for " + caratteristicaNome);
                 filtri.put(caratteristicaNome, opzioni);
             }
         }
@@ -265,6 +278,8 @@ public class SearchService {
                                                              CriteriaBuilder cb) {
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
         Root<Libro> root = cq.from(Libro.class);
+
+        System.out.println("root " + root);
 
         // Path per gli attributi della descrizione
         Join<Libro, LibroInfo> descrizioneJoin = root.join("descrizione", JoinType.LEFT);

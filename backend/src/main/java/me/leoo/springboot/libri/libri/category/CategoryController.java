@@ -118,9 +118,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}/image")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long categoryId) {
+    public ResponseEntity<byte[]> getImage(@PathVariable Long categoryId,
+                                           @RequestParam(required = false) boolean nullIfNotFound) {
+
+        System.out.println("Fetching image for category ID: " + categoryId + " with nullIfNotFound=" + nullIfNotFound);
+
         try {
-            return categoryService.getPictureResponse(categoryId);
+            return categoryService.getPictureResponse(categoryId,nullIfNotFound);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -104,7 +104,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                         e.stopPropagation();
                                         hasWishlisted ? removeFromWishlist(bookId) : addToWishlist(bookId);
                                     }}
-                                    className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md shadow-gray-500 hover:bg-gray-50 transition-colors"
+                                    className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md shadow-gray-500 hover:bg-gray-200 transition-colors"
                                 >
                                     <i className={`${hasWishlisted ? 'bxs-heart text-red-600' : 'bx-heart text-gray-500'} bx text-lg`}></i>
                                 </button>

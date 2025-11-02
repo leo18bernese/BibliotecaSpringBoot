@@ -148,7 +148,7 @@ public class ImageController {
     @GetMapping("/category/{categoryId}/index/{index}")
     public ResponseEntity<byte[]> getCategoryImage(@PathVariable Long categoryId, @PathVariable int index) {
         try {
-            return categoryService.getPictureResponse(categoryId, index);
+            return categoryService.getPictureResponse(categoryId, index, false);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
