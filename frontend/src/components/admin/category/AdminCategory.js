@@ -6,6 +6,7 @@ import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import MaskedSuggestionInput from "../../ui/fields/MaskedSuggetionInput";
 import {usePageTitle} from "../../utils/usePageTitle";
+import CreateForm from "./create/CreateForm";
 
 const fetchCategoryById = async (id) => {
     const {data} = await axios.get(`/api/admin/category/${id}`);
@@ -60,12 +61,6 @@ const AdminCategory = () => {
     });
 
     const [subCategories, setSubCategories] = useState([]);
-
-    const getCategoryName = (catId) => {
-        if (!categoryList) return '';
-
-        return categoryList.find(c => c.id === catId) ? category.name : '';
-    }
 
     // Inizializza gli stati quando category è disponibile
     useEffect(() => {
@@ -174,8 +169,33 @@ const AdminCategory = () => {
                 You can edit the category details, such as name and description.
             </p>
 
-            <div className="mt-8 pl-4">
-                <h2 className="text-md font-semibold">Category Relationships</h2>
+                <div className="mt-4 flex space-x-2">
+                    <Link to={`/category/${id}`}
+                          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                          target="_blank" rel="noopener noreferrer">
+                        View Category
+                    </Link>
+                    <Link to={`/admin/category/${id}/images`}
+                          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Manage Images
+                    </Link>
+                    <CreateForm
+                        endpoint={`/api/admin/category`}
+                        showAddMessage={"Create Sub-category"}
+                        addMessage={"Create New Sub-category"}
+                        data={[
+                            ['name', 'Category Name', '', 'Name is required', false, 'text'],
+                            ['description', 'Category Description', '', 'Description is required', false, 'text'],
+                            ['parentId', 'Parent ID', id, null, true, 'number', true]
+                        ]}
+                        buttonClassName="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                        Create Sub-category
+                    </CreateForm>
+                </div>
+
+            <div className="mt-8 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <h2 className="text-lg font-semibold mb-4 text-gray-800">Category Relationships</h2>
 
                 <div className="pl-4">
                     <p className="text-sm text-gray-500 mb-1 ">
@@ -205,7 +225,7 @@ const AdminCategory = () => {
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-sm text-gray-500 pl-4">No subcategories.</p>
+                        <p className="text-sm text-gray-500">This category has no subcategories.</p>
                     )}
                 </div>
             </div>

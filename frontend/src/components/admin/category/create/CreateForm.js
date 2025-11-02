@@ -14,6 +14,8 @@ const CreateForm = ({
                         addMessage = "Add New Item",
                         abortMessage = "Cancel",
                         confirmMessage = "Add Item",
+                        buttonClassName,
+                        children
                     }) => {
 
     const queryClient = useQueryClient();
@@ -93,17 +95,22 @@ console.log("data id:", id, "value:", newData[id] );
         }
     }
 
+    const defaultButtonClassName = "flex items-center border-2 border-green-500 px-4 py-3 rounded-md " +
+        "bg-green-100 hover:bg-green-200 w-1/3 transition";
+
     return <>
         <button
-            className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
-                 bg-green-100 hover:bg-green-200 w-1/3 transition"
+            className={buttonClassName || defaultButtonClassName}
             onClick={() => setShowPopup(true)}
         >
-
-            <i className='bx bx-plus-circle text-2xl text-green-600'></i>
-            <span className="ml-2 font-semibold text-green-700">
-                {showAddMessage}
-            </span>
+            {children || (
+                <>
+                    <i className='bx bx-plus-circle text-2xl text-green-600'></i>
+                    <span className="ml-2 font-semibold text-green-700">
+                        {showAddMessage}
+                    </span>
+                </>
+            )}
         </button>
 
         {showPopup && (
@@ -127,29 +134,32 @@ console.log("data id:", id, "value:", newData[id] );
 
 
                     <div className="space-y-4">
-                        {data.map(([id, name, , , nullable, type]) =>
-                            <div key={id}>
-                                <label className="block text-sm font-medium text-gray-700">{name}</label>
-                                <input
-                                    type={type || 'text'}
-                                    name={id}
-                                    value={newData[id] || ''}
-                                    onChange={handleChange}
-                                    required={!nullable}
-                                    className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors[id] ? 'border-red-500' : ''}`}
-                                    ref={node => {
-                                        if (errors[id]) errorRef.current = node;
-                                    }}
-                                />
+                        {data.map(([id, name, , , nullable, type, hidden]) => {
+                            return (
+                                <div key={id}>
+                                    <label className="block text-sm font-medium text-gray-700">{name}</label>
+                                    <input
+                                        type={type || 'text'}
+                                        name={id}
+                                        value={newData[id] || ''}
+                                        onChange={handleChange}
+                                        required={!nullable}
+                                        disabled={hidden}
+                                        className={`mt-1 block w-full border-2 border-gray-200 rounded-md shadow-sm p-2 ${errors[id] ? 'border-red-500' : ''} ${hidden ? 'bg-gray-100' : ''}`}
+                                        ref={node => {
+                                            if (errors[id]) errorRef.current = node;
+                                        }}
+                                    />
 
-                                {errors[id] && <p className="text-red-500 text-sm">{errors[id]}</p>}
-                            </div>
-                        )}
+                                    {errors[id] && <p className="text-red-500 text-sm">{errors[id]}</p>}
+                                </div>
+                            );
+                        })}
                     </div>
 
 
 
-                            <div className="flex gap-3 mt-6">
+                    <div className="flex gap-3 mt-6">
                         <button
                             className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded transition-colors"
                             onClick={() => {

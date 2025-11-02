@@ -79,7 +79,7 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
 
             <div>
 
-                <CategoryMap map={category.categoryMap} considerLast={false}/>
+                <CategoryMap map={category.categoryMap} considerLast={false} backToCategories={!category.parentId}/>
 
                 {categoryID ? (
                     <div className="text-2xl font-semibold cursor-pointer mb-4 flex flex-row items-center">
