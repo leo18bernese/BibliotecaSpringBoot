@@ -203,23 +203,26 @@ function SearchPageTemplate({
                         {availableCharacteristicTypes.map(type => (
 
                             <div key={type} className="border-t border-gray-200 py-2">
-                                <div className="flex items-center justify-between"
+
+                                <div className="flex items-center justify-between hover:cursor-pointer"
                                      onClick={() => setShownFilters(prev => ({...prev, [type]: !prev[type]}))}
                                 >
 
                                     <div
                                         className="text-lg font-semibold text-gray-500">{type.charAt(0).toUpperCase() + type.slice(1)}</div>
 
-                                    <button
+                                    <span
                                         className="text-gray-700 focus:outline-none"
                                         aria-label={shownFilters[type] ? "Collapse filter options" : "Expand filter options"}
                                     >
+
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                                              viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                                   d={shownFilters[type] ? "M18 12H6" : "M12 6v12m6-6H6"}/>
                                         </svg>
-                                    </button>
+
+                                    </span>
                                 </div>
 
                                 {shownFilters[type] && (

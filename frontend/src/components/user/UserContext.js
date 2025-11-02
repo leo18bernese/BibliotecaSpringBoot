@@ -6,6 +6,7 @@ export const UserContext = createContext();
 
 export const UserProvider = ({children}) => {
     const [user, setUser] = useState(null);
+    const [adminMode, setAdminMode] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchAndSetUser = async (jwtToken) => {
@@ -72,6 +73,16 @@ export const UserProvider = ({children}) => {
 
     const isAdmin = () => hasRole('ROLE_ADMIN');
 
+    const isAdminMode = () => {
+        return isAdmin() && adminMode;
+    }
+
+    const toggleAdminMode = () => {
+        if (isAdmin()) {
+            setAdminMode(!adminMode);
+        }
+    }
+
     const authContextValue = {
         user,
         setUser,
@@ -79,7 +90,10 @@ export const UserProvider = ({children}) => {
         fetchAndSetUser,
         logout,
         hasRole,
-        isAdmin, // Espone la funzione isAdmin
+
+        isAdmin,
+        isAdminMode,
+        toggleAdminMode,
     };
 
     if (isLoading) {

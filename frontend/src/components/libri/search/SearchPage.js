@@ -5,7 +5,9 @@ function SearchPage() {
 
     return (
         <div className="container mx-auto py-12">
-        <SearchPageTemplate/>
+            <SearchPageTemplate
+                enableSearchBar={false}
+            />
         </div>
     );
 }

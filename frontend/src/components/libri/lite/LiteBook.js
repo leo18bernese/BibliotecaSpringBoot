@@ -26,7 +26,7 @@ const fetchBookImage = async (id) => {
 
 const LiteBook = ({bookID, book: providedBook}) => {
 
-    const user = useContext(UserContext);
+    const {user, isAdmin, isAdminMode} = useContext(UserContext);
     const bookId = bookID || providedBook?.libroId;
 
     const {data: parsedBook, isLoading: isBookLoading, error: bookError} = useQuery({
@@ -95,6 +95,18 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                     className="absolute top-2 left-2 bg-red-600 text-white px-4 py-2 rounded-md font-semibold">
                                     -{sconto.percentuale > 0 ? `${sconto.percentuale}%` : `${sconto.valore}€`}
                                 </div>
+                            )}
+
+                            {user && isAdminMode() && (
+                                <Link to={`/admin/book/${bookId}`}>
+                                    <div
+                                        className="absolute bottom-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded-md font-semibold
+                                        hover:bg-yellow-600 transition-colors"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <i className='bx bx-edit-alt text-xl'></i>
+                                    </div>
+                                </Link>
                             )}
 
                             {user && (
