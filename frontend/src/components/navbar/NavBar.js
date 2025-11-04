@@ -71,7 +71,8 @@ const NavBar = () => {
             <div className="container mx-auto  px-4 py-3 ">
 
                 <div className="flex flex-col space-y-3 md:space-y-4 ">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
+                    <div className="flex flex-row justify-between items-center">
+
                         <div className="text-lg md:text-2xl font-bold text-gray-700">
                             <Link to="/">Dani Commerce</Link>
                         </div>
@@ -141,7 +142,7 @@ const NavBar = () => {
                         </div>
                     </div>
 
-                    <div className="w-1/3 mx-auto flex flex-row ">
+                    <div className="md:w-1/3 mx-auto flex flex-row ">
                         <input
                             type="text"
                             placeholder={"Cerca..."}

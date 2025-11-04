@@ -122,7 +122,7 @@ const CategoryItemsFinal = ({categoryID, isParent, current}) => {
                     {hasSubcategories && (
                         <div className=" py-4">
 
-                            <div className="grid grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-6 ml-2">
+                            <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-3 md:gap-6 ml-2">
                                 {subcategories.map(subcat => {
 
                                         return (

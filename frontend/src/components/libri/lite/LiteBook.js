@@ -64,8 +64,8 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
     return (
         <>
-            <div className="bg-white shadow-lg rounded-2xl mb-4 flex flex-col h-full">
-                <div className="flex flex-col flex-grow">
+            <div className="bg-white shadow-lg rounded-2xl flex flex-col h-full">
+                <div className="flex md:flex-col flex-grow">
 
                     <Link to={`/book/${bookId}`}>
                         <div className="relative">

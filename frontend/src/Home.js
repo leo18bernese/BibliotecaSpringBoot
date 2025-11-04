@@ -34,6 +34,22 @@ export default function Home() {
         staleTime: Infinity, // Impedisce il refetch automatico
     });
 
+    const getTitle = (title, path) => {
+        return (
+            <div className="flex justify-between items-center pt-10 pb-6 px-4 md:px-0">
+
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800 py-2 pr-4 md:pr-16 inline-block border-b-4 border-gray-800">
+                    {title}
+                </h3>
+
+                <Link className="text-lg font-bold text-blue-500  hover:underline " to={path}>
+                    View All >
+                </Link>
+
+            </div>
+        )
+    }
+
     return (
         <div className=" container mx-auto">
 
@@ -51,16 +67,7 @@ export default function Home() {
             <HomepageSellers/>
 
             {/* Categorie */}
-            <div className="flex justify-between items-center pt-10 pb-6">
-
-                <h3 className="text-2xl  font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Featured
-                    Categories</h3>
-
-                <Link className="text-lg font-bold text-blue-500  hover:underline" to="/categories">
-                    View All >
-                </Link>
-
-            </div>
+            {getTitle("Featured Categories", "/categories")}
 
             <CategoryDisplay idList={homepageCategories} isLoading={isLoading} error={error}
                              gridCss={"grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-8 px-4 md:px-0"}
@@ -68,19 +75,10 @@ export default function Home() {
 
 
             {/* Prodotti */}
-            <div className="flex justify-between items-center pt-10 pb-6">
-
-                <h3 className="text-2xl  font-bold text-gray-800 py-2 pr-16  inline-block border-b-4 border-gray-800">Products
-                    for you</h3>
-
-                <Link className="text-lg font-bold text-blue-500  hover:underline" to="/ricerca">
-                    View All >
-                </Link>
-
-            </div>
+            {getTitle("Products for you", "/ricerca")}
 
             <BookDisplay idList={homepageIds} isLoading={isLoading} error={error}
-                         gridCss={"grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-8 px-4 md:px-0"}
+                         gridCss={"grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-8 px-4 md:px-0"}
             />
 
         </div>
