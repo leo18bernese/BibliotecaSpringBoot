@@ -19,6 +19,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findByParentIsNull();
 
+    List<Category> findByParent_Id(Long parentId);
+
     // find the previous category id (with the highest id less than the given id)
     @Query("SELECT c.id FROM Category c WHERE c.id < :id ORDER BY c.id DESC LIMIT 1")
     Long findPreviousCategory(@Param("id") Long id);
@@ -26,6 +28,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c.id FROM Category c WHERE c.id > :id ORDER BY c.id ASC LIMIT 1")
     Long findNextCategory(@Param("id") Long id);
 }
+
 
 
 

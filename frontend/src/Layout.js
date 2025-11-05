@@ -1,9 +1,8 @@
-import React, {useContext} from 'react';
-import {BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation, useParams} from "react-router-dom";
-import {UserContext, UserProvider} from './components/user/UserContext';
+import React from 'react';
+import {Navigate, Route, Routes, useLocation, useParams} from "react-router-dom";
+import {UserProvider} from './components/user/UserContext';
 import {CartProvider} from "./components/carrello/CartContext";
 import {AuthProvider} from "./components/user/AuthContext";
-import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query';
 import ScrollToTop from "./components/utils/ScrollToTop";
 import {Toaster} from "react-hot-toast";
 import NavBar from "./components/navbar/NavBar";
@@ -81,6 +80,7 @@ export default function Layout() {
                                 <Routes>
                                     <Route path="/" element={<Home/>}/>
                                     <Route path="/ricerca" element={<SearchPage/>}/>
+                                    <Route path="/prodotti" element={<Navigate to="/ricerca" replace/>}/>
 
                                     <Route path="/book/:id" element={<BookInfo/>}/>
                                     <Route path="/libri/:id" element={<RedirectToBook/>}/>
@@ -98,7 +98,9 @@ export default function Layout() {
                                         <Route path="/ordine/:id/reso/nuovo" element={<NuovoReso/>}/>
                                         <Route path="/reso/:id" element={<Reso/>}/>
                                         <Route path="/reso/:id/chat" element={<ResoChat/>}/>
+
                                         <Route path="/account/*" element={<AccountInfo/>}>
+
                                             <Route index element={<Navigate to="personal-details" replace/>}/>
                                             <Route path="personal-details" element={<PersonalDetails/>}/>
                                             <Route path="personal-details/edit" element={<PersonalDetailsEdit/>}/>

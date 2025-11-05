@@ -159,7 +159,7 @@ function SearchPageTemplate({
 
     return (
         <div className="flex items-start">
-            <div className="hidden md:w-1/4 p-5 mr-4 bg-white self-start">
+            <div className="hidden md:block md:w-1/4 p-5 mr-4 bg-white self-start">
                 <h2 className="font-semibold text-xl text-gray-700">FILTRI</h2>
 
                 {loadingResults && Object.keys(stableFilters).length === 0 && <p>Caricamento filtri...</p>}

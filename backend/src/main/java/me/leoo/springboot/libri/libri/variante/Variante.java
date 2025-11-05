@@ -31,6 +31,7 @@ public class Variante implements Cloneable {
     @JsonIgnore
     private Libro libro;
 
+    private boolean aggregable = true;
     private String nome;
 
     @OneToOne(cascade = CascadeType.ALL)

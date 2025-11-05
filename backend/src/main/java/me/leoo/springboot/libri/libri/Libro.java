@@ -14,6 +14,7 @@ import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import me.leoo.springboot.libri.rifornimento.Rifornimento;
+import org.aspectj.weaver.ast.Var;
 
 import java.util.*;
 
@@ -127,6 +128,32 @@ public class Libro {
                 this.descrizione.addCaratteristica(entry.getKey(), entry.getValue());
             }
         }
+
+        return this;
+    }
+
+    public Libro updateFrom(LibroController.GenericCreateRequest request){
+        this.titolo = request.titolo();
+        this.genere = request.genere();
+        this.annoPubblicazione = request.annoPubblicazione();
+        this.numeroPagine = request.numeroPagine();
+        this.editore = request.editore();
+        this.lingua = request.lingua();
+        this.isbn = request.isbn();
+
+        this.descrizione = new LibroInfo(this, request.descrizione());
+
+        if (request.caratteristiche() != null) {
+            for (var entry : request.caratteristiche().entrySet()) {
+                this.descrizione.addCaratteristica(entry.getKey(), entry.getValue());
+            }
+        }
+
+        Variante variante = new Variante(this, "base", new Prezzo(request.prezzo()),
+                new Rifornimento(request.quantita()),
+                new LibroDimension(request.length(), request.width(), request.height(), request.weight()));
+
+        this.varianti.add(variante);
 
         return this;
     }

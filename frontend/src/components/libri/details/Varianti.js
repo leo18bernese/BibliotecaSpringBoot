@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 
 const Varianti = ({varianti, onSelect, selected}) => {
     const [alberoVarianti, setAlberoVarianti] = useState({});
+    const [variantiSingole, setVariantiSingole] = useState([]);
     const [selectedPath, setSelectedPath] = useState("");
     const [selectedVariantPath, setSelectedVariantPath] = useState("");
 
@@ -29,7 +30,12 @@ const Varianti = ({varianti, onSelect, selected}) => {
     // Funzione per costruire l'albero delle varianti
     const costruisciAlbero = (varianti) => {
         const albero = {};
+        const singole = [];
         varianti.forEach((variante) => {
+            if (variante.aggregable) {
+                singole.push(variante);
+                return;
+            }
             const attr = variante.attributiSpecifici;
             if (!attr) return;
             const chiavi = Object.keys(attr).sort();
@@ -52,8 +58,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 }
             });
         });
-        //console.log("Albero delle varianti:", albero);
-        return albero;
+        return {albero, singole};
     };
 
     // Funzione per costruire il percorso della variante selezionata
@@ -63,7 +68,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
         return chiavi.map(chiave => variante.attributiSpecifici[chiave]).join('.');
     };
 
-    const renderVarianteCard = (variante) => {
+    const renderVarianteCard = (variante, dynamicName = true) => {
         //console.log("variante", variante.nome);
 
         return <div
@@ -75,7 +80,7 @@ const Varianti = ({varianti, onSelect, selected}) => {
                 if (onSelect) onSelect(variante);
             }}>
 
-            <h4 className="font-semibold text-sm mb-2">{variante.dynamicName}</h4>
+            <h4 className="font-semibold text-sm mb-2">{dynamicName ?  variante.dynamicName:variante.nome }</h4>
 
             <div className="space-y-1">
 
@@ -144,6 +149,8 @@ const Varianti = ({varianti, onSelect, selected}) => {
                         const isLeaf = !isSubVar ? (Object.keys(nodo.figli).length) === 0 : true;
                         const isOnlyVariant = !isSubVar ? (Object.keys(nodo.figli).length === 0 && nodo.varianti.length > 1) : true;
 
+
+                        console.log("Rendering path:", nuovoPath,nodo, {isLeaf, isOnlyVariant, isSubVar, currentPath, selectedPath});
                         //console.log("Rendering node:", nodo);
 
                         if (isSubVar) {
@@ -202,7 +209,9 @@ const Varianti = ({varianti, onSelect, selected}) => {
 
     useEffect(() => {
         if (varianti && varianti.length > 0) {
-            setAlberoVarianti(costruisciAlbero(varianti));
+            const {albero, singole} = costruisciAlbero(varianti);
+            setAlberoVarianti(albero);
+            setVariantiSingole(singole);
         }
     }, [varianti]);
 
@@ -224,6 +233,20 @@ const Varianti = ({varianti, onSelect, selected}) => {
                     Variante selezionata: <strong className="font-medium">{selected.nome}</strong>
                 </p>
             )}
+
+            {variantiSingole.length > 0 && (
+                <div className="mt-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2 capitalize">
+                        Altre opzioni:
+                    </h3>
+                    <div className="flex flex-wrap items-stretch gap-4">
+                        {variantiSingole.map((variante => (
+                            renderVarianteCard(variante, false)
+                        )))}
+                    </div>
+                </div>
+            )}
+
             {renderAllLevels(alberoVarianti)}
         </div>
     );

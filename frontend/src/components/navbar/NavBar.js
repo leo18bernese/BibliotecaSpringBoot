@@ -80,7 +80,7 @@ const NavBar = () => {
                         {/* Left side - Navigation links */}
                         <ul className="flex space-x-2 list-none m-0 p-0 items-center">
                             {getLinkClass('/', 'Home')}
-                            {getLinkClass('/prodotti', 'Prodotti')}
+                            {getLinkClass('/ricerca', 'Prodotti', ['/prodotti'])}
                             {getLinkClass('/categories', 'Categorie', ['/category'])}
                             {getLinkClass('/contatti', 'Contatti')}
                             {getLinkClass('/admin', 'Admin', null, user && user.ruoli.includes('ROLE_ADMIN'), true)}

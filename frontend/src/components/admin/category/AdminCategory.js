@@ -164,7 +164,7 @@ const AdminCategory = () => {
             </div>
 
 
-            <h1 className="text-lg font-semibold">Category Editor - #{category.id}</h1>
+            <h1 className="text-lg font-semibold">Category Editor - {category.name} #{category.id}</h1>
             <p className="text-sm text-gray-500">
                 You can edit the category details, such as name and description.
             </p>
@@ -179,6 +179,7 @@ const AdminCategory = () => {
                           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Manage Images
                     </Link>
+
                     <CreateForm
                         endpoint={`/api/admin/category`}
                         showAddMessage={"Create Sub-category"}
@@ -191,6 +192,33 @@ const AdminCategory = () => {
                         buttonClassName="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
                         Create Sub-category
+                    </CreateForm>
+
+                    <CreateForm
+                        endpoint={`/api/libri`}
+                        showAddMessage={"Create New Book in this Category"}
+                        addMessage={"Create New Book"}
+                        data={[
+                            ['titolo', 'Title', '', 'Title is required', false, 'text'],
+                            ['autore', 'Author', '', 'Author is required', false, 'text'],
+                            ['genere', 'Genre', '', 'Genre is required', false, 'text'],
+                            ['annoPubblicazione', 'Publication Year', new Date().getFullYear(), 'Publication year is required', false, 'number'],
+                            ['numeroPagine', 'Pages', '', 'Page count is required', false, 'number'],
+                            ['editore', 'Publisher', '', 'Publisher is required', false, 'text'],
+                            ['lingua', 'Language', 'Italian', 'Language is required', false, 'text'],
+                            ['isbn', 'ISBN', '', 'ISBN is required', false, 'text'],
+                            ['descrizione', 'Description', '', 'Description is required', false, 'textarea'],
+                            ['prezzo', 'Price', '', 'Price is required', false, 'number'],
+                            ['quantita', 'Quantity', '', 'Quantity is required', false, 'number'],
+                            ['length', 'Length (cm)', '', 'Length is required', false, 'number'],
+                            ['width', 'Width (cm)', '', 'Width is required', false, 'number'],
+                            ['height', 'Height (cm)', '', 'Height is required', false, 'number'],
+                            ['weight', 'Weight (kg)', '', 'Weight is required', false, 'number'],
+                            ['categoryId', 'Category ID', id, null, true, 'number', true]
+                        ]}
+                        buttonClassName="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                        Create Book
                     </CreateForm>
                 </div>
 

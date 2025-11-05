@@ -9,6 +9,8 @@ import me.leoo.springboot.libri.libri.LibroController;
 import me.leoo.springboot.libri.libri.LibroRepository;
 import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzione;
 import me.leoo.springboot.libri.libri.caratteristiche.CaratteristicaOpzioneRepository;
+import me.leoo.springboot.libri.libri.category.Category;
+import me.leoo.springboot.libri.libri.category.CategoryRepository;
 import me.leoo.springboot.libri.libri.descrizione.LibroInfo;
 import me.leoo.springboot.libri.libri.variante.Variante;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class SearchService {
 
     @Autowired
     private CaratteristicaOpzioneRepository caratteristicheRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -70,7 +75,9 @@ public class SearchService {
         }
 
         if (categoriaId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("id"), categoriaId));
+            List<Long> allCategoryIds = getAllSubCategoryIds(categoriaId);
+            allCategoryIds.add(categoriaId);
+            spec = spec.and((root, query, cb) -> root.get("category").get("id").in(allCategoryIds));
         }
 
         if (prezzoMin != null) {
@@ -353,4 +360,15 @@ public class SearchService {
 
         return caratteristiche;
     }
+
+    private List<Long> getAllSubCategoryIds(Long parentId) {
+        List<Long> allSubCategoryIds = new ArrayList<>();
+        List<Category> subCategories = categoryRepository.findByParent_Id(parentId);
+        for (Category subCategory : subCategories) {
+            allSubCategoryIds.add(subCategory.getId());
+            allSubCategoryIds.addAll(getAllSubCategoryIds(subCategory.getId()));
+        }
+        return allSubCategoryIds;
+    }
 }
+

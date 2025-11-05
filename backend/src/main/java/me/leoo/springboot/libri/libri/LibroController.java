@@ -6,6 +6,7 @@ import me.leoo.springboot.libri.carrello.CarrelloService;
 import me.leoo.springboot.libri.libri.autore.Autore;
 import me.leoo.springboot.libri.libri.autore.AutoreRepository;
 import me.leoo.springboot.libri.libri.autore.AutoreService;
+import me.leoo.springboot.libri.libri.category.CategoryService;
 import me.leoo.springboot.libri.libri.descrizione.LibroDimension;
 import me.leoo.springboot.libri.libri.prezzo.Prezzo;
 import me.leoo.springboot.libri.libri.search.RicercaLibriResponse;
@@ -37,6 +38,7 @@ public class LibroController {
     private final SearchService searchService;
     private final AutoreRepository autoreRepository;
     private final AutoreService autoreService;
+    private final CategoryService categoryService;
     private final CarrelloService carrelloService;
     private final PdfGeneratorService pdfGeneratorService;
 
@@ -48,6 +50,16 @@ public class LibroController {
     public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione,
                                    double prezzoOriginale, double prezzo,
                                    Sconto sconto) {
+    }
+
+    // DTO per creazione
+    public record GenericCreateRequest(Long categoryId, String titolo, String autore, String genere,
+                                       int annoPubblicazione, int numeroPagine, String editore,
+                                       String lingua,
+                                       String isbn, String descrizione,
+                                       Map<String, String> caratteristiche,
+                                       double prezzo, int quantita,
+                                       double length, double width, double height, double weight) {
     }
 
     // DTO per update
@@ -82,14 +94,12 @@ public class LibroController {
         return libri.stream()
                 .map(libro -> {
                     // Trova la variante con il prezzo più basso
-                    Optional<Variante> variantePiuEconomica = libro.getVarianti().stream()
-                            .min(Comparator.comparingDouble(v -> v.getPrezzo().getPrezzoTotale()));
+                   Variante variante = libro.getLowestVariant();
 
-                    if (variantePiuEconomica.isEmpty()) {
+                    if (variante == null) {
                         return null; // Salta i libri senza varianti
                     }
 
-                    Variante variante = variantePiuEconomica.get();
                     Prezzo prezzo = variante.getPrezzo();
 
                     // Simula dati di recensione
@@ -177,14 +187,14 @@ public class LibroController {
 
     // Crea libro
     @PostMapping
-    public ResponseEntity<Libro> createLibro(@RequestBody Libro libro) {
-        // Validazione autore
-        if (libro.getAutore() == null || libro.getAutore().getNome() == null || libro.getAutore().getNome().trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Libro> createLibro(@RequestBody GenericCreateRequest request) {
 
-        // Usa AutoreService per gestire l'autore con getOrCreate
-        libro.setAutore(autoreService.getOrCreate(libro.getAutore()));
+        Libro libro = new Libro();
+        libro.setAutore(autoreService.getOrCreate(request.autore(), ""));
+        libro.setCategory(categoryService.getCategoryById(request.categoryId()));
+
+        libro.updateFrom(request);
+
         Libro savedLibro = libroRepository.save(libro);
 
         return ResponseEntity.ok(savedLibro);
