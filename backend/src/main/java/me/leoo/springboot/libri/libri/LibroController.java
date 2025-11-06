@@ -73,7 +73,8 @@ public class LibroController {
     public record VarianteRequest(String nome, LibroDimension dimensioni,
                                   double prezzo, Sconto sconto,
                                   Map<Long, Integer> prenotatiMap,
-                                  Map<String, String> attributi) {
+                                  Map<String, String> attributi,
+                                  boolean aggregable) {
     }
 
     public record RifornimentoRequest(double prezzo, int quantita, Sconto sconto, int giorniConsegna,

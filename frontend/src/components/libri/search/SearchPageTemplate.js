@@ -3,6 +3,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import MetadataDisplay from "./MetadataDisplay";
 import BookDisplay from "../BookDisplay";
+import {usePageTitle} from "../../utils/usePageTitle";
 
 function SearchPageTemplate({
                                 initSearchParams, endpoint = '/api/libri/ricerca',
@@ -155,6 +156,8 @@ function SearchPageTemplate({
     };
 
     const availableCharacteristicTypes = Object.keys(stableFilters);
+
+    usePageTitle("Ricerca per: " + (searchParams.get('q') || "Tutti i libri"));
 
 
     return (

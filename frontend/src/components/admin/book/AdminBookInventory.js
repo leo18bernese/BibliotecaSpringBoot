@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
@@ -133,24 +133,33 @@ const AdminBookInventory = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-lg font-semibold">Book Inventory Management</h1>
+
+            <Link to={`/admin/book/${id}`}
+                  className="text-blue-500 hover:underline font-semibold ">
+                &larr; Back to Book Details
+            </Link>
+
+            <h1 className="text-lg font-semibold mt-4">Book Inventory Management</h1>
             <p className="text-sm text-gray-500">
                 Manage the inventory and storage details of this book. <br/>
                 You can edit available quantity, add storage locations, and update stock information. <br/>
                 You can also edit the price, create discounts, and manage other inventory-related details.
             </p>
 
-            <button
-                className="flex items-center border-2  border-green-500 px-4 py-3 rounded-md
-                 bg-green-100 hover:bg-green-200 w-1/3 transition"
-                onClick={() => setShowAddVariantPopup(true)}
-            >
-
-                <i className='bx bx-plus-circle text-2xl text-green-600'></i>
-                <span className="ml-2 font-semibold text-green-700">
-                    Aggiungi Nuova Variante</span>
-
-            </button>
+            <CreateForm
+                endpoint={`/api/libri/${id}/variante`}
+                showAddCategoryPopup={showAddVariantPopup}
+                setShowAddCategoryPopup={setShowAddVariantPopup}
+                showAddMessage="Aggiungi Nuova Variante"
+                data={[
+                    ['nome', 'Nome Variante', '', 'Name is required'],
+                    ['dimensioni.length', 'Lunghezza (cm)', '', 'Length is required', true],
+                    ['dimensioni.width', 'Larghezza (cm)', '', 'Width is required', true],
+                    ['dimensioni.height', 'Altezza (cm)', '', 'Height is required',true],
+                    ['dimensioni.weight', 'Peso (kg)', '', 'Weight is required',true],
+                    ['prezzo', 'Prezzo (€)', '', 'Price is required'],
+                ]}
+            />
 
             <div className="mt-8 p-4 bg-gray-50 rounded-md">
                 <h2 className="text-md font-semibold rounded-md">Seleziona una variante qui sotto</h2>
@@ -164,8 +173,14 @@ const AdminBookInventory = () => {
                                 <div>
 
                                     <h3 className="text-md font-semibold mb-2">{variante.nome}</h3>
-                                    <p className="text-sm text-gray-600 mb-4">Nome basato su
-                                        attributi: <b>{variante.dynamicName}</b></p>
+                                    <p className="text-sm text-gray-600 mb-0">Nome basato su
+                                        attributi: <b>{variante.dynamicName}</b>
+                                    </p>
+                                    <p className='text-sm text-gray-600  mb-4 '>
+                                        Aggregable: <b
+                                        className={variante.aggregable ? 'text-green-600' : 'text-red-600'}>
+                                        {variante.aggregable ? 'Sì' : 'No'}</b>
+                                    </p>
                                 </div>
 
                                 <div>
@@ -210,25 +225,11 @@ const AdminBookInventory = () => {
             </div>
 
 
-
             <CreateVariant bookId={id}
                            setShowAddVariantPopup={setShowAddVariantPopup}
                            showAddVariantPopup={showAddVariantPopup}
             />
 
-            <CreateForm
-                endpoint={`/api/libri/${id}/variante`}
-                showAddCategoryPopup={showAddVariantPopup}
-                setShowAddCategoryPopup={setShowAddVariantPopup}
-                data={[
-                    ['nome', 'Nome Variante', '', 'Name is required'],
-                    ['dimensioni.length', 'Lunghezza (cm)', '', 'Length is required'],
-                    ['dimensioni.width', 'Larghezza (cm)', '', 'Width is required'],
-                    ['dimensioni.height', 'Altezza (cm)', '', 'Height is required'],
-                    ['dimensioni.weight', 'Peso (kg)', '', 'Weight is required'],
-                    ['prezzo', 'Prezzo (€)', '', 'Price is required'],
-                ]}
-            />
 
             <div className="fixed bottom-4 right-4">
                 <button

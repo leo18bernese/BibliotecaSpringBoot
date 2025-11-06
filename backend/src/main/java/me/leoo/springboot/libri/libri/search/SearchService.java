@@ -63,13 +63,17 @@ public class SearchService {
 
         if (q != null && !q.isEmpty()) {
             spec = spec.and((root, query, cb) -> {
-                Join<Libro, LibroInfo> descrizioneJoin = root.join("descrizione"); // Join con LibroInfo
+                query.distinct(true); // Evita duplicati a causa dei join
+                Join<Libro, Variante> variantiJoin = root.join("varianti", JoinType.LEFT);
 
                 return cb.or(
                         cb.like(cb.lower(root.get("titolo")), "%" + q.toLowerCase() + "%"),
                         cb.like(cb.lower(root.get("autore").get("nome")), "%" + q.toLowerCase() + "%"), // Ricerca nell'autore
                         cb.like(cb.lower(root.get("editore")), "%" + q.toLowerCase() + "%"), // Ricerca nell'editore
-                        cb.like(cb.lower(root.get("isbn")), "%" + q.toLowerCase() + "%") // Ricerca nell'ISBN
+                        cb.like(cb.lower(root.get("isbn")), "%" + q.toLowerCase() + "%"), // Ricerca nell'ISBN
+                        cb.like(cb.lower(variantiJoin.get("nome")), "%" + q.toLowerCase() + "%"), // Ricerca per nome variante
+                        cb.like(cb.lower(variantiJoin.get("id").as(String.class)), "%" + q.toLowerCase() + "%"), // Ricerca per ID variante
+                        cb.like(cb.lower(root.get("id").as(String.class)), "%" + q.toLowerCase() + "%") // Ricerca per ID libro
                 );
             });
         }

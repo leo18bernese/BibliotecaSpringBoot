@@ -9,6 +9,7 @@ import ViewableField from "../../ui/fields/ViewableField";
 import ButtonField from "../../ui/fields/ButtonField";
 import {usePageTitle} from "../../utils/usePageTitle";
 import RemovableField from "../../ui/fields/RemovableField";
+import CheckableField from "../../ui/fields/CheckableField";
 
 const fetchBookByIdAndVariante = async (id, varianteId) => {
     const {data} = await axios.get(`/api/libri/${id}/variante/${varianteId}`);
@@ -66,6 +67,7 @@ const AdminBookVariant = () => {
 
     const [showPrenotati, setShowPrenotati] = useState(false);
     const [attributi, setAttributi] = useState({});
+    const [aggregable, setAggregable] = useState(false);
 
     // Inizializza gli stati quando variante è disponibile
     useEffect(() => {
@@ -90,6 +92,7 @@ const AdminBookVariant = () => {
             setDimensioni(variante.dimensioni || {});
             setGiorniConsegna(rifornimento.giorniConsegna || 0);
             setAttributi(variante.attributiSpecifici);
+            setAggregable(variante.aggregable || false);
         }
     }, [variante]);
 
@@ -141,6 +144,7 @@ const AdminBookVariant = () => {
         onSuccess: () => {
             toast.success('Libro aggiornato con successo!');
             queryClient.invalidateQueries({queryKey: ['variante', id]});
+            queryClient.invalidateQueries({queryKey: ['book', id]});
         },
         onError: (error) => {
             toast.error(`Errore nell'aggiornamento del libro: ${error.response?.data?.message || error.message}`);
@@ -158,12 +162,14 @@ const AdminBookVariant = () => {
             prezzo: prezzo,
             sconto: scontoFormatted,
             // prenotatiMap rimosso
-            attributi: attributi
+            attributi: attributi,
+            aggregable: aggregable,
 
         };
 
         priceMutation.mutate({id, varianteData});
         setHasUnsavedChanges(false);
+
         navigate("/admin/book/" + id + "/inventory");
 
     };
@@ -294,6 +300,9 @@ const AdminBookVariant = () => {
                         <div className="mt-4 p-4 bg-gray-50 rounded-md">
 
                             <h2 className="text-md font-semibold">Book dimensions</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Can be left blank if put in attributes.
+                            </p>
 
                             <EditableField key='length'
                                            id="length" label="Length (cm)" icon="ruler"
@@ -582,6 +591,25 @@ const AdminBookVariant = () => {
                                             spacing={"2/6"}
                             />
                         </div>
+                    </div>
+
+                    <div className="mt-8 p-4 bg-gray-50 rounded-md">
+                        <h2 className="text-md font-semibold">Advanced Options</h2>
+
+                        <CheckableField key="aggregable"
+                                        id="aggregable" label="Aggregable" icon="badge-info"
+                                        value={aggregable}
+                                        placeholder="Is this variante aggregable with others?"
+                                        minChars={1} maxChars={3}
+                                        type="checkbox"
+                                        description="Check this box to make the variante aggregable with others."
+                                        confirm={true}
+                                        confirmText="Are you sure you want to change the aggregable status?"
+                                        onChange={(newAggregable) => {
+                                            setAggregable(newAggregable);
+                                            setHasUnsavedChanges(true);
+                                        }}
+                        />
                     </div>
                 </div>
             </div>

@@ -28,6 +28,7 @@ public class Variante implements Cloneable {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "libro_id")
     @JsonIgnore
     private Libro libro;
 
@@ -88,6 +89,8 @@ public class Variante implements Cloneable {
         this.dimensioni = request.dimensioni();
 
         this.attributiSpecifici = request.attributi();
+
+        this.aggregable = request.aggregable();
 
         return this;
     }

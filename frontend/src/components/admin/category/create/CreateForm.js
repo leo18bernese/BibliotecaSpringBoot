@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 /**
- * data structure: [id, displayName, defaultValue, missingErrorMessage]
+ * data structure: [id, displayName, defaultValue, missingErrorMessage, nullable, type, hidden]
  * @constructor
  */
 const CreateForm = ({
@@ -63,11 +63,11 @@ const CreateForm = ({
         console.log("Data:", data );
         console.log("New Data:", newData );
 
-        data.forEach(([id, , , missingErrorMessage]) => {
+        data.forEach(([id, , , missingErrorMessage, nullable]) => {
 
-console.log("data id:", id, "value:", newData[id] );
+            console.log("data id:", id, "value:", newData[id]  );
 
-            if (!newData[id] || newData[id].toString().trim() === '') {
+            if (!nullable && (!newData[id] || newData[id].toString().trim() === '')) {
 
                 validationErrors[id] = missingErrorMessage || 'This field is required';
             }
@@ -78,8 +78,29 @@ console.log("data id:", id, "value:", newData[id] );
             return;
         }
 
+        const finalData = {};
+
+        // Process newData to handle nested properties (e.g., "x.a" -> {x: {a: value}})
+        Object.keys(newData).forEach(key => {
+            if (key.includes('.')) {
+                const parts = key.split('.');
+                let current = finalData;
+
+                for (let i = 0; i < parts.length - 1; i++) {
+                    if (!current[parts[i]]) {
+                        current[parts[i]] = {};
+                    }
+                    current = current[parts[i]];
+                }
+
+                current[parts[parts.length - 1]] = newData[key];
+            } else {
+                finalData[key] = newData[key];
+            }
+        });
+
         try {
-            await axios.post(endpoint, newData);
+            await axios.post(endpoint, finalData);
 
             toast.success(globalSuccessMessage);
             setShowPopup(false);
@@ -137,7 +158,7 @@ console.log("data id:", id, "value:", newData[id] );
                         {data.map(([id, name, , , nullable, type, hidden]) => {
                             return (
                                 <div key={id}>
-                                    <label className="block text-sm font-medium text-gray-700">{name}</label>
+                                    <label className="block text-sm font-medium text-gray-700">{name} {!nullable && <span className="text-red-500">*</span>}</label>
                                     <input
                                         type={type || 'text'}
                                         name={id}
@@ -155,6 +176,8 @@ console.log("data id:", id, "value:", newData[id] );
                                 </div>
                             );
                         })}
+
+                        <p className="text-sm text-gray-500">* Required fields</p>
                     </div>
 
 
