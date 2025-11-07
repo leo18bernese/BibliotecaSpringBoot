@@ -46,7 +46,7 @@ public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecific
 
     // Libri in offerta - ora basato sulle varianti
     @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE v.prezzo.sconto IS NOT NULL AND l.hidden = false")
-    List<Libro> findByInOffertaTrue();
+    List<Libro> findBooksOnSale();
 
     // Libri con scorte basse - ora basato sulle varianti
     @Query("SELECT DISTINCT l FROM Libro l JOIN l.varianti v WHERE   l.hidden = false AND v.rifornimento.quantita BETWEEN :min AND :max ORDER BY v.rifornimento.quantita ASC")

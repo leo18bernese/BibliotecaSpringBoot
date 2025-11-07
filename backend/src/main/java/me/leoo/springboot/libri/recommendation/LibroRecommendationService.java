@@ -22,7 +22,7 @@ public class LibroRecommendationService {
         List<Libro> newArrivals = libroRepository.findTop10ByOrderByDataAggiuntaDesc();
         addRandomBooks(libri, newArrivals, 5); // Aggiungiamo 5 nuovi arrivi
 
-        List<Libro> booksOnSale = libroRepository.findByInOffertaTrue();
+        List<Libro> booksOnSale = libroRepository.findBooksOnSale();
         addRandomBooks(libri, booksOnSale, 6); // Aggiungiamo 6 libri in promozione
 
         List<Libro> limitedStock = libroRepository.findTop5ByVariantiRifornimentoQuantitaBetween(1, 5);

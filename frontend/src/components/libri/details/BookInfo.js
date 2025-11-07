@@ -71,6 +71,11 @@ const fetchHasWishlisted = async (id, variantId) => {
     return data;
 };
 
+const fetchTop = async (type) => {
+    const {data} = await axios.get(`/api/rankings/${type}`);
+    return data;
+}
+
 const BookInfo = () => {
     const {user, isAdmin} = useContext(UserContext);
     const {showLoginPrompt} = useAuth();
@@ -163,6 +168,13 @@ const BookInfo = () => {
         enabled: !!user && !!selectedVariant,
     });
 
+    const {data: topSales} = useQuery({
+        queryKey: ['topSales'],
+        queryFn: () => fetchTop('MOST_VIEWED'),
+    });
+
+    console.log("Top sales data:", topSales);
+
     //Book viewed tracking
     useEffect(() => {
         if (bookId && user && !viewTracked.current) {
@@ -241,6 +253,8 @@ const BookInfo = () => {
     }
 
     const addViewedBook = async () => {
+        console.log("Tracking viewed book:", bookId);
+
         addEventMutation.mutate({
             productId: bookId,
             eventType: 'VIEW'

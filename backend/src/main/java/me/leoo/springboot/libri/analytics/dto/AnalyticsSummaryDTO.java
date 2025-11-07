@@ -13,5 +13,6 @@ public class AnalyticsSummaryDTO {
     private Map<InteractionEnum, Integer> last24Hours;
     private Map<InteractionEnum, Integer> last7Days;
     private Map<InteractionEnum, Integer> last30Days;
+    private Map<InteractionEnum, Integer> allTime;
 }
 

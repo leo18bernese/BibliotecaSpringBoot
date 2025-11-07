@@ -80,27 +80,8 @@ const CreateForm = ({
 
         const finalData = {};
 
-        // Process newData to handle nested properties (e.g., "x.a" -> {x: {a: value}})
-        Object.keys(newData).forEach(key => {
-            if (key.includes('.')) {
-                const parts = key.split('.');
-                let current = finalData;
-
-                for (let i = 0; i < parts.length - 1; i++) {
-                    if (!current[parts[i]]) {
-                        current[parts[i]] = {};
-                    }
-                    current = current[parts[i]];
-                }
-
-                current[parts[parts.length - 1]] = newData[key];
-            } else {
-                finalData[key] = newData[key];
-            }
-        });
-
         try {
-            await axios.post(endpoint, finalData);
+            await axios.post(endpoint, newData);
 
             toast.success(globalSuccessMessage);
             setShowPopup(false);

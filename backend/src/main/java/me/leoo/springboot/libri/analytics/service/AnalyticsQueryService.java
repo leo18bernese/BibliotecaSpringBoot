@@ -13,6 +13,7 @@ import me.leoo.springboot.libri.analytics.objects.BaseAnalytics;
 import me.leoo.springboot.libri.analytics.repo.Analytics20MinRepository;
 import me.leoo.springboot.libri.analytics.repo.AnalyticsDailyRepository;
 import me.leoo.springboot.libri.analytics.repo.AnalyticsHourlyRepository;
+import me.leoo.springboot.libri.analytics.repo.AllTimeAnalyticsRepository;
 import me.leoo.utils.common.time.TimeUtil;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class AnalyticsQueryService {
     private final Analytics20MinRepository analytics20MinRepository;
     private final AnalyticsHourlyRepository analyticsHourlyRepository;
     private final AnalyticsDailyRepository analyticsDailyRepository;
+    private final AllTimeAnalyticsRepository allTimeAnalyticsRepository;
 
     // ===== DASHBOARD OVERVIEW =====
 
@@ -45,6 +47,7 @@ public class AnalyticsQueryService {
         Map<InteractionEnum, Integer> metrics7d = getTotalMetricsDaily(productId, last7d, now);
         System.out.println("getting daily metrics for last 30d");
         Map<InteractionEnum, Integer> metrics30d = getTotalMetricsDaily(productId, last30d, now);
+        Map<InteractionEnum, Integer> allTimeMetrics = getAllTimeMetrics(productId);
 
         System.out.println(metrics7d);
 
@@ -53,6 +56,7 @@ public class AnalyticsQueryService {
                 .last24Hours(metrics24h)
                 .last7Days(metrics7d)
                 .last30Days(metrics30d)
+                .allTime(allTimeMetrics)
                 .build();
     }
 
@@ -103,6 +107,12 @@ public class AnalyticsQueryService {
     }
 
     // ===== AGGREGAZIONI =====
+
+    public Map<InteractionEnum, Integer> getAllTimeMetrics(Long productId) {
+        return allTimeAnalyticsRepository.findByProductId(productId)
+                .map(BaseAnalytics::getCounts)
+                .orElse(new HashMap<>());
+    }
 
     public Map<InteractionEnum, Integer> getTotalMetricsHourly(Long productId, Date startTime, Date endTime) {
         List<AnalyticsHourly> data = analyticsHourlyRepository.findByProductIdAndTimeRange(productId, startTime, endTime);

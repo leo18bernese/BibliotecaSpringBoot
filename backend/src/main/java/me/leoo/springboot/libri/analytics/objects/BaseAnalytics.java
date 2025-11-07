@@ -22,6 +22,8 @@ public abstract class BaseAnalytics {
 
     protected Date date;
     protected Map<InteractionEnum, Integer> counts = new HashMap<>();
+    protected Double totalRevenue = 0.0;
+    protected Integer totalUnitsSold = 0;
 
     public BaseAnalytics(Long productId, Date date) {
         this.productId = productId;
@@ -34,5 +36,13 @@ public abstract class BaseAnalytics {
 
     public Integer getCount(InteractionEnum eventType) {
         return counts.getOrDefault(eventType, 0);
+    }
+
+    public void addRevenue(Double amount) {
+        this.totalRevenue += amount;
+    }
+
+    public void addUnitsSold(Integer quantity) {
+        this.totalUnitsSold += quantity;
     }
 }

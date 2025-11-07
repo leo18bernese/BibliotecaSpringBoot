@@ -29,7 +29,9 @@ public class AnalyticsWriteService {
                 CompletableFuture.runAsync(() ->
                         incrementMetric("analytics_hourly", productId, userId, eventType, roundToHour(timestamp))),
                 CompletableFuture.runAsync(() ->
-                        incrementMetric("analytics_daily", productId, userId, eventType, roundToDay(timestamp)))
+                        incrementMetric("analytics_daily", productId, userId, eventType, roundToDay(timestamp))),
+                CompletableFuture.runAsync(() ->
+                        incrementMetric("all_time_analytics", productId, userId, eventType, null))
         ).join();
     }
 
@@ -40,6 +42,7 @@ public class AnalyticsWriteService {
                 incrementMetric("analytics_20min", productId, userId, eventType, roundTo20Min(timestamp), count);
                 incrementMetric("analytics_hourly", productId, userId, eventType, roundToHour(timestamp), count);
                 incrementMetric("analytics_daily", productId, userId, eventType, roundToDay(timestamp), count);
+                incrementMetric("all_time_analytics", productId, userId, eventType, null, count);
             }
         });
     }
@@ -52,8 +55,11 @@ public class AnalyticsWriteService {
 
         Query query = new Query(
                 Criteria.where("productId").is(productId)
-                        .and("timeBucket").is(timeBucket)
         );
+
+        if (timeBucket != null) {
+            query.addCriteria(Criteria.where("timeBucket").is(timeBucket));
+        }
 
         Update update = new Update().inc("counts." + eventType.name(), count);
         //System.out.println("Incrementing " + eventType.name() + " by " + count + " for productId: " + productId + " in collection: " + collection);
