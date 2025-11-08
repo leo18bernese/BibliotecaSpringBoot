@@ -72,7 +72,7 @@ const fetchHasWishlisted = async (id, variantId) => {
 };
 
 const fetchTop = async (type) => {
-    const {data} = await axios.get(`/api/rankings/${type}`);
+    const {data} = await axios.get(`/api/rankings/${type}/top3`);
     return data;
 }
 
@@ -168,12 +168,17 @@ const BookInfo = () => {
         enabled: !!user && !!selectedVariant,
     });
 
-    const {data: topSales} = useQuery({
-        queryKey: ['topSales'],
+    const {data: topViewed} = useQuery({
+        queryKey: ['topViewed'],
         queryFn: () => fetchTop('MOST_VIEWED'),
     });
 
-    console.log("Top sales data:", topSales);
+    const {data: topSales} = useQuery({
+        queryKey: ['topSales'],
+        queryFn: () => fetchTop('BEST_SELLERS_UNITS'),
+    });
+
+    console.log("Top sales data:", topSales, topViewed);
 
     //Book viewed tracking
     useEffect(() => {

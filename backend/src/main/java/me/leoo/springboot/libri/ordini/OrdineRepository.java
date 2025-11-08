@@ -1,6 +1,8 @@
 package me.leoo.springboot.libri.ordini;
 
 import me.leoo.springboot.libri.utente.Utente;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,4 +15,6 @@ public interface OrdineRepository extends JpaRepository<Ordine, Long> {
     boolean existsByIdAndUtente(long id, Utente utente);
 
     List<Ordine> findAllByUtente(Utente utente);
+
+    Page<Ordine> findAllByUtente(Utente utente, Pageable pageable);
 }

@@ -14,6 +14,12 @@ import java.util.List;
 public class LibroService {
 
     private final ImageService imageService;
+    private final LibroRepository libroRepository;
+
+
+    public Long getCategoryIdByProductId(Long productId) {
+        return libroRepository.findCategoryIdByLibroId(productId);
+    }
 
     public List<Path> getBookAllImages(Long id) {
         return FileImageUtils.getAllImages(id, imageService.getCommonImagesPath(id));

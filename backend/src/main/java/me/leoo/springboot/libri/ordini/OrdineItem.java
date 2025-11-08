@@ -26,6 +26,7 @@ public class OrdineItem {
     private Ordine ordine;
 
     private Long libroId;
+    private Long categoryId;
     private Long varianteId;
     private String varianteNome;
 
@@ -38,6 +39,7 @@ public class OrdineItem {
 
     public OrdineItem(Variante variante, int quantita, Date dataAggiunta) {
         this.libroId = variante.getLibro().getId();
+        this.categoryId = variante.getLibro().getCategory().getId();
         this.varianteId = variante.getId();
         this.varianteNome = variante.getNome();
         this.titolo = variante.getLibro().getTitolo();

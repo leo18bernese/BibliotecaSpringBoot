@@ -7,6 +7,7 @@ import me.leoo.springboot.libri.analytics.dto.ProductAnalyticsDTO;
 import me.leoo.springboot.libri.analytics.dto.TimeSeriesPointDTO;
 import me.leoo.springboot.libri.analytics.service.AnalyticsQueryService;
 import me.leoo.springboot.libri.analytics.service.AnalyticsWriteService;
+import me.leoo.springboot.libri.libri.LibroService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +22,21 @@ public class AnalyticsController {
     private final AnalyticsWriteService writeService;
     private final AnalyticsQueryService queryService;
 
+    private final LibroService libroService;
+
     // Record single event
     @PostMapping("/events")
     public ResponseEntity<String> recordEvent(
             @RequestParam Long productId,
             @RequestParam(required = false) Long userId,
             @RequestParam InteractionEnum eventType) {
+
+        Long categoryId = libroService.getCategoryIdByProductId(productId);
+
+        System.out.println("Recording event: " + eventType + " for productId: " + productId + ", categoryId: " + categoryId + ", userId: " + userId);
+
         //System.out.println("Recording event: " + eventType + " for productId: " + productId);
-        writeService.recordEvent(productId, userId, eventType, new Date());
+        writeService.recordEvent(productId, categoryId, userId, eventType, new Date());
         return ResponseEntity.ok("Event recorded");
     }
 

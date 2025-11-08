@@ -1,6 +1,6 @@
 package me.leoo.springboot.libri.analytics.ranking;
 
-public enum RankingType {
+public enum     RankingType {
 
     BEST_SELLERS_REVENUE,
     BEST_SELLERS_UNITS,

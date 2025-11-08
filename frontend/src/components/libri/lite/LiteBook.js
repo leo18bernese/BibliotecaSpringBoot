@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {useWishlist} from "../wishlist/WishlistContext";
 import {UserContext} from "../../user/UserContext";
+import { fetchTopItems, useAnalyticsMutation } from "../../admin/book/chart/useAnalytics";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/lite/${id}`);
@@ -26,7 +27,7 @@ const fetchBookImage = async (id) => {
 
 const LiteBook = ({bookID, book: providedBook}) => {
 
-    const {user, isAdmin, isAdminMode} = useContext(UserContext);
+    const {user, isAdminMode} = useContext(UserContext);
     const bookId = bookID || providedBook?.libroId;
 
     const {data: parsedBook, isLoading: isBookLoading, error: bookError} = useQuery({
@@ -40,6 +41,17 @@ const LiteBook = ({bookID, book: providedBook}) => {
         queryFn: () => fetchBookImage(bookId),
         enabled: !!bookId,
     });
+
+    const {data: topViewed} = useQuery({
+        queryKey: ['topViewed'],
+        queryFn: () => fetchTopItems('MOST_VIEWED'),
+    });
+
+    const {data: topPurchased} = useQuery({
+        queryKey: ['topPurchased'],
+        queryFn: () => fetchTopItems('BEST_SELLERS_UNITS'),
+    });
+
 
     const {hasWishlisted, isLoadingWishlist, addToWishlist, removeFromWishlist} =
         useWishlist(bookId);
@@ -60,7 +72,10 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
     const sconto = book.sconto;
     const hasSconto = sconto && (sconto.percentuale > 0 || sconto.valore > 0);
-    console.log(book);
+
+    const topText = (topViewed && topViewed.find(id => id === bookId)) ? 'Top Visited ' :
+    (topPurchased && topPurchased.find(id => id === bookId)) ? 'Best Seller' : null;
+
 
     return (
         <>
@@ -89,6 +104,12 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                     <span className="text-gray-500">No image available</span>
                                 )}
                             </div>
+
+                            {topText && (
+                                <div className="absolute -top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                    {topText}
+                                </div>
+                            )}
 
                             {hasSconto && (
                                 <div

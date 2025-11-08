@@ -21,6 +21,7 @@ function BookDisplay({idList, contentList, isLoading, error, gridCss}) {
             const list = idList || contentList;
             list.forEach(item => {
                 const productId = item.id || item;
+
                 trackImpression(productId);
             });
             impressionTracked.current = true;

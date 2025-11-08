@@ -18,8 +18,8 @@ public interface AllTimeAnalyticsRepository extends MongoRepository<AllTimeAnaly
     List<AllTimeAnalytics> findTop10ByOrderByTotalUnitsSoldDesc();
 
     @Query(value = "{}", sort = "{ 'counts.VIEW' : -1 }")
-    List<AllTimeAnalytics> findTop10Viewed();
+    List<AllTimeAnalytics> findTop10Viewed(Pageable pageable);
 
     @Query(value = "{}", sort = "{ 'counts.ADD_TO_WISHLIST' : -1 }")
-    List<AllTimeAnalytics> findTop10Wished();
+    List<AllTimeAnalytics> findTop10Wished(Pageable pageable);
 }

@@ -19,6 +19,8 @@ public class Ranking {
     private Long id;
 
     private Long productId;
+    private Long categoryId;
+
     private RankingType rankingType;
 
     private Integer position;
@@ -26,8 +28,9 @@ public class Ranking {
 
     private Date lastUpdated;
 
-    public Ranking(Long productId, RankingType rankingType, Integer position, double value) {
+    public Ranking(Long productId, Long categoryId, RankingType rankingType, Integer position, double value) {
         this.productId = productId;
+        this.categoryId = categoryId;
         this.rankingType = rankingType;
         this.position = position;
         this.value = value;

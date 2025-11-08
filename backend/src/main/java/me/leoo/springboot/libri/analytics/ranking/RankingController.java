@@ -17,5 +17,11 @@ public class RankingController {
     public ResponseEntity<List<Ranking>> getRankings(@PathVariable RankingType type) {
         return ResponseEntity.ok(rankingService.getRankingsByType(type));
     }
+
+    @GetMapping("/{type}/top3")
+    public ResponseEntity<List<Long>> getTop3Rankings(@PathVariable RankingType type) {
+        return ResponseEntity.ok(rankingService.getTop3RankingsByType(type));
+    }
+
 }
 

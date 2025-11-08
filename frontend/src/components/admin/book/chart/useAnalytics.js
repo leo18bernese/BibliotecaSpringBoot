@@ -8,9 +8,7 @@ const trackEvent = async (productId, user, type) => {
         const formData = new FormData();
         formData.append('productId', productId);
 
-        {
-            user && formData.append('userId', user.id);
-        }
+        if(user) formData.append('userId', user.id);
 
         formData.append('eventType', type);
 
@@ -21,6 +19,15 @@ const trackEvent = async (productId, user, type) => {
         throw error;
     }
 };
+
+
+export const fetchTopItems = async (type) => {
+    console.log(`Fetching top items of type: ${type}`);
+
+    const {data} = await axios.get(`/api/rankings/${type}/top3`);
+    return data;
+}
+
 
 export const useAnalyticsMutation = () => {
     const {user} = useContext(UserContext);
@@ -38,6 +45,6 @@ export const useAnalyticsMutation = () => {
     });
 
     return {
-        addEventMutation
+        addEventMutation,
     }
 }

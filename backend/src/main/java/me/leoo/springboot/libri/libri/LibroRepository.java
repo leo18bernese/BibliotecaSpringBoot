@@ -13,6 +13,10 @@ import java.util.Set;
 
 public interface LibroRepository extends JpaRepository<Libro, Long>, JpaSpecificationExecutor<Libro> {
 
+    //category
+    @Query("SELECT l.category.id FROM Libro l WHERE l.id = :libroId")
+    Long findCategoryIdByLibroId(@Param("libroId") Long libroId);
+
     // Query sui metadati del libro (non cambiano)
     List<Libro> findByTitoloEqualsIgnoreCase(String keyword);
 

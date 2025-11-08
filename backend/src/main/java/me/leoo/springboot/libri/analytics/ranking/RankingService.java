@@ -3,8 +3,8 @@ package me.leoo.springboot.libri.analytics.ranking;
 import lombok.RequiredArgsConstructor;
 import me.leoo.springboot.libri.analytics.InteractionEnum;
 import me.leoo.springboot.libri.analytics.objects.AllTimeAnalytics;
-import me.leoo.springboot.libri.analytics.objects.BaseAnalytics;
 import me.leoo.springboot.libri.analytics.repo.AllTimeAnalyticsRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +26,9 @@ public class RankingService {
         System.out.println("Updating rankings...");
 
         rankingRepository.deleteAll();
+        System.out.println("Cleared existing rankings.");
+
+        System.out.println(getTopProductsByRevenue());
 
         updateRanking(RankingType.BEST_SELLERS_REVENUE, getTopProductsByRevenue());
         updateRanking(RankingType.BEST_SELLERS_UNITS, getTopProductsByUnitsSold());
@@ -47,29 +50,38 @@ public class RankingService {
                 case MOST_WISHED -> value = analytic.getCount(InteractionEnum.ADD_TO_WISHLIST);
             }
 
-            Ranking ranking = new Ranking(analytic.getProductId(), type, i + 1, value);
+            Ranking ranking = new Ranking(analytic.getProductId(), analytic.getCategoryId(), type, i + 1, value);
             rankingRepository.save(ranking);
         }
     }
 
     private List<AllTimeAnalytics> getTopProductsByRevenue() {
+        System.out.println("Fetching top products by revenue...");
         return analyticsRepository.findTop10ByOrderByTotalRevenueDesc();
     }
 
     private List<AllTimeAnalytics> getTopProductsByUnitsSold() {
+        System.out.println("Fetching top products by units sold...");
         return analyticsRepository.findTop10ByOrderByTotalUnitsSoldDesc();
     }
 
     private List<AllTimeAnalytics> getTopViewedProducts() {
-        return analyticsRepository.findTop10Viewed();
+        System.out.println("Fetching top viewed products...");
+        return analyticsRepository.findTop10Viewed(Pageable.ofSize(10));
     }
 
     private List<AllTimeAnalytics> getTopWishedProducts() {
-        return analyticsRepository.findTop10Wished();
+        System.out.println("Fetching top wished products...");
+        return analyticsRepository.findTop10Wished(Pageable.ofSize(10));
     }
 
     //public methods
     public List<Ranking> getRankingsByType(RankingType type) {
         return rankingRepository.findByRankingTypeOrderByPositionAsc(type);
     }
+
+    public List<Long> getTop3RankingsByType(RankingType type) {
+        return rankingRepository.findTop3ProductIdsByRankingType(type);
+    }
+
 }

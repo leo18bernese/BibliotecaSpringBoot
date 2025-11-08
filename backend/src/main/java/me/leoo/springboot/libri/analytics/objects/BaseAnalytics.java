@@ -22,6 +22,7 @@ public abstract class BaseAnalytics {
 
     protected Date date;
     protected Map<InteractionEnum, Integer> counts = new HashMap<>();
+
     protected Double totalRevenue = 0.0;
     protected Integer totalUnitsSold = 0;
 
