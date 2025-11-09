@@ -13,7 +13,13 @@ public class RankingController {
 
     private final RankingService rankingService;
 
-    @GetMapping("/{type}")
+
+    @GetMapping("/{type}/ids")
+    public ResponseEntity<List<Long>> getRankingProductIds(@PathVariable RankingType type) {
+        return ResponseEntity.ok(rankingService.getRankingProductIdsByType(type));
+    }
+
+    @GetMapping("/{type}/content")
     public ResponseEntity<List<Ranking>> getRankings(@PathVariable RankingType type) {
         return ResponseEntity.ok(rankingService.getRankingsByType(type));
     }

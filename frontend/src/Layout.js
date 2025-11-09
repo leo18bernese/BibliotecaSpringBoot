@@ -55,6 +55,7 @@ import Footer from "./components/footer/Footer";
 import {WishlistProvider} from "./components/libri/wishlist/WishlistContext";
 import CategoryItemsFinal from "./components/category/CategoryItemsFinal";
 import AdminCategoryImages from "./components/admin/category/AdminCategoryImages";
+import TopSeller from "./components/top/TopSeller";
 
 function RedirectToBook() {
     const {id} = useParams();
@@ -91,6 +92,8 @@ export default function Layout() {
                                     <Route path="/category/:catId" element={<CategoryItemsFinal/>}/>
                                     <Route path="/category/:catId/user" element={<CategoryItems/>}/>
                                     <Route path="/category/:catId/admin" element={<CategoryForUser/>}/>
+
+                                    <Route path="/top/sellers" element={<TopSeller/>}/>
 
                                     <Route element={<ProtectedRoute/>}>
                                         <Route path="/book/:id/recensioni/nuova" element={<NuovaRecensione/>}/>

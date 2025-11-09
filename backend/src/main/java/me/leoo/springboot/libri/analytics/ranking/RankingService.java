@@ -80,6 +80,10 @@ public class RankingService {
         return rankingRepository.findByRankingTypeOrderByPositionAsc(type);
     }
 
+    public List<Long> getRankingProductIdsByType(RankingType type) {
+        return rankingRepository.findTop10ProductIdsByRankingType(type);
+    }
+
     public List<Long> getTop3RankingsByType(RankingType type) {
         return rankingRepository.findTop3ProductIdsByRankingType(type);
     }

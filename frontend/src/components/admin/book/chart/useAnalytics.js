@@ -21,19 +21,27 @@ const trackEvent = async (productId, user, type) => {
 };
 
 
-export const fetchTopItems = async (type) => {
+export const fetchTopItems = async (type, complete = false ) => {
     console.log(`Fetching top items of type: ${type}`);
 
-    const {data} = await axios.get(`/api/rankings/${type}/top3`);
+    const amount = complete ? "ids" : "top3";
+
+    const {data} = await axios.get(`/api/rankings/${type}/${amount}`);
     return data;
 }
 
+export const fetchTopItemsContent = async (type) => {
+    const {data} = await axios.get(`/api/rankings/${type}/content`);
+    return data;
+}
 
 export const useAnalyticsMutation = () => {
     const {user} = useContext(UserContext);
 
     const addEventMutation = useMutation({
         mutationFn: async ({productId, eventType}) => {
+            if(!user) return;
+
             return await trackEvent(productId, user, eventType);
         },
         onError: (error) => {

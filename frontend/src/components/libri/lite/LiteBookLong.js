@@ -26,7 +26,7 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const LiteBook = ({bookID, book: providedBook}) => {
+const LiteBookLong = ({bookID, book: providedBook}) => {
 
     const {user, isAdminMode} = useContext(UserContext);
     const bookId = bookID || providedBook?.libroId;
@@ -61,17 +61,6 @@ const LiteBook = ({bookID, book: providedBook}) => {
         }
     }, [bookImageBlob]);
 
-    const {data: topViewed} = useQuery({
-        queryKey: ['topViewed'],
-        queryFn: () => fetchTopItems('MOST_VIEWED'),
-    });
-
-    const {data: topPurchased} = useQuery({
-        queryKey: ['topPurchased'],
-        queryFn: () => fetchTopItems('BEST_SELLERS_UNITS'),
-    });
-
-
     const {hasWishlisted, isLoadingWishlist, addToWishlist, removeFromWishlist} =
         useWishlist(bookId);
 
@@ -92,24 +81,20 @@ const LiteBook = ({bookID, book: providedBook}) => {
     const sconto = book.sconto;
     const hasSconto = sconto && (sconto.percentuale > 0 || sconto.valore > 0);
 
-    const topText = (topViewed && topViewed.find(id => id === bookId)) ? 'Top Visited ' :
-    (topPurchased && topPurchased.find(id => id === bookId)) ? 'Best Seller' : null;
-
-
     return (
         <>
-            <div className="bg-white shadow-lg rounded-2xl flex flex-col h-full">
-                <div className="flex md:flex-col flex-grow">
+            <div className="bg-white shadow-lg rounded-2xl ">
+                <div className="flex flex-grow">
 
                     <Link to={`/book/${bookId}`}>
                         <div className="relative">
 
 
                             <div
-                                className={`w-full rounded-md h-64 
+                                className={`h-full rounded-md 
                                 ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : imageSrc ? '' : 
                                     'bg-gray-200 flex items-center justify-center'}`}
-                                style={{height: '250px'}}
+                                style={{height: '120px'}}
                             >
                                 {isImageLoading ? (
                                     <span className="text-gray-500">Loading image...</span>
@@ -125,12 +110,6 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                     <span className="text-gray-500">No image available</span>
                                 )}
                             </div>
-
-                            {topText && (
-                                <div className="absolute -top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                    {topText}
-                                </div>
-                            )}
 
                             {hasSconto && (
                                 <div
@@ -204,4 +183,4 @@ const LiteBook = ({bookID, book: providedBook}) => {
     );
 }
 
-export default LiteBook;
+export default LiteBookLong;
