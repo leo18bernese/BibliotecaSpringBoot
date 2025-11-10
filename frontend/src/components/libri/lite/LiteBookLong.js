@@ -1,10 +1,9 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {useWishlist} from "../wishlist/WishlistContext";
 import {UserContext} from "../../user/UserContext";
-import { fetchTopItems } from "../../admin/book/chart/useAnalytics";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/lite/${id}`);
@@ -14,7 +13,7 @@ const fetchBookById = async (id) => {
 const fetchBookImage = async (id) => {
     try {
         // richiedo il blob dell'immagine per evitare che l'<img> faccia una seconda richiesta
-        const response = await axios.get(`/api/images/${id}/first`, { responseType: 'blob' });
+        const response = await axios.get(`/api/images/${id}/first`, {responseType: 'blob'});
         return response.data; // Blob o null
     } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -26,7 +25,7 @@ const fetchBookImage = async (id) => {
     }
 }
 
-const LiteBookLong = ({bookID, book: providedBook}) => {
+const LiteBookLong = ({bookID, book: providedBook, index}) => {
 
     const {user, isAdminMode} = useContext(UserContext);
     const bookId = bookID || providedBook?.libroId;
@@ -84,15 +83,20 @@ const LiteBookLong = ({bookID, book: providedBook}) => {
     return (
         <>
             <div className="bg-white shadow-lg rounded-2xl ">
-                <div className="flex flex-grow">
+                <div className=" flex flex-grow">
+
+                    { (
+                        <div className="text-2xl font-bold px-8 my-auto">
+                            {index}
+                        </div>
+                    )}
 
                     <Link to={`/book/${bookId}`}>
                         <div className="relative">
 
-
                             <div
                                 className={`h-full rounded-md 
-                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : imageSrc ? '' : 
+                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : imageSrc ? '' :
                                     'bg-gray-200 flex items-center justify-center'}`}
                                 style={{height: '120px'}}
                             >
@@ -130,7 +134,7 @@ const LiteBookLong = ({bookID, book: providedBook}) => {
                                 </Link>
                             )}
 
-                            {user && (
+                            {/*user && (
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -141,13 +145,13 @@ const LiteBookLong = ({bookID, book: providedBook}) => {
                                 >
                                     <i className={`${hasWishlisted ? 'bxs-heart text-red-600' : 'bx-heart text-gray-500'} bx text-lg`}></i>
                                 </button>
-                            )}
+                            )*/}
                         </div>
 
                     </Link>
 
 
-                    <div className="px-4 pt-3 pb-1 flex flex-col flex-grow">
+                    <div className="px-4 pt-3 pb-1 flex flex-grow">
                         <div className="flex-grow">
                             <h3 className="sm:text-lg font-semibold text-gray-800">{book.titolo}</h3>
                             <p className=" text-gray-600 mb-1">by {book.autore}</p>
@@ -164,14 +168,14 @@ const LiteBookLong = ({bookID, book: providedBook}) => {
                                     </span>
                                     )}
 
-                                    <span className="text-blue-600 text-xl font-bold">
+                                    <span className="text-blue-600 mr-2 text-xl font-bold">
                                     {book.prezzo ? `€${book.prezzo.toFixed(2)}` : 'Price not available'}
                                   </span>
 
                                 </div>
 
-                                <button className="bg-blue-100 rounded-full  hover:bg-blue-200 transition-colors">
-                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600' ></i>
+                                <button className="bg-blue-100 rounded-full hover:bg-blue-200 transition-colors">
+                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600'></i>
                                 </button>
                             </h3>
                         </div>

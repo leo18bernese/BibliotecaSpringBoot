@@ -35,6 +35,9 @@ public class Carrello {
     @OneToMany(mappedBy = "carrello", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<CarrelloItem> items = new HashSet<>();
 
+    /*@OneToMany(mappedBy = "carrello_dopo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final Set<CarrelloItem> savedItems = new HashSet<>();*/
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCreazione;
 

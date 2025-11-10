@@ -12,7 +12,7 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
 
     List<Ranking> findTop3ByRankingTypeOrderByPositionAsc(RankingType rankingType);
 
-    @Query("SELECT r.productId FROM Ranking r WHERE r.rankingType = :rankingType AND r.position <= 3 ORDER BY r.position ASC LIMIT 10")
+    @Query("SELECT r.productId FROM Ranking r WHERE r.rankingType = :rankingType AND r.position <= 10 ORDER BY r.position ASC LIMIT 10")
     List<Long> findTop10ProductIdsByRankingType(RankingType rankingType);
 
     @Query("SELECT r.productId FROM Ranking r WHERE r.rankingType = :rankingType AND r.position <= 3 ORDER BY r.position ASC LIMIT 3")

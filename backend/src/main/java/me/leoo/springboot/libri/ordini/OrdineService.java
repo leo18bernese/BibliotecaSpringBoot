@@ -80,7 +80,7 @@ public class OrdineService {
                     item.getCategoryId(),
                     null,
                     "totalUnitsSold",
-                    1
+                    item.getQuantita()
             );
         }
 

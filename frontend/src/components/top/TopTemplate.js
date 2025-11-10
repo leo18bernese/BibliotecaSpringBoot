@@ -21,16 +21,16 @@ const TopTemplate = ({idList, contentList, title, description, isLoading, error}
     }
 
     return (
-        <div>
+        <div className="container mx-auto mt-8">
             <div className="flex flex-col mb-4">
                 <h2 className="text-2xl font-bold mb-2">{title}</h2>
                 <p className="text-gray-600">{description}</p>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-4">
                 {idList ? (
-                    idList.map(id => (
-                        <LiteBookLong bookID={id} key={id}/>
+                    idList.map((id, index) => (
+                        <LiteBookLong index={index} bookID={id} key={id}/>
                     ))
                 ) : contentList ? (
                     contentList.map(book => (
