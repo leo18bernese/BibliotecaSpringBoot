@@ -2,6 +2,7 @@ import React from 'react';
 import {Navigate, Route, Routes, useLocation, useParams} from "react-router-dom";
 import {UserProvider} from './components/user/UserContext';
 import {CartProvider} from "./components/carrello/CartContext";
+import { CartPromptProvider } from './components/carrello/CartPromptContext';
 import {AuthProvider} from "./components/user/AuthContext";
 import ScrollToTop from "./components/utils/ScrollToTop";
 import {Toaster} from "react-hot-toast";
@@ -70,7 +71,8 @@ export default function Layout() {
         <AuthProvider>
             <UserProvider>
                 <CartProvider>
-                    <WishlistProvider>
+                    <CartPromptProvider >
+                     <WishlistProvider>
                         <ScrollToTop/>
                         <Toaster position="top-center" reverseOrder={false}/>
 
@@ -154,7 +156,8 @@ export default function Layout() {
                             {!isAdminPage && <Footer/>}
                         </div>
                     </WishlistProvider>
-                </CartProvider>
+                    </CartPromptProvider>
+                 </CartProvider>
             </UserProvider>
         </AuthProvider>
     );

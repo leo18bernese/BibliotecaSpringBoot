@@ -145,7 +145,7 @@ const NavBar = () => {
                     <div className="md:w-1/3 mx-auto flex flex-row ">
                         <input
                             type="text"
-                            placeholder={"Cerca..."}
+                            placeholder={"Cerca un prodotto o una categoria"}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={handleSearchKeyDown}
@@ -154,7 +154,7 @@ const NavBar = () => {
                         />
 
                         <button onClick={ () =>redirectToSearch()}
-                                className="bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-r-md"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-md"
                         >
                             <i className='bxr bx-search'></i>
                         </button>

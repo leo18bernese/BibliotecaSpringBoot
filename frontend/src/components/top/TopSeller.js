@@ -1,6 +1,7 @@
 import TopTemplate from "./TopTemplate";
 import {fetchTopItems} from "../admin/book/chart/useAnalytics";
 import {useQuery} from "@tanstack/react-query";
+import {usePageTitle} from "../utils/usePageTitle";
 
 const TopSeller = () => {
 
@@ -9,6 +10,8 @@ const TopSeller = () => {
         queryFn: () => fetchTopItems('BEST_SELLERS_UNITS', true),
         staleTime: Infinity,
     });
+
+    usePageTitle( 'Top Seller' );
 
     return (
         <TopTemplate title={'Top Seller'} description={'Discover the best-selling books that readers love.'}

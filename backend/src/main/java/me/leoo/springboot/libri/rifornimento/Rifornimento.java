@@ -85,7 +85,7 @@ public class Rifornimento implements Cloneable {
         }
 
         if (disponibili < 10) {
-            return "⚠ In esaurimento. Disponibili solo " + disponibili + " pezzi";
+            return "⚠ Disponibili solo " + disponibili + " pezzi";
         }
 
         if (disponibili == Integer.MAX_VALUE) {

@@ -172,7 +172,8 @@ public class Libro {
                 this.annoPubblicazione,
                 variante.getPrezzo().getPrezzo(),
                 variante.getPrezzo().getPrezzoTotale(),
-                variante.getPrezzo().getSconto()
+                variante.getPrezzo().getSconto(),
+                variante.getId()
         );
     }
 

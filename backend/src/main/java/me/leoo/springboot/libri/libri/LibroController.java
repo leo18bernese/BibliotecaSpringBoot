@@ -47,9 +47,10 @@ public class LibroController {
                                  int recensioneMedia, int numeroRecensioni) {
     }
 
-    public record LiteBookResponse(Long libroId, String titolo, String autore, String editore, int annoPubblicazione,
+    public record LiteBookResponse(Long libroId, String titolo, String autore, String editore,
+                                   int annoPubblicazione,
                                    double prezzoOriginale, double prezzo,
-                                   Sconto sconto) {
+                                   Sconto sconto, Long varianteId) {
     }
 
     // DTO per creazione
@@ -130,7 +131,6 @@ public class LibroController {
         if (libroOptional.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
 
         try {
             Libro libro = libroOptional.get();

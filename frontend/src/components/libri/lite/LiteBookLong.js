@@ -80,14 +80,23 @@ const LiteBookLong = ({bookID, book: providedBook, index}) => {
     const sconto = book.sconto;
     const hasSconto = sconto && (sconto.percentuale > 0 || sconto.valore > 0);
 
+    const topColorsMap = {
+        1: 'bg-yellow-400 text-white',
+        2: 'bg-gray-400 text-white',
+        3: 'bg-yellow-600 text-white',
+    };
+
     return (
         <>
-            <div className="bg-white shadow-lg rounded-2xl ">
+            <div className="bg-white shadow-lg rounded-2xl hover:bg-gray-200 transition-all">
                 <div className=" flex flex-grow">
 
                     { (
-                        <div className="text-2xl font-bold px-8 my-auto">
-                            {index}
+                        <div className={'text-2xl font-bold px-8 mx-3 my-auto ' +
+                            (topColorsMap[index + 1] || 'bg-blue-300 text-white') +
+                            ' rounded-full w-12 h-12 flex items-center justify-center'}>
+
+                            {index !== undefined ? index + 1 : ''}
                         </div>
                     )}
 

@@ -14,6 +14,7 @@ import Varianti from "./Varianti";
 import RecensioneInfo from "../../recensioni/RecensioneInfo";
 import {useAnalyticsMutation} from "../../admin/book/chart/useAnalytics";
 import CategoryMap from "../../category/CategoryMap";
+import { useCartPrompt } from "../../carrello/CartPromptContext";
 
 const API_URL = '/api/images';
 
@@ -83,6 +84,7 @@ const BookInfo = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const {updateCartItemMutation} = useCartMutations();
+    const { showCartPrompt } = useCartPrompt();
     const {addEventMutation} = useAnalyticsMutation();
 
     const bookId = Number.parseInt(id);
@@ -254,6 +256,18 @@ const BookInfo = () => {
             bookId: book.id,
             varianteId: selectedVariant.id,
             quantity: quantity,
+        }, {
+            onSuccess: (data) => {
+
+                showCartPrompt(
+                    book.id,
+                    book.titolo,
+                    selectedVariant.prezzo.prezzoTotale.toFixed(2),
+                    quantity
+                );
+
+                toast.success('Articolo aggiornato nel carrello');
+            }
         });
     }
 
@@ -471,13 +485,13 @@ const BookInfo = () => {
                                             </p>
                                         )}
 
-                                        <p className="text-2xl font-semibold mb-2">
+                                        <p className="text-3xl font-bold mb-2">
                                             {selectedVariant.prezzo.prezzoTotale.toFixed(2)} €
                                         </p>
 
                                         <div className="group relative flex items-center">
                                               <span
-                                                  className="w-4 h-4 bg-gray-400 text-white text-xs rounded-full flex items-center justify-center cursor-help">
+                                                  className="w-4 h-4 border border-gray-400 text-gray-400 text-xs font-semibold rounded-full flex items-center justify-center cursor-help">
                                                 i
                                               </span>
                                             <div
@@ -502,7 +516,7 @@ const BookInfo = () => {
                                     )}
 
                                     <p className="mb-8">
-                                        Variante selezionata: <b>{selectedVariant.nome}</b>
+                                        <span className="text-gray-500">Variante selezionata:</span> <b>{selectedVariant.nome}</b>
                                     </p>
 
 
@@ -554,7 +568,7 @@ const BookInfo = () => {
                                                 </button>
 
                                                 <input type="number"
-                                                       className="w-14 md:w-16 text-center border-4 border-blue-500 p-1 md:p-1.5 rounded-lg text-blue-800 text-sm md:text-base"
+                                                       className="w-14 md:w-16 text-center no-spinner border-4 border-blue-500 p-1 md:p-1.5 rounded-lg text-blue-800 focus:outline-none  focus:ring-0 text-sm md:text-base"
                                                        value={quantityToAdd}
                                                        min={1}
                                                        max={quantitaDisponibile}
@@ -585,7 +599,7 @@ const BookInfo = () => {
                                                 <button
                                                     className={`w-full sm:flex-grow ${isUpdateButtonDisabled ?
                                                         'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
-                                                    text-white font-semibold py-2 px-2 md:px-4 rounded-xl transition text-sm md:text-base min-w-0`}
+                                                    text-white font-semibold py-2 px-2 md:px-4 rounded-md transition text-sm md:text-base min-w-0`}
                                                     onClick={() => updateItem(quantityToAdd)}
                                                     disabled={isUpdateButtonDisabled}
                                                 >
@@ -601,7 +615,7 @@ const BookInfo = () => {
 
                                         {isDisponibile && (
                                             <button
-                                                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-2 md:px-4 rounded-xl transition text-sm md:text-base">
+                                                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-2 md:px-4 rounded-md transition text-sm md:text-base">
                                                 <span className="truncate">Acquista Ora</span>
                                             </button>
                                         )}

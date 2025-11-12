@@ -1,10 +1,13 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {useWishlist} from "../wishlist/WishlistContext";
 import {UserContext} from "../../user/UserContext";
-import { fetchTopItems } from "../../admin/book/chart/useAnalytics";
+import {fetchTopItems} from "../../admin/book/chart/useAnalytics";
+import toast from "react-hot-toast";
+import {useAuth} from "../../user/AuthContext";
+import {useCartMutations} from "../../hook/useCartMutations";
 
 const fetchBookById = async (id) => {
     const {data} = await axios.get(`/api/libri/lite/${id}`);
@@ -14,7 +17,7 @@ const fetchBookById = async (id) => {
 const fetchBookImage = async (id) => {
     try {
         // richiedo il blob dell'immagine per evitare che l'<img> faccia una seconda richiesta
-        const response = await axios.get(`/api/images/${id}/first`, { responseType: 'blob' });
+        const response = await axios.get(`/api/images/${id}/first`, {responseType: 'blob'});
         return response.data; // Blob o null
     } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -29,6 +32,9 @@ const fetchBookImage = async (id) => {
 const LiteBook = ({bookID, book: providedBook}) => {
 
     const {user, isAdminMode} = useContext(UserContext);
+    const {showLoginPrompt} = useAuth();
+    const {updateCartItemMutation} = useCartMutations();
+
     const bookId = bookID || providedBook?.libroId;
 
     const {data: parsedBook, isLoading: isBookLoading, error: bookError} = useQuery({
@@ -71,6 +77,29 @@ const LiteBook = ({bookID, book: providedBook}) => {
         queryFn: () => fetchTopItems('BEST_SELLERS_UNITS'),
     });
 
+    const updateItem = (quantity) => {
+        if (!user) {
+            showLoginPrompt();
+            return;
+        }
+
+        if (!book.varianteId || book.varianteId < 1) {
+            toast.error('Go to book page to select variant.');
+            return;
+        }
+
+        updateCartItemMutation.mutate({
+            bookId: book.id,
+            varianteId: book.varianteId,
+            quantity: quantity,
+        });
+
+        /* updateCartItemMutation.mutate({
+             bookId: book.id,
+             varianteId: selectedVariant.id,
+             quantity: quantity,
+         });*/
+    }
 
     const {hasWishlisted, isLoadingWishlist, addToWishlist, removeFromWishlist} =
         useWishlist(bookId);
@@ -92,9 +121,19 @@ const LiteBook = ({bookID, book: providedBook}) => {
     const sconto = book.sconto;
     const hasSconto = sconto && (sconto.percentuale > 0 || sconto.valore > 0);
 
-    const topText = (topViewed && topViewed.find(id => id === bookId)) ? 'Top Visited ' :
-    (topPurchased && topPurchased.find(id => id === bookId)) ? 'Best Seller' : null;
+    const topInfo = (() => {
+        if (topViewed && topViewed.includes(bookId)) {
+            const pos = topViewed.findIndex(id => id === bookId) + 1;
+            return { text: 'Top Visited', position: pos };
+        }
 
+        if (topPurchased && topPurchased.includes(bookId)) {
+            const pos = topPurchased.findIndex(id => id === bookId) + 1;
+            return { text: 'Best Seller', position: pos };
+        }
+
+        return { text: null, position: null };
+    })();
 
     return (
         <>
@@ -107,7 +146,7 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
                             <div
                                 className={`w-full rounded-md h-64 
-                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : imageSrc ? '' : 
+                                ${isImageLoading ? 'bg-gray-200 animate-pulse' : imageError ? 'bg-red-200' : imageSrc ? '' :
                                     'bg-gray-200 flex items-center justify-center'}`}
                                 style={{height: '250px'}}
                             >
@@ -126,9 +165,10 @@ const LiteBook = ({bookID, book: providedBook}) => {
                                 )}
                             </div>
 
-                            {topText && (
-                                <div className="absolute -top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                    {topText}
+                            {topInfo.text && (
+                                <div
+                                    className="absolute -top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                    {topInfo.text} #{topInfo.position}
                                 </div>
                             )}
 
@@ -191,8 +231,9 @@ const LiteBook = ({bookID, book: providedBook}) => {
 
                                 </div>
 
-                                <button className="bg-blue-100 rounded-full  hover:bg-blue-200 transition-colors">
-                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600' ></i>
+                                <button className="bg-blue-100 rounded-full  hover:bg-blue-200 transition-colors"
+                                        onClick={() => updateItem(1)}>
+                                    <i className='bxr bx-cart-plus text-2xl px-3 text-blue-600'></i>
                                 </button>
                             </h3>
                         </div>
