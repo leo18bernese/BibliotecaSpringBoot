@@ -7,6 +7,7 @@ import HomepageSellers from "./components/utils/HomepageSellers";
 import CategoryDisplay from "./components/category/CategoryDisplay";
 import BookDisplay from "./components/libri/BookDisplay";
 import {Toaster} from "react-hot-toast";
+import {Carousel} from "antd";
 
 
 const fetchHomepageItems = async () => {
@@ -64,7 +65,11 @@ export default function Home() {
                 )}
             </header>
 
-            <HomepageSellers/>
+            <Carousel>
+                <HomepageSellers/>
+                <HomepageSellers/>
+                <HomepageSellers/>
+            </Carousel>
 
             {/* Categorie */}
             {getTitle("Featured Categories", "/categories")}
